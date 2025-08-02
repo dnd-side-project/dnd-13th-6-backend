@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: runners-server
+
+  profiles:
+    active: local  # 기본 활성 프로필 (local or prod)
+
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true

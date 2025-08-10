@@ -7,6 +7,13 @@ public class GlobalException extends RuntimeException {
 	@Getter
 	private final ErrorCode errorCode;
 
+	/**
+	 * Constructs a new GlobalException with the specified ErrorCode.
+	 *
+	 * The exception message is set to the message provided by the given ErrorCode.
+	 *
+	 * @param errorCode the ErrorCode representing the specific error condition
+	 */
 	public GlobalException(ErrorCode errorCode) {
         super(errorCode.getMessage());
 		this.errorCode = errorCode;

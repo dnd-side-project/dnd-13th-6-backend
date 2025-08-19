@@ -40,11 +40,11 @@ runky:
       ttlMinutes: ${SIGNUP_TTL}
     jwt:
       access:
-        secret-key: ${ACCESS_SECRET_KEY}
+        secret-key: ${JWT_ACCESS_SECRET}
         expiration-minutes: ${ACCESS_EXPIRATION}
         algorithm: ${ACCESS_ALGORITHM}
       refresh:
-        secret-key: ${REFRESH_SECRET_KEY}
+        secret-key: ${JWT_REFRESH_SECRET}
         expiration-minutes: ${REFRESH_EXPIRATION}
         algorithm: ${REFRESH_ALGORITHM}
 
@@ -52,7 +52,7 @@ runky:
       hash:
         mode: ${REFRESH_HASH_MODE}
         algorithm: ${REFRESH_HASH_ALGORITHM}
-        pepper: ${REFRESH_HASH_PEPPER}
+        pepper: ${REFRESH_TOKEN_PEPPER}
 
     cookie:
       common:

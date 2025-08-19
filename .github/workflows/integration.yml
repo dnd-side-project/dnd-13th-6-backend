@@ -1,0 +1,65 @@
+name: Runky Integration Workflow
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # DB 환경변수
+      MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+      MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+      MYSQL_USER: ${{ secrets.MYSQL_USER }}
+      MYSQL_PWD: ${{ secrets.MYSQL_PWD }}
+
+      # KAKAO
+      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+      KAKAO_REDIRECT_URL: ${{ secrets.KAKAO_REDIRECT_URL }}
+
+      # TOKEN
+      JWT_ACCESS_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
+      JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+      ACCESS_ALGORITHM: ${{ secrets.ACCESS_ALGORITHM }}
+      ACCESS_EXPIRATION: ${{ secrets.ACCESS_EXPIRATION }}
+      REFRESH_ALGORITHM: ${{ secrets.REFRESH_ALGORITHM }}
+      REFRESH_EXPIRATION: ${{ secrets.REFRESH_EXPIRATION }}
+      REFRESH_HASH_ALGORITHM: ${{ secrets.REFRESH_HASH_ALGORITHM }}
+      REFRESH_HASH_MODE: ${{ secrets.REFRESH_HASH_MODE }}
+      REFRESH_TOKEN_PEPPER: ${{ secrets.REFRESH_TOKEN_PEPPER }}
+      SIGNUP_TTL : ${{ secrets.SIGNUP_TTL }}
+
+
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: JDK 21 설정
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: corretto
+
+      - name: Gradle 의존성 캐싱
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/caches/build-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+
+
+      - name: Gradle 권한 부여
+        run: chmod +x ./gradlew
+        shell: bash
+
+      - name: Gradle로 테스트 및 커버리지 리포트 생성
+        run: ./gradlew clean build -x test
+        env:
+          SPRING_PROFILES_ACTIVE: prod

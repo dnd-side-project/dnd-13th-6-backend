@@ -14,13 +14,10 @@
     </springProfile>
 
     <springProfile name="prod">
+        <springProperty name="LOG_PATH" source="LOG_PATH" defaultValue="logs"/>
 
-        <!-- 스프링 프로파일 설정 (개발/운영 환경 분리 가능) -->
-        <springProperty name="LOG_PATH" source="LOG_PATH" defaultValue="/home/logs"/>
-
-        <!-- 콘솔 출력용 Appender -->
-        <include resource="appenders/json-console-appender.xml"/>
-        <include resource="appenders/slack-appender.xml"/>
+        <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
 
         <!-- 로그 파일 저장용 RollingFileAppender -->
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -32,7 +29,7 @@
                 <!-- 최대 보관 개수 설정 (예: 14일) -->
                 <maxHistory>14</maxHistory>
                 <!-- 파일 크기 제한 (최대 크기 이후 롤링) -->
-                <totalSizeCap>10MB</totalSizeCap>
+                <totalSizeCap>100MB</totalSizeCap>
             </rollingPolicy>
 
             <encoder>

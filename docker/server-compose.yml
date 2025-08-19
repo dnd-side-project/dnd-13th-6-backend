@@ -1,0 +1,9 @@
+services:
+  server:
+    image: ${DOCKER_USERNAME}/runky:${TAG}
+    container_name: runky-server
+    ports:
+      - "80:8080"
+    env_file:
+      - .env
+    restart: always

@@ -41,7 +41,7 @@ class DeviceTokenServiceTest {
 				.thenAnswer(inv -> inv.getArgument(0));
 
 			// when
-			deviceTokenService.register(new DeviceTokenCommand.Register(1L, "tkn-123"));
+			deviceTokenService.register(new DeviceTokenCommand.Register(1L, "tkn-123", "MOBILE"));
 
 			// then
 			verify(deviceTokenRepository)
@@ -59,7 +59,7 @@ class DeviceTokenServiceTest {
 
 			// when
 			GlobalException thrown = assertThrows(GlobalException.class,
-				() -> deviceTokenService.register(new DeviceTokenCommand.Register(1L, "dup-token")));
+				() -> deviceTokenService.register(new DeviceTokenCommand.Register(1L, "dup-token", "MOBILE")));
 
 			// then
 			assertThat(thrown)
@@ -117,7 +117,7 @@ class DeviceTokenServiceTest {
 
 			// when
 			DeviceTokenInfo.View view =
-				deviceTokenService.view(new DeviceTokenCommand.Find(1L, "tkn-123"));
+				deviceTokenService.getDeviceToken(new DeviceTokenCommand.Find(1L, "tkn-123"));
 
 			// then
 			assertThat(view.id()).isEqualTo(10L);
@@ -133,7 +133,7 @@ class DeviceTokenServiceTest {
 				.thenReturn(Optional.empty());
 
 			GlobalException thrown = assertThrows(GlobalException.class,
-				() -> deviceTokenService.view(new DeviceTokenCommand.Find(1L, "nope")));
+				() -> deviceTokenService.getDeviceToken(new DeviceTokenCommand.Find(1L, "nope")));
 
 			assertThat(thrown)
 				.usingRecursiveComparison()

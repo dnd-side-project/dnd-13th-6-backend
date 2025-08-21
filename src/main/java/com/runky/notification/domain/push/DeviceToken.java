@@ -33,14 +33,18 @@ public class DeviceToken extends BaseTimeEntity {
 	@Column(name = "token", nullable = false, length = 512, unique = true)
 	private String token;
 
+	@Column(name = "device_type", nullable = false, unique = true)
+	private String deviceType;
+
 	@Column(name = "active", nullable = false)
 	private boolean active;
 
-	public static DeviceToken register(Long memberId, String token) {
+	public static DeviceToken register(Long memberId, String token, String deviceType) {
 		return DeviceToken.builder()
 			.memberId(memberId)
 			.token(token)
 			.active(true)
+			.deviceType(deviceType)
 			.build();
 	}
 

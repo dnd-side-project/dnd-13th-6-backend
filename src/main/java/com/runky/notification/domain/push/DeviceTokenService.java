@@ -17,7 +17,7 @@ public class DeviceTokenService {
 
 	@Transactional
 	public void register(DeviceTokenCommand.Register command) {
-		DeviceToken deviceToken = DeviceToken.register(command.memberId(), command.token());
+		DeviceToken deviceToken = DeviceToken.register(command.memberId(), command.token(), command.deviceType());
 		try {
 			deviceTokenRepository.save(deviceToken);
 		} catch (DataIntegrityViolationException e) {
@@ -39,7 +39,7 @@ public class DeviceTokenService {
 	}
 
 	@Transactional(readOnly = true)
-	public DeviceTokenInfo.View view(DeviceTokenCommand.Find cmd) {
+	public DeviceTokenInfo.View getDeviceToken(DeviceTokenCommand.Find cmd) {
 		return deviceTokenRepository.findByMemberIdAndToken(cmd.memberId(), cmd.token())
 			.map(dt -> new DeviceTokenInfo.View(dt.getId(), dt.getMemberId(), dt.getToken(), dt.isActive()))
 			.orElseThrow(() -> new GlobalException(NotificationErrorCode.NOT_FOUND_DEVICE_TOKEN));

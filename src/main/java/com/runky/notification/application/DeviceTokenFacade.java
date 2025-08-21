@@ -17,7 +17,8 @@ public class DeviceTokenFacade {
 
 	@Transactional
 	public void register(DeviceTokenCriteria.Register criteria) {
-		deviceTokenService.register(new DeviceTokenCommand.Register(criteria.memberId(), criteria.token()));
+		deviceTokenService.register(new DeviceTokenCommand.Register(criteria.memberId(), criteria.token(),
+			criteria.deviceType()));
 	}
 
 	@Transactional

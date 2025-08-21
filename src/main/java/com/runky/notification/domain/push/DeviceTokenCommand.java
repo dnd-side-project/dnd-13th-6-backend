@@ -10,6 +10,9 @@ public sealed interface DeviceTokenCommand {
 	}
 
 	// Query //
-	record Find(Long memberId, String token) implements DeviceTokenCommand {
+	record Get(Long memberId, String deviceType) implements DeviceTokenCommand {
+	}
+
+	record Existence(Long memberId, String deviceType) implements DeviceTokenCommand {
 	}
 }

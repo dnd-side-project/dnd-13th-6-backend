@@ -39,15 +39,16 @@ public class DeviceTokenService {
 	}
 
 	@Transactional(readOnly = true)
-	public DeviceTokenInfo.View getDeviceToken(DeviceTokenCommand.Find cmd) {
-		return deviceTokenRepository.findByMemberIdAndToken(cmd.memberId(), cmd.token())
+	public DeviceTokenInfo.View getDeviceToken(DeviceTokenCommand.Get cmd) {
+		return deviceTokenRepository.findByMemberIdAndDeviceType(cmd.memberId(), cmd.deviceType())
 			.map(dt -> new DeviceTokenInfo.View(dt.getId(), dt.getMemberId(), dt.getToken(), dt.isActive()))
 			.orElseThrow(() -> new GlobalException(NotificationErrorCode.NOT_FOUND_DEVICE_TOKEN));
 	}
 
 	@Transactional(readOnly = true)
-	public DeviceTokenInfo.Existence isExists(DeviceTokenCommand.Find command) {
-		boolean exists = deviceTokenRepository.existsActiveByMemberIdAndToken(command.memberId(), command.token());
+	public DeviceTokenInfo.Existence isExists(DeviceTokenCommand.Existence command) {
+		boolean exists = deviceTokenRepository.existsActiveByMemberIdAndDeviceType(command.memberId(),
+			command.deviceType());
 		return new DeviceTokenInfo.Existence((exists));
 	}
 

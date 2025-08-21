@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/device-tokens")
 @RequiredArgsConstructor
-public class DeviceTokenController {
+public class DeviceTokenController implements DeviceTokenApiSpec {
 
 	private final DeviceTokenFacade deviceTokenFacade;
 

@@ -42,7 +42,7 @@ public class DeviceTokenService {
 	public DeviceTokenInfo.View view(DeviceTokenCommand.Find cmd) {
 		return deviceTokenRepository.findByMemberIdAndToken(cmd.memberId(), cmd.token())
 			.map(dt -> new DeviceTokenInfo.View(dt.getId(), dt.getMemberId(), dt.getToken(), dt.isActive()))
-			.orElseThrow(() -> new GlobalException(NotificationErrorCode.NOT_EXIST_TO_DELETE_DEVICE_TOKEN));
+			.orElseThrow(() -> new GlobalException(NotificationErrorCode.NOT_FOUND_DEVICE_TOKEN));
 	}
 
 	@Transactional(readOnly = true)

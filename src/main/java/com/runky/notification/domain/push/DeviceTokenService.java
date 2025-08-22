@@ -1,5 +1,7 @@
 package com.runky.notification.domain.push;
 
+import static com.runky.notification.domain.push.PushInfo.*;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +18,7 @@ public class DeviceTokenService {
 	private final DeviceTokenRepository deviceTokenRepository;
 
 	@Transactional
-	public void register(DeviceTokenCommand.Register command) {
+	public void register(PushCommand.DeviceToken.Register command) {
 		DeviceToken deviceToken = DeviceToken.register(command.memberId(), command.token(), command.deviceType());
 		try {
 			deviceTokenRepository.save(deviceToken);
@@ -29,7 +31,7 @@ public class DeviceTokenService {
 	}
 
 	@Transactional
-	public DeviceTokenInfo.DeletionResult delete(DeviceTokenCommand.Delete command) {
+	public DeviceTokenInfo.DeletionResult delete(PushCommand.DeviceToken.Delete command) {
 		int deletedCount = deviceTokenRepository.deleteByMemberIdAndToken(command.memberId(), command.token());
 
 		if (deletedCount == 0) {
@@ -39,19 +41,19 @@ public class DeviceTokenService {
 	}
 
 	@Transactional(readOnly = true)
-	public DeviceTokenInfo.ActiveToken getActiveToken(DeviceTokenCommand.Get cmd) {
+	public DeviceTokenInfo.ActiveToken getActiveToken(PushCommand.DeviceToken.Get cmd) {
 		return deviceTokenRepository.findByMemberId(cmd.memberId())
 			.map(dt -> new DeviceTokenInfo.ActiveToken(dt.getToken()))
 			.orElseThrow(() -> new GlobalException(NotificationErrorCode.NOT_FOUND_DEVICE_TOKEN));
 	}
 
 	@Transactional(readOnly = true)
-	public DeviceTokenInfo.ActiveTokens getActiveTokens(DeviceTokenCommand.Gets command) {
+	public DeviceTokenInfo.ActiveTokens getActiveTokens(PushCommand.DeviceToken.Gets command) {
 		return new DeviceTokenInfo.ActiveTokens(deviceTokenRepository.findActiveTokensByMemberIds(command.memberIds()));
 	}
 
 	@Transactional(readOnly = true)
-	public DeviceTokenInfo.ExistenceCheck isExists(DeviceTokenCommand.CheckExistence command) {
+	public DeviceTokenInfo.ExistenceCheck isExists(PushCommand.DeviceToken.CheckExistence command) {
 		boolean exists = deviceTokenRepository.existsActiveByMemberId(command.memberId());
 		return new DeviceTokenInfo.ExistenceCheck((exists));
 	}

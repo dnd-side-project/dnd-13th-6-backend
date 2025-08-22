@@ -12,13 +12,6 @@ import com.runky.notification.domain.push.DeviceToken;
 
 interface DeviceTokenJpaRepository extends JpaRepository<DeviceToken, Long> {
 
-	@Query("""
-		  select dt.token
-		  from DeviceToken dt
-		  where dt.memberId in :memberIds and dt.active = true
-		""")
-	List<String> findActiveTokensByMemberIds(@Param("memberIds") List<Long> memberIds);
-
 	@Modifying
 	@Query("delete from DeviceToken dt where dt.memberId = :memberId and dt.token = :token")
 	int deleteByMemberIdAndToken(@Param("memberId") Long memberId, @Param("token") String token);
@@ -27,14 +20,20 @@ interface DeviceTokenJpaRepository extends JpaRepository<DeviceToken, Long> {
 	@Query("update DeviceToken dt set dt.active = false where dt.token in :tokens")
 	void deactivateTokens(@Param("tokens") List<String> tokens);
 
-	Optional<DeviceToken> findByMemberIdAndDeviceType(Long memberId, String deviceType);
+	Optional<DeviceToken> findByMemberId(Long memberId);
+
+	@Query("""
+		  select dt.token
+		  from DeviceToken dt
+		  where dt.memberId in :memberIds and dt.active = true
+		""")
+	List<String> findActiveTokensByMemberIds(@Param("memberIds") List<Long> memberIds);
 
 	@Query("""
 		  select case when count(dt) > 0 then true else false end
 		  from DeviceToken dt
-		  where dt.memberId = :memberId and dt.deviceType = :deviceType and dt.active = true
+		  where dt.memberId = :memberId and dt.active = true
 		""")
-	boolean existsActiveByMemberIdAndDeviceType(@Param("memberId") Long memberId,
-		@Param("deviceType") String deviceType);
+	boolean existsActiveByMemberId(@Param("memberId") Long memberId);
 
 }

@@ -1,18 +1,18 @@
 package com.runky.notification.api;
 
-import com.runky.notification.application.DeviceTokenCriteria;
+import com.runky.notification.application.NotificationCriteria;
 
 public sealed interface DeviceTokenRequest {
 
 	record Register(String token, String deviceType) implements DeviceTokenRequest {
-		DeviceTokenCriteria.Register toCriteria(Long memberId) {
-			return new DeviceTokenCriteria.Register(memberId, token, deviceType);
+		NotificationCriteria.RegisterDeviceToken toCriteria(Long memberId) {
+			return new NotificationCriteria.RegisterDeviceToken(memberId, token, deviceType);
 		}
 	}
 
 	record Delete(String token) implements DeviceTokenRequest {
-		DeviceTokenCriteria.Delete toCriteria(Long memberId) {
-			return new DeviceTokenCriteria.Delete(memberId, token);
+		NotificationCriteria.DeleteDeviceToken toCriteria(Long memberId) {
+			return new NotificationCriteria.DeleteDeviceToken(memberId, token);
 
 		}
 	}

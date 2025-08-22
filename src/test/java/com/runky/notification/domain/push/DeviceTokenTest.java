@@ -10,7 +10,7 @@ class DeviceTokenTest {
 
 	@Nested
 	@DisplayName("DeviceToken.register()")
-	class Register {
+	class RegisterDeviceToken {
 		@Test
 		@DisplayName("memberId, token으로 active=true 상태의 토큰을 생성한다.")
 		void createActiveToken() {

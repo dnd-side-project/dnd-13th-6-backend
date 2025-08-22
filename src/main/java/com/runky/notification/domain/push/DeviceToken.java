@@ -33,7 +33,7 @@ public class DeviceToken extends BaseTimeEntity {
 	@Column(name = "token", nullable = false, length = 512, unique = true)
 	private String token;
 
-	@Column(name = "device_type", nullable = false, unique = true)
+	@Column(name = "device_type", nullable = false)
 	private String deviceType;
 
 	@Column(name = "active", nullable = false)

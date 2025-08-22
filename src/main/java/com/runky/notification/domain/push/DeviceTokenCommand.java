@@ -1,5 +1,7 @@
 package com.runky.notification.domain.push;
 
+import java.util.List;
+
 public sealed interface DeviceTokenCommand {
 
 	// Command //
@@ -10,9 +12,12 @@ public sealed interface DeviceTokenCommand {
 	}
 
 	// Query //
-	record Get(Long memberId, String deviceType) implements DeviceTokenCommand {
+	record Get(Long memberId) implements DeviceTokenCommand {
 	}
 
-	record Existence(Long memberId, String deviceType) implements DeviceTokenCommand {
+	record Gets(List<Long> memberIds) implements DeviceTokenCommand {
+	}
+
+	record CheckExistence(Long memberId) implements DeviceTokenCommand {
 	}
 }

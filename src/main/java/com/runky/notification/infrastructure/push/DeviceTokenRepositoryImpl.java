@@ -36,8 +36,8 @@ public class DeviceTokenRepositoryImpl implements DeviceTokenRepository {
 	}
 
 	@Override
-	public Optional<DeviceToken> findByMemberIdAndDeviceType(final Long memberId, final String deviceType) {
-		return jpa.findByMemberIdAndDeviceType(memberId, deviceType);
+	public Optional<DeviceToken> findByMemberId(final Long memberId) {
+		return jpa.findByMemberId(memberId);
 	}
 
 	/** 조회(읽기) 중심 **/
@@ -47,8 +47,8 @@ public class DeviceTokenRepositoryImpl implements DeviceTokenRepository {
 	}
 
 	@Override
-	public boolean existsActiveByMemberIdAndDeviceType(Long memberId, String deviceType) {
-		return jpa.existsActiveByMemberIdAndDeviceType(memberId, deviceType);
+	public boolean existsActiveByMemberId(Long memberId) {
+		return jpa.existsActiveByMemberId(memberId);
 	}
 
 }

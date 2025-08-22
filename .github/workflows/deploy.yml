@@ -57,6 +57,7 @@ jobs:
           echo "REFRESH_TOKEN_PEPPER=${{ secrets.REFRESH_TOKEN_PEPPER }}" >> ./docker/.env
           echo "SIGNUP_TTL=${{ secrets.SIGNUP_TTL }}" >> ./docker/.env
           echo "TAG=${{ github.sha }}" >> ./docker/.env
+          echo "FCM_PRIVATE_KEY=${{ secrets.FCM_PRIVATE_KEY }}" >> ./docker/.env 
 
       - name: Docker 이미지 빌드 및 푸시
         run: |

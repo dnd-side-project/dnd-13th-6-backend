@@ -1,6 +1,7 @@
 package com.runky.reward.api;
 
 import com.runky.global.response.ApiResponse;
+import com.runky.reward.api.RewardResponse.Images;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,7 +13,7 @@ public interface RewardApiSpec {
             summary = "내 캐릭터 목록 조회",
             description = "내가 보유한 캐릭터 목록을 조회합니다."
     )
-    ApiResponse<RewardResponse.Characters> getCharacters(
+    ApiResponse<Images> getBadges(
             @Schema(name = "사용자 ID", description = "X-USER-ID로 로그인 대체") Long userId
     );
 

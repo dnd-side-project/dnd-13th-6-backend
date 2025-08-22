@@ -47,6 +47,8 @@ dependencies {
     // Firebase-FCM
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
 
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

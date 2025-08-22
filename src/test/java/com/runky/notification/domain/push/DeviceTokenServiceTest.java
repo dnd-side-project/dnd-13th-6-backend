@@ -1,5 +1,6 @@
 package com.runky.notification.domain.push;
 
+import static com.runky.notification.domain.push.PushInfo.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -39,7 +40,7 @@ class DeviceTokenServiceTest {
 				.thenAnswer(inv -> inv.getArgument(0));
 
 			// when
-			deviceTokenService.register(new DeviceTokenCommand.Register(1L, "tkn-123", "MOBILE"));
+			deviceTokenService.register(new PushCommand.DeviceToken.Register(1L, "tkn-123", "MOBILE"));
 
 			// then
 			verify(deviceTokenRepository)
@@ -57,7 +58,7 @@ class DeviceTokenServiceTest {
 
 			// when
 			GlobalException thrown = assertThrows(GlobalException.class,
-				() -> deviceTokenService.register(new DeviceTokenCommand.Register(1L, "dup-token", "MOBILE")));
+				() -> deviceTokenService.register(new PushCommand.DeviceToken.Register(1L, "dup-token", "MOBILE")));
 
 			// then
 			assertThat(thrown)
@@ -77,7 +78,7 @@ class DeviceTokenServiceTest {
 
 			// when
 			DeviceTokenInfo.DeletionResult result =
-				deviceTokenService.delete(new DeviceTokenCommand.Delete(1L, "tkn-123"));
+				deviceTokenService.delete(new PushCommand.DeviceToken.Delete(1L, "tkn-123"));
 
 			// then
 			assertThat(result.count()).isEqualTo(1);
@@ -91,7 +92,7 @@ class DeviceTokenServiceTest {
 
 			// when
 			GlobalException thrown = assertThrows(GlobalException.class,
-				() -> deviceTokenService.delete(new DeviceTokenCommand.Delete(1L, "nope")));
+				() -> deviceTokenService.delete(new PushCommand.DeviceToken.Delete(1L, "nope")));
 
 			// then
 			assertThat(thrown)
@@ -110,7 +111,7 @@ class DeviceTokenServiceTest {
 				.thenReturn(true);
 
 			DeviceTokenInfo.ExistenceCheck existenceCheck =
-				deviceTokenService.isExists(new DeviceTokenCommand.CheckExistence(1L));
+				deviceTokenService.isExists(new PushCommand.DeviceToken.CheckExistence(1L));
 
 			assertThat(existenceCheck.exists()).isTrue();
 		}
@@ -122,7 +123,7 @@ class DeviceTokenServiceTest {
 				.thenReturn(false);
 
 			DeviceTokenInfo.ExistenceCheck existenceCheck =
-				deviceTokenService.isExists(new DeviceTokenCommand.CheckExistence(1L));
+				deviceTokenService.isExists(new PushCommand.DeviceToken.CheckExistence(1L));
 
 			assertThat(existenceCheck.exists()).isFalse();
 		}

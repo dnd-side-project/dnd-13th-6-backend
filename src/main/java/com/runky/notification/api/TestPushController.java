@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.runky.global.response.ApiResponse;
-import com.runky.notification.application.NotificationCriteria;
-import com.runky.notification.application.NotificationFacade;
+import com.runky.notification.domain.push.PushCommand;
+import com.runky.notification.domain.push.PushService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,19 +18,19 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/test/api/device-tokens")
 @RequiredArgsConstructor
 public class TestPushController {
-	private final NotificationFacade notificationFacade;
+	private final PushService pushService;
 
 	@PostMapping("/sendToOne")
 	public ApiResponse<?> sendToOne(@RequestBody SendToOne request) {
-		var result = notificationFacade.pushToOne(
-			new NotificationCriteria.PushToOne(request.memberId, request.title, request.body, request.data));
+		var result = pushService.pushToOne(
+			new PushCommand.Push.ToOne(request.memberId, request.title, request.body, request.data));
 		return ApiResponse.success(result);
 	}
 
 	@PostMapping("/sendToMany")
 	public ApiResponse<?> sendToMany(@RequestBody SendToMany request) {
-		var result = notificationFacade.pushToMany(
-			new NotificationCriteria.PushToMany(request.memberIds, request.title, request.body, request.data));
+		var result = pushService.pushToMany(
+			new PushCommand.Push.ToMany(request.memberIds, request.title, request.body, request.data));
 		return ApiResponse.success(result);
 	}
 

@@ -1,5 +1,7 @@
 package com.runky.notification.application;
 
+import static com.runky.notification.application.NotificationResult.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,21 +13,21 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class DeviceTokenFacade {
+public class NotificationFacade {
 
 	private final DeviceTokenService deviceTokenService;
 
 	@Transactional
-	public void register(DeviceTokenCriteria.Register criteria) {
+	public void registerDeviceToken(NotificationCriteria.RegisterDeviceToken criteria) {
 		deviceTokenService.register(new DeviceTokenCommand.Register(criteria.memberId(), criteria.token(),
 			criteria.deviceType()));
 	}
 
 	@Transactional
-	public DeviceTokenResult.Delete delete(DeviceTokenCriteria.Delete criteria) {
-		DeviceTokenInfo.Delete info = deviceTokenService.delete(
+	public DeviceTokenDeletionResult deleteDeviceToken(NotificationCriteria.DeleteDeviceToken criteria) {
+		DeviceTokenInfo.DeletionResult info = deviceTokenService.delete(
 			new DeviceTokenCommand.Delete(criteria.memberId(), criteria.token()));
 
-		return new DeviceTokenResult.Delete(info.count());
+		return new DeviceTokenDeletionResult(info.count());
 	}
 }

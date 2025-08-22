@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.google.firebase.messaging.BatchResponse;
@@ -20,6 +21,7 @@ import com.runky.notification.domain.push.PushSender;
 import lombok.RequiredArgsConstructor;
 
 @Service
+@Profile("prod")
 @RequiredArgsConstructor
 public class FirebaseCloudMessagingClient implements PushSender {
 

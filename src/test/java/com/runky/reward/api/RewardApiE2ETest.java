@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.runky.global.response.ApiResponse;
 import com.runky.reward.domain.Badge;
 import com.runky.reward.domain.BadgeRepository;
+import com.runky.reward.domain.Clover;
+import com.runky.reward.domain.CloverRepository;
 import com.runky.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +30,8 @@ class RewardApiE2ETest {
     private DatabaseCleanUp databaseCleanUp;
     @Autowired
     private BadgeRepository badgeRepository;
+    @Autowired
+    private CloverRepository cloverRepository;
 
     @AfterEach
     void tearDown() {
@@ -54,6 +58,28 @@ class RewardApiE2ETest {
 
             assertThat(response.getBody().getResult().badges()).hasSize(1);
             assertThat(response.getBody().getResult().badges().get(0).badge()).isEqualTo(badge1.getImageUrl());
+        }
+    }
+
+    @Nested
+    @DisplayName("GET api/rewards/clovers")
+    class GetCloverCount {
+        final String BASE_URL = "/api/rewards/clovers";
+
+        @Test
+        @DisplayName("유저의 클로버 개수를 조회한다.")
+        void getCloverCount() {
+            Clover clover = Clover.of(1L);
+            clover.add(1000L);
+            cloverRepository.save(clover);
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", "1");
+
+            ResponseEntity<ApiResponse<RewardResponse.Clover>> response =
+                    testRestTemplate.exchange(BASE_URL, HttpMethod.GET, new HttpEntity<>(httpHeaders),
+                            new ParameterizedTypeReference<>() {});
+
+            assertThat(response.getBody().getResult().count()).isEqualTo(1000L);
         }
     }
 }

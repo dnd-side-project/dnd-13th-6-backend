@@ -1,6 +1,7 @@
 package com.runky.reward.application;
 
 import com.runky.reward.domain.Badge;
+import com.runky.reward.domain.Clover;
 import com.runky.reward.domain.RewardCommand;
 import com.runky.reward.domain.RewardService;
 import java.util.List;
@@ -18,5 +19,10 @@ public class RewardFacade {
         return badges.stream()
                 .map(RewardResult.Image::from)
                 .toList();
+    }
+
+    public RewardResult.Clover getClover(RewardCriteria.User criteria) {
+        Clover clover = rewardService.getClover(new RewardCommand.GetClover(criteria.userId()));
+        return new RewardResult.Clover(clover.getUserId(), clover.getCount());
     }
 }

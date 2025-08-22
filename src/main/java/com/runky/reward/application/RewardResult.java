@@ -11,4 +11,10 @@ public class RewardResult {
             return new Image(image.getImageUrl());
         }
     }
+
+    public record Clover(
+            Long userId,
+            Long count
+    ) {
+    }
 }

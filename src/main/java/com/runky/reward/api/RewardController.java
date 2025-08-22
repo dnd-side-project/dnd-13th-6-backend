@@ -34,7 +34,9 @@ public class RewardController implements RewardApiSpec {
     }
 
     @Override
-    public ApiResponse<RewardResponse.Clover> getCloverCount(Long userId) {
-        return ApiResponse.success(new RewardResponse.Clover(23L));
+    @GetMapping("/clovers")
+    public ApiResponse<RewardResponse.Clover> getCloverCount(@RequestHeader("X-USER-ID") Long userId) {
+        RewardResult.Clover result = rewardFacade.getClover(new RewardCriteria.User(userId));
+        return ApiResponse.success(new RewardResponse.Clover(result.count()));
     }
 }

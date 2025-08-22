@@ -7,6 +7,11 @@ public class RewardCommand {
     ) {
     }
 
+    public record GetClover(
+            Long userId
+    ) {
+    }
+
     private RewardCommand() {
     }
 }

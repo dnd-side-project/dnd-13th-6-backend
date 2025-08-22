@@ -1,15 +1,21 @@
 package com.runky.notification.domain.push;
 
+import java.util.List;
+
 public sealed interface DeviceTokenInfo {
 
-	record Delete(int count) implements DeviceTokenInfo {
+	record DeletionResult(int count) implements DeviceTokenInfo {
 	}
 
-	record View(Long id, Long memberId, String token, boolean active) implements DeviceTokenInfo {
+	record ActiveToken(String token) implements DeviceTokenInfo {
 
 	}
 
-	record Existence(boolean exists) implements DeviceTokenInfo {
+	record ActiveTokens(List<String> tokens) implements DeviceTokenInfo {
+
+	}
+
+	record ExistenceCheck(boolean exists) implements DeviceTokenInfo {
 
 	}
 

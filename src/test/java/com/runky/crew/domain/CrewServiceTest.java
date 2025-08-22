@@ -122,7 +122,7 @@ class CrewServiceTest {
 
 	@Nested
 	@DisplayName("크루원 목록 조회 시,")
-	class GetMembers {
+	class FindMembers {
 
 		@Test
 		@DisplayName("크루가 존재하지 않으면 NOT_FOUND_CREW 예외를 발생시킨다.")

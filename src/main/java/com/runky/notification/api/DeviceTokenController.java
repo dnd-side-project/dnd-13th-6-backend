@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.runky.global.response.ApiResponse;
-import com.runky.notification.application.DeviceTokenFacade;
-import com.runky.notification.application.DeviceTokenResult;
+import com.runky.notification.application.NotificationFacade;
+import com.runky.notification.application.NotificationResult;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,14 +18,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DeviceTokenController implements DeviceTokenApiSpec {
 
-	private final DeviceTokenFacade deviceTokenFacade;
+	private final NotificationFacade notificationFacade;
 
 	@PostMapping
 	public ApiResponse<Void> register(
 		@RequestHeader("X-USER-ID") Long userId,
 		@RequestBody DeviceTokenRequest.Register request
 	) {
-		deviceTokenFacade.register(request.toCriteria(userId));
+		notificationFacade.registerDeviceToken(request.toCriteria(userId));
 		return ApiResponse.ok();
 	}
 
@@ -34,7 +34,8 @@ public class DeviceTokenController implements DeviceTokenApiSpec {
 		@RequestHeader("X-USER-ID") Long userId,
 		@RequestBody DeviceTokenRequest.Delete request
 	) {
-		DeviceTokenResult.Delete result = deviceTokenFacade.delete(request.toCriteria(userId));
+		NotificationResult.DeviceTokenDeletionResult result = notificationFacade.deleteDeviceToken(
+			request.toCriteria(userId));
 		return ApiResponse.success(new DeviceTokenResponse.Delete(result.count()));
 	}
 }

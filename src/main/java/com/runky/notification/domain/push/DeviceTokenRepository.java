@@ -11,11 +11,11 @@ public interface DeviceTokenRepository {
 
 	void deactivateTokens(List<String> tokens);
 
-	Optional<DeviceToken> findByMemberIdAndToken(Long memberId, String token); // 운영/정합 목적
+	Optional<DeviceToken> findByMemberId(Long memberId); // 운영/정합 목적
 
 	/** 조회(읽기) 중심 **/
 	List<String> findActiveTokensByMemberIds(List<Long> memberIds);
 
-	boolean existsActiveByMemberIdAndToken(Long memberId, String token);
+	boolean existsActiveByMemberId(Long memberId);
 
 }

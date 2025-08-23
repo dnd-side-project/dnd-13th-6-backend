@@ -31,6 +31,7 @@ public class MemberService {
         return member;
     }
 
+    @Transactional
     public Member changeBadge(MemberCommand.ChangeBadge command) {
         Member member = memberRepository.findById(command.memberId())
                 .orElseThrow(() -> new GlobalException(MemberErrorCode.MEMBER_NOT_FOUND));

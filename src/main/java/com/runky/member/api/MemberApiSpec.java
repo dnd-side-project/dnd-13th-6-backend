@@ -2,8 +2,6 @@ package com.runky.member.api;
 
 
 import com.runky.global.response.ApiResponse;
-import com.runky.member.api.MemberResponse.Badge;
-import com.runky.member.api.MemberResponse.Nickname;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,7 +21,7 @@ public interface MemberApiSpec {
             summary = "닉네임 변경",
             description = "사용자의 닉네임을 변경합니다."
     )
-    ApiResponse<Nickname> changeNickname(
+    ApiResponse<MemberResponse.Nickname> changeNickname(
             @Schema(name = "닉네임 변경 요청", description = "변경할 닉네임") MemberRequest.Nickname request,
             Long userId
     );
@@ -32,8 +30,17 @@ public interface MemberApiSpec {
             summary = "대표 캐릭터 변경",
             description = "사용자의 대표 캐릭터를 변경합니다."
     )
-    ApiResponse<Badge> changeNickname(
+    ApiResponse<MemberResponse.Badge> changeNickname(
             @Schema(name = "캐릭터 변경 요청", description = "변경할 캐릭터 ID") MemberRequest.Badge request,
+            Long userId
+    );
+
+    @Operation(
+            summary = "유저 대표 뱃지 조회",
+            description = "유저의 대표 뱃지 정보를 조회합니다."
+    )
+    ApiResponse<MemberResponse.Badge> getMemberBadge(
+            Long targetId,
             Long userId
     );
 }

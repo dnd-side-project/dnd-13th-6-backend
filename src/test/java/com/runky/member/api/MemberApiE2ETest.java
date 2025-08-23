@@ -121,4 +121,32 @@ class MemberApiE2ETest {
             assertThat(response.getBody().getResult().badgeImageUrl()).isEqualTo(badge2.getImageUrl());
         }
     }
+
+    @Nested
+    @DisplayName("GET /api/members/{memberId}/badge")
+    class GetMemberBadge {
+        @Test
+        @DisplayName("특정 유저의 뱃지를 조회한다.")
+        void getMemberBadge() {
+            Member member1 = memberRepository.save(Member.register(ExternalAccount.of("kakao", "1234"), "nick1"));
+            Badge badge1 = badgeRepository.save(Badge.of("뱃지1", "image1"));
+            member1.changeBadge(badge1.getId());
+            MemberBadge memberBadge1 = badge1.issue(member1.getId());
+            badgeRepository.save(memberBadge1);
+
+            Member member2 = memberRepository.save(Member.register(ExternalAccount.of("kakao", "5678"), "nick2"));
+
+            ParameterizedTypeReference<ApiResponse<MemberResponse.Badge>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", member2.getId().toString());
+
+            ResponseEntity<ApiResponse<MemberResponse.Badge>> response = testRestTemplate.exchange(
+                    "/api/members/" + member1.getId() + "/badge",
+                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+
+            assertThat(response.getBody().getResult().id()).isEqualTo(member1.getId());
+            assertThat(response.getBody().getResult().badgeImageUrl()).isEqualTo(badge1.getImageUrl());
+        }
+    }
 }

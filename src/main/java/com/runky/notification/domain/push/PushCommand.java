@@ -6,11 +6,13 @@ import java.util.Map;
 public sealed interface PushCommand {
 
 	sealed interface Push extends PushCommand {
-		record ToOne(Long memberId, String title, String body, Map<String, String> data) implements Push {
+		record ToOne(Long senderId, Long receiverId, String title, String body, Map<String, String> data)
+			implements Push {
 
 		}
 
-		record ToMany(List<Long> memberIds, String title, String body, Map<String, String> data) implements Push {
+		record ToMany(Long senderId, List<Long> receiverIds, String title, String body, Map<String, String> data)
+			implements Push {
 
 		}
 	}

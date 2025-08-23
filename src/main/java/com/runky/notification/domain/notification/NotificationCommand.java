@@ -10,4 +10,8 @@ public sealed interface NotificationCommand {
 
 	record Records(Long senderId, List<Long> receiverIds, String title, String message) implements NotificationCommand {
 	}
+
+	record GetRecentTopN(Long receiverId, int limit) implements NotificationCommand {
+	}
+
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,8 +15,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Table(
+	name = "notifications",
+	indexes = {
+		@Index(name = "ix_notifications_receiver_id", columnList = "receiver_id"),
+		@Index(name = "ix_notifications_receiver_created_at", columnList = "receiver_id,created_at")
+	}
+)
 @Entity
-@Table(name = "notifications")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

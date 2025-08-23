@@ -18,7 +18,7 @@ public class MemberFacade {
 
     public MemberResult.WithBadge getMember(MemberCriteria.Get criteria) {
         Member member = memberService.getMember(new MemberCommand.Find(criteria.memberId()));
-        Badge badge = rewardService.getBadge(new RewardCommand.Find(member.getId()));
+        Badge badge = rewardService.getBadge(new RewardCommand.Find(member.getBadgeId()));
         return MemberResult.WithBadge.of(member, badge);
     }
 

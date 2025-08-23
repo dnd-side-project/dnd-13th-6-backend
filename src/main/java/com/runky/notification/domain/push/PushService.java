@@ -7,6 +7,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.runky.notification.domain.notification.NotificationCommand;
+import com.runky.notification.domain.notification.NotificationService;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -15,13 +18,16 @@ public class PushService {
 
 	private final DeviceTokenService deviceTokenService;
 	private final PushSendService pushSendService;
+	private final NotificationService notificationService;
 
 	@Transactional
 	public SenTPush.Summary pushToOne(PushCommand.Push.ToOne command) {
-		String token = deviceTokenService.getActiveToken(new PushCommand.DeviceToken.Push.Get(command.memberId()))
+		String token = deviceTokenService.getActiveToken(new PushCommand.DeviceToken.Push.Get(command.receiverId()))
 			.token();
 		PushSender.SendResult sendResult = pushSendService.sendToOne(token, command.title(), command.body(),
 			command.data());
+		notificationService.record(
+			new NotificationCommand.Record(command.senderId(), command.receiverId(), command.title(), command.body()));
 		return new SenTPush.Summary(sendResult.success(), sendResult.failure(), sendResult.invalidTokens());
 
 	}
@@ -29,10 +35,13 @@ public class PushService {
 	@Transactional
 	public SenTPush.Summary pushToMany(PushCommand.Push.ToMany command) {
 		List<String> tokens = deviceTokenService.getActiveTokens(
-				new PushCommand.DeviceToken.Push.Gets(command.memberIds()))
+				new PushCommand.DeviceToken.Push.Gets(command.receiverIds()))
 			.tokens();
 		PushSender.SendResult sendResult = pushSendService.sendToMany(tokens, command.title(), command.body(),
 			command.data());
+		notificationService.records(
+			new NotificationCommand.Records(command.senderId(), command.receiverIds(), command.title(),
+				command.body()));
 		return new SenTPush.Summary(sendResult.success(), sendResult.failure(), sendResult.invalidTokens());
 	}
 

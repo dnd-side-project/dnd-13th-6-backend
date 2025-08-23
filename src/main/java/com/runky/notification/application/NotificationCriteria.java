@@ -9,4 +9,8 @@ public sealed interface NotificationCriteria {
 	record DeleteDeviceToken(Long memberId, String token) implements NotificationCriteria {
 
 	}
+
+	record GetRecentTopN(Long receiverId, int limit) implements NotificationCriteria {
+	}
+
 }

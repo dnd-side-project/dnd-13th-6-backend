@@ -29,8 +29,8 @@ public class RewardController implements RewardApiSpec {
     }
 
     @Override
-    public ApiResponse<RewardResponse.Draw> drawCharacter(Long userId) {
-        return ApiResponse.success(new RewardResponse.Draw("/character15.png"));
+    public ApiResponse<RewardResponse.Draw> drawBadge(Long userId) {
+        return ApiResponse.success(new RewardResponse.Draw("/badge12.png"));
     }
 
     @Override

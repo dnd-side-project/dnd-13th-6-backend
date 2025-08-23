@@ -38,4 +38,19 @@ class RewardServiceTest {
                 .usingRecursiveComparison()
                 .isEqualTo(new GlobalException(RewardErrorCode.NOT_FOUND_CLOVER));
     }
+
+    @Test
+    @DisplayName("뱃지 조회 시, 뱃지가 없으면, NOT_FOUND_BADGE 예외가 발생한다.")
+    void throwNotFoundBadgeException_whenBadgeNotFound() {
+        given(badgeRepository.findBadge(1L))
+                .willReturn(Optional.empty());
+
+        RewardCommand.Find command = new RewardCommand.Find(1L);
+
+        GlobalException exception = assertThrows(GlobalException.class, () -> rewardService.getBadge(command));
+
+        assertThat(exception)
+                .usingRecursiveComparison()
+                .isEqualTo(new GlobalException(RewardErrorCode.NOT_FOUND_BADGE));
+    }
 }

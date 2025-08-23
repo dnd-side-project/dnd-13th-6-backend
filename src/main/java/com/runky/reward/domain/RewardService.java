@@ -20,6 +20,12 @@ public class RewardService {
     }
 
     @Transactional(readOnly = true)
+    public Badge getBadge(RewardCommand.Find command) {
+        return badgeRepository.findBadge(command.badgeId())
+                .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_BADGE));
+    }
+
+    @Transactional(readOnly = true)
     public Clover getClover(RewardCommand.GetClover command) {
         return cloverRepository.findByUserId(command.userId())
                 .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_CLOVER));

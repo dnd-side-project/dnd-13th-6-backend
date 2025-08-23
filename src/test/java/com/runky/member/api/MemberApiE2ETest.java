@@ -50,20 +50,21 @@ class MemberApiE2ETest {
         @Test
         @DisplayName("유저의 정보를 조회한다.")
         void getMember() {
-            Member member = memberRepository.save(Member.register(ExternalAccount.of("kakao", "1234"), "nick"));
+            Member member = Member.register(ExternalAccount.of("kakao", "1234"), "nick");
             Badge badge = badgeRepository.save(Badge.of("뱃지1", "image1"));
             member.changeBadge(badge.getId());
+            Member savedMember = memberRepository.save(member);
 
             ParameterizedTypeReference<ApiResponse<MemberResponse.Detail>> responseType = new ParameterizedTypeReference<>() {
             };
             HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.set("X-USER-ID", member.getId().toString());
+            httpHeaders.set("X-USER-ID", savedMember.getId().toString());
 
             ResponseEntity<ApiResponse<MemberResponse.Detail>> response = testRestTemplate.exchange(BASE_URL,
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
-            assertThat(response.getBody().getResult().userId()).isEqualTo(member.getId());
-            assertThat(response.getBody().getResult().nickname()).isEqualTo(member.getNickname().value());
+            assertThat(response.getBody().getResult().userId()).isEqualTo(savedMember.getId());
+            assertThat(response.getBody().getResult().nickname()).isEqualTo(savedMember.getNickname().value());
             assertThat(response.getBody().getResult().badgeUrl()).isEqualTo(badge.getImageUrl());
         }
     }
@@ -74,19 +75,20 @@ class MemberApiE2ETest {
         @Test
         @DisplayName("유저의 닉네임을 변경한다.")
         void changeNickname() {
-            Member member = memberRepository.save(Member.register(ExternalAccount.of("kakao", "1234"), "nick"));
+            Member member = Member.register(ExternalAccount.of("kakao", "1234"), "nick");
+            Member savedMember = memberRepository.save(member);
 
             ParameterizedTypeReference<ApiResponse<MemberResponse.Nickname>> responseType = new ParameterizedTypeReference<>() {
             };
             HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.set("X-USER-ID", member.getId().toString());
+            httpHeaders.set("X-USER-ID", savedMember.getId().toString());
             MemberRequest.Nickname request = new MemberRequest.Nickname("newNick");
 
             ResponseEntity<ApiResponse<MemberResponse.Nickname>> response = testRestTemplate.exchange(
                     "/api/members/me/nickname",
                     HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders), responseType);
 
-            assertThat(response.getBody().getResult().userId()).isEqualTo(member.getId());
+            assertThat(response.getBody().getResult().userId()).isEqualTo(savedMember.getId());
             assertThat(response.getBody().getResult().nickname()).isEqualTo("newNick");
         }
     }

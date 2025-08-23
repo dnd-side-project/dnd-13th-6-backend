@@ -26,6 +26,6 @@ public class BadgeRepositoryImpl implements BadgeRepository {
 
     @Override
     public List<Badge> findBadgesOfUser(Long userId) {
-        return badgeJpaRepository.findCharactersByUserId(userId);
+        return badgeJpaRepository.findBadgesOf(userId);
     }
 }

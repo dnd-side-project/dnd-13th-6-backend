@@ -21,7 +21,7 @@ public class RewardController implements RewardApiSpec {
     @Override
     @GetMapping("/badges")
     public ApiResponse<RewardResponse.Images> getBadges(@RequestHeader("X-USER-ID") Long userId) {
-        List<RewardResult.Image> results = rewardFacade.getMyCharacters(new RewardCriteria.User(userId));
+        List<RewardResult.Badge> results = rewardFacade.getMyBadges(new RewardCriteria.Find(userId));
         RewardResponse.Images response = new RewardResponse.Images(results.stream()
                 .map(result -> new RewardResponse.Image(result.ImageUrl()))
                 .toList());
@@ -36,7 +36,7 @@ public class RewardController implements RewardApiSpec {
     @Override
     @GetMapping("/clovers")
     public ApiResponse<RewardResponse.Clover> getCloverCount(@RequestHeader("X-USER-ID") Long userId) {
-        RewardResult.Clover result = rewardFacade.getClover(new RewardCriteria.User(userId));
+        RewardResult.Clover result = rewardFacade.getClover(new RewardCriteria.Find(userId));
         return ApiResponse.success(new RewardResponse.Clover(result.count()));
     }
 }

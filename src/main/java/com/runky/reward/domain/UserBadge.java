@@ -19,7 +19,7 @@ public class UserBadge extends BaseTimeEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "character_id", nullable = false)
+    @Column(name = "badge_id", nullable = false)
     private Long badgeId;
 
     protected UserBadge() {

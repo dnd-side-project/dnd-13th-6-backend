@@ -14,14 +14,14 @@ public class RewardFacade {
 
     private final RewardService rewardService;
 
-    public List<RewardResult.Image> getMyCharacters(RewardCriteria.User criteria) {
+    public List<RewardResult.Badge> getMyBadges(RewardCriteria.Find criteria) {
         List<Badge> badges = rewardService.getBadges(new RewardCommand.GetBadges(criteria.userId()));
         return badges.stream()
-                .map(RewardResult.Image::from)
+                .map(badge -> new RewardResult.Badge(badge.getImageUrl(), badge.getName()))
                 .toList();
     }
 
-    public RewardResult.Clover getClover(RewardCriteria.User criteria) {
+    public RewardResult.Clover getClover(RewardCriteria.Find criteria) {
         Clover clover = rewardService.getClover(new RewardCommand.GetClover(criteria.userId()));
         return new RewardResult.Clover(clover.getUserId(), clover.getCount());
     }

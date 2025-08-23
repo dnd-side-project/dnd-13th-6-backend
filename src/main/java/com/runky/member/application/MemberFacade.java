@@ -21,4 +21,9 @@ public class MemberFacade {
         Badge badge = rewardService.getBadge(new RewardCommand.Find(member.getId()));
         return MemberResult.WithBadge.of(member, badge);
     }
+
+    public MemberResult changeNickname(MemberCriteria.ChangeNickname criteria) {
+        Member member = memberService.changeNickname(criteria.toCommand());
+        return MemberResult.from(member);
+    }
 }

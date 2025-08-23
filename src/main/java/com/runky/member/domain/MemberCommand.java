@@ -9,4 +9,10 @@ public class MemberCommand {
             Long memberId
     ) {
     }
+
+    public record ChangeNickname(
+            Long memberId,
+            String nickname
+    ) {
+    }
 }

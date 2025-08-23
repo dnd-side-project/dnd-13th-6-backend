@@ -30,7 +30,9 @@ public class MemberController implements MemberApiSpec {
     @PatchMapping("/nickname")
     public ApiResponse<MemberResponse.Nickname> changeNickname(@RequestBody MemberRequest.Nickname request,
                                                                @RequestHeader("X-USER-ID") Long userId) {
-        return ApiResponse.success(new MemberResponse.Nickname(5L, "nickname"));
+        MemberResult result = memberFacade.changeNickname(
+                new MemberCriteria.ChangeNickname(userId, request.nickname()));
+        return ApiResponse.success(new MemberResponse.Nickname(result.id(), result.nickname()));
     }
 
     @Override

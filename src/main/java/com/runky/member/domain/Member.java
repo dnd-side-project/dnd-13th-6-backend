@@ -65,4 +65,8 @@ public class Member {
     public void changeBadge(Long badgeId) {
         this.badgeId = badgeId;
     }
+
+    public void changeNickname(String nickname) {
+        this.nickname = new Nickname(nickname);
+    }
 }

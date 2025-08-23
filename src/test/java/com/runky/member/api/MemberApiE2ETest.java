@@ -66,4 +66,27 @@ class MemberApiE2ETest {
             assertThat(response.getBody().getResult().badgeUrl()).isEqualTo(badge.getImageUrl());
         }
     }
+
+    @Nested
+    @DisplayName("PATCH /api/members/me/nickname")
+    class ChangeNickname {
+        @Test
+        @DisplayName("유저의 닉네임을 변경한다.")
+        void changeNickname() {
+            Member member = memberRepository.save(Member.register(ExternalAccount.of("kakao", "1234"), "nick"));
+
+            ParameterizedTypeReference<ApiResponse<MemberResponse.Nickname>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", member.getId().toString());
+            MemberRequest.Nickname request = new MemberRequest.Nickname("newNick");
+
+            ResponseEntity<ApiResponse<MemberResponse.Nickname>> response = testRestTemplate.exchange(
+                    "/api/members/me/nickname",
+                    HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders), responseType);
+
+            assertThat(response.getBody().getResult().id()).isEqualTo(member.getId());
+            assertThat(response.getBody().getResult().nickname()).isEqualTo("newNick");
+        }
+    }
 }

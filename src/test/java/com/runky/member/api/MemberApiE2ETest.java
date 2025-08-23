@@ -1,0 +1,69 @@
+package com.runky.member.api;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.runky.global.response.ApiResponse;
+import com.runky.member.domain.ExternalAccount;
+import com.runky.member.domain.Member;
+import com.runky.member.domain.MemberRepository;
+import com.runky.reward.domain.Badge;
+import com.runky.reward.domain.BadgeRepository;
+import com.runky.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class MemberApiE2ETest {
+
+    @Autowired
+    private TestRestTemplate testRestTemplate;
+    @Autowired
+    private DatabaseCleanUp databaseCleanUp;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private BadgeRepository badgeRepository;
+
+    @AfterEach
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
+    }
+
+    @Nested
+    @DisplayName("GET /api/members/me")
+    class Get {
+
+        private final String BASE_URL = "/api/members/me";
+
+        @Test
+        @DisplayName("유저의 정보를 조회한다.")
+        void getMember() {
+            Member member = memberRepository.save(Member.register(ExternalAccount.of("kakao", "1234"), "nick"));
+            Badge badge = badgeRepository.save(Badge.of("뱃지1", "image1"));
+            member.changeBadge(badge.getId());
+
+            ParameterizedTypeReference<ApiResponse<MemberResponse.Detail>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", member.getId().toString());
+
+            ResponseEntity<ApiResponse<MemberResponse.Detail>> response = testRestTemplate.exchange(BASE_URL,
+                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+
+            assertThat(response.getBody().getResult().id()).isEqualTo(member.getId());
+            assertThat(response.getBody().getResult().nickname()).isEqualTo(member.getNickname().value());
+            assertThat(response.getBody().getResult().badgeUrl()).isEqualTo(badge.getImageUrl());
+        }
+    }
+}

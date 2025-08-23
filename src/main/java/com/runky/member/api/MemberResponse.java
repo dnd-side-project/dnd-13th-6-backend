@@ -5,7 +5,7 @@ public class MemberResponse {
     public record Detail(
             Long id,
             String nickname,
-            String character
+            String badgeUrl
     ) {
     }
 

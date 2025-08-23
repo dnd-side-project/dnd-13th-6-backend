@@ -4,6 +4,7 @@ import com.runky.reward.domain.Badge;
 import com.runky.reward.domain.BadgeRepository;
 import com.runky.reward.domain.UserBadge;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +28,10 @@ public class BadgeRepositoryImpl implements BadgeRepository {
     @Override
     public List<Badge> findBadgesOfUser(Long userId) {
         return badgeJpaRepository.findBadgesOf(userId);
+    }
+
+    @Override
+    public Optional<Badge> findBadge(Long badgeId) {
+        return badgeJpaRepository.findById(badgeId);
     }
 }

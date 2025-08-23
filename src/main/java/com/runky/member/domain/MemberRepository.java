@@ -1,8 +1,6 @@
-package com.runky.member.domain.port;
+package com.runky.member.domain;
 
 import java.util.Optional;
-
-import com.runky.member.domain.Member;
 
 public interface MemberRepository {
 	boolean existsByExternalAccountProviderAndExternalAccountProviderId(String provider, String providerId);
@@ -11,4 +9,5 @@ public interface MemberRepository {
 
 	Member save(Member member);
 
+    Optional<Member> findById(Long id);
 }

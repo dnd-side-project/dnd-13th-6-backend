@@ -6,15 +6,29 @@ import com.runky.reward.domain.Badge;
 public record MemberResult(
         Long id,
         String role,
-        String nickname,
-        String badgeUrl
+        String nickname
 ) {
-    public static MemberResult of(Member member, Badge badge) {
+    public static MemberResult from(Member member) {
         return new MemberResult(
                 member.getId(),
                 member.getRole().name(),
-                member.getNickname().value(),
-                badge.getImageUrl()
+                member.getNickname().value()
         );
+    }
+
+    public record WithBadge(
+            Long id,
+            String role,
+            String nickname,
+            String badgeUrl
+    ) {
+        public static MemberResult.WithBadge of(Member member, Badge badge) {
+            return new MemberResult.WithBadge(
+                    member.getId(),
+                    member.getRole().name(),
+                    member.getNickname().value(),
+                    badge.getImageUrl()
+            );
+        }
     }
 }

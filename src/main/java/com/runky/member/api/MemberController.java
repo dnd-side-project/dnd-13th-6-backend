@@ -22,7 +22,7 @@ public class MemberController implements MemberApiSpec {
     @Override
     @GetMapping
     public ApiResponse<MemberResponse.Detail> getMyInfo(@RequestHeader("X-USER-ID") Long userId) {
-        MemberResult result = memberFacade.getMember(new MemberCriteria.Get(userId));
+        MemberResult.WithBadge result = memberFacade.getMember(new MemberCriteria.Get(userId));
         return ApiResponse.success(new MemberResponse.Detail(result.id(), result.nickname(), result.badgeUrl()));
     }
 

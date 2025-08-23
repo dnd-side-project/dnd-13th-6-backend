@@ -9,5 +9,7 @@ public interface RunningRepository {
 
 	Optional<Running> findByIdAndRunnerId(Long id, Long runnerId);
 
+	Optional<Long> findRunnerIdById(Long id);
+
 	Running save(Running running);
 }

@@ -30,6 +30,11 @@ public class RunningRepositoryImpl implements RunningRepository {
 	}
 
 	@Override
+	public Optional<Long> findRunnerIdById(final Long id) {
+		return jpaRepository.findRunnerIdById(id);
+	}
+
+	@Override
 	public Running save(final Running running) {
 		jpaRepository.save(running);
 		return running;

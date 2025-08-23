@@ -13,4 +13,6 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 
 	boolean existsByIdAndStatus(Long id, Running.Status status);
 
+	Optional<Long> findRunnerIdById(Long id);
+
 }

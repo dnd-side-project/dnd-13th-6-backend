@@ -58,4 +58,9 @@ public class RunningService {
 	public boolean isActive(final Long runningId) {
 		return runningRepository.existsByIdAndStatus(runningId, Running.Status.RUNNING);
 	}
+
+	public Long getRunnerId(final Long runningId) {
+		return runningRepository.findRunnerIdById(runningId)
+			.orElseThrow(() -> new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING));
+	}
 }

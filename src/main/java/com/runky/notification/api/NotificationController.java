@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/notifications")
 @RequiredArgsConstructor
-public class NotificationController {
+public class NotificationController implements NotificationApiSpec {
 	private static final int DEFAULT_LIMIT = 10;
 
 	private final NotificationFacade notificationFacade;

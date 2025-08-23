@@ -20,7 +20,7 @@ public record MemberResult(
             Long id,
             String role,
             String nickname,
-            String badgeUrl
+            String badgeImageUrl
     ) {
         public static MemberResult.WithBadge of(Member member, Badge badge) {
             return new MemberResult.WithBadge(

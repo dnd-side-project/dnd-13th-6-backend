@@ -23,7 +23,7 @@ public class MemberController implements MemberApiSpec {
     @GetMapping
     public ApiResponse<MemberResponse.Detail> getMyInfo(@RequestHeader("X-USER-ID") Long userId) {
         MemberResult.WithBadge result = memberFacade.getMember(new MemberCriteria.Get(userId));
-        return ApiResponse.success(new MemberResponse.Detail(result.id(), result.nickname(), result.badgeUrl()));
+        return ApiResponse.success(new MemberResponse.Detail(result.id(), result.nickname(), result.badgeImageUrl()));
     }
 
     @Override
@@ -36,9 +36,11 @@ public class MemberController implements MemberApiSpec {
     }
 
     @Override
-    @PatchMapping("/character")
-    public ApiResponse<MemberResponse.Character> changeCharacter(@RequestBody MemberRequest.Character request,
-                                                                 @RequestHeader("X-USER-ID") Long userId) {
-        return ApiResponse.success(new MemberResponse.Character(5L, "badgeUrl"));
+    @PatchMapping("/badge")
+    public ApiResponse<MemberResponse.Badge> changeNickname(@RequestBody MemberRequest.Badge request,
+                                                            @RequestHeader("X-USER-ID") Long userId) {
+        MemberResult.WithBadge result = memberFacade.changeBadge(
+                new MemberCriteria.ChangeBadge(userId, request.badgeId()));
+        return ApiResponse.success(new MemberResponse.Badge(result.id(), result.badgeImageUrl()));
     }
 }

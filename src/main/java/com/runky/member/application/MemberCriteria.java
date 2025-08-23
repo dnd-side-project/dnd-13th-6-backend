@@ -12,4 +12,7 @@ public class MemberCriteria {
             return new MemberCommand.ChangeNickname(memberId, nickname);
         }
     }
+
+    public record ChangeBadge(Long memberId, Long badgeId) {
+    }
 }

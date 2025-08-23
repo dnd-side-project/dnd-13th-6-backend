@@ -15,9 +15,9 @@ public class MemberResponse {
     ) {
     }
 
-    public record Character(
+    public record Badge(
             Long id,
-            String character
+            String badgeImageUrl
     ) {
     }
 

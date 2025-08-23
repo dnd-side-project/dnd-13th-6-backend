@@ -8,6 +8,7 @@ import com.runky.member.domain.Member;
 import com.runky.member.domain.MemberRepository;
 import com.runky.reward.domain.Badge;
 import com.runky.reward.domain.BadgeRepository;
+import com.runky.reward.domain.MemberBadge;
 import com.runky.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -87,6 +88,37 @@ class MemberApiE2ETest {
 
             assertThat(response.getBody().getResult().id()).isEqualTo(member.getId());
             assertThat(response.getBody().getResult().nickname()).isEqualTo("newNick");
+        }
+    }
+
+    @Nested
+    @DisplayName("PATCH /api/members/me/badge")
+    class ChangeBadge {
+
+        @Test
+        @DisplayName("유저의 뱃지를 변경한다.")
+        void changeBadge() {
+            Member member = memberRepository.save(Member.register(ExternalAccount.of("kakao", "1234"), "nick"));
+            Badge badge1 = badgeRepository.save(Badge.of("뱃지1", "image1"));
+            member.changeBadge(badge1.getId());
+            MemberBadge memberBadge1 = badge1.issue(member.getId());
+            badgeRepository.save(memberBadge1);
+            Badge badge2 = badgeRepository.save(Badge.of("뱃지2", "image2"));
+            MemberBadge memberBadge2 = badge2.issue(member.getId());
+            badgeRepository.save(memberBadge2);
+
+            ParameterizedTypeReference<ApiResponse<MemberResponse.Badge>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", member.getId().toString());
+            MemberRequest.Badge request = new MemberRequest.Badge(badge2.getId());
+
+            ResponseEntity<ApiResponse<MemberResponse.Badge>> response = testRestTemplate.exchange(
+                    "/api/members/me/badge",
+                    HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders), responseType);
+
+            assertThat(response.getBody().getResult().id()).isEqualTo(member.getId());
+            assertThat(response.getBody().getResult().badgeImageUrl()).isEqualTo(badge2.getImageUrl());
         }
     }
 }

@@ -30,4 +30,11 @@ public class MemberService {
         }
         return member;
     }
+
+    public Member changeBadge(MemberCommand.ChangeBadge command) {
+        Member member = memberRepository.findById(command.memberId())
+                .orElseThrow(() -> new GlobalException(MemberErrorCode.MEMBER_NOT_FOUND));
+        member.changeBadge(command.badgeId());
+        return member;
+    }
 }

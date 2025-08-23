@@ -23,7 +23,7 @@ class CloverTest {
     }
 
     @Test
-    @DisplayName("클로버 충전 시, 보유 수량이 사용 수량보다 적으면, INSUFFICIENT_CLOVER 예외가 발생한다.")
+    @DisplayName("클로버 사용시 시, 보유 수량이 사용 수량보다 적으면, INSUFFICIENT_CLOVER 예외가 발생한다.")
     void throwException_whenUseMoreThanCount() {
         Clover clover = Clover.of(1L);
         clover.add(10L);

@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import com.runky.utils.DatabaseCleanUp;
 
 @SpringBootTest
 class NotificationServiceTest {
@@ -17,6 +20,14 @@ class NotificationServiceTest {
 
 	@Autowired
 	NotificationRepository notificationRepository;
+
+	@Autowired
+	private DatabaseCleanUp databaseCleanUp;
+
+	@AfterEach
+	void tearDown() {
+		databaseCleanUp.truncateAllTables();
+	}
 
 	@DisplayName("최신순(생성일 내림차순, id 내림차순)으로 최대 10개의 알림을 조회한다.")
 	@Test

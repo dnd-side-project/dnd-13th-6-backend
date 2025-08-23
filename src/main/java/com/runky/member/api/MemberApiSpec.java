@@ -27,10 +27,10 @@ public interface MemberApiSpec {
     );
 
     @Operation(
-            summary = "대표 캐릭터 변경",
-            description = "사용자의 대표 캐릭터를 변경합니다."
+            summary = "대표 뱃지 변경",
+            description = "사용자의 대표 뱃지를 변경합니다."
     )
-    ApiResponse<MemberResponse.Badge> changeNickname(
+    ApiResponse<MemberResponse.Badge> changeBadge(
             @Schema(name = "캐릭터 변경 요청", description = "변경할 캐릭터 ID") MemberRequest.Badge request,
             Long userId
     );

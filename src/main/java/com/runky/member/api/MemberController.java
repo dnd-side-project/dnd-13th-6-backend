@@ -38,8 +38,8 @@ public class MemberController implements MemberApiSpec {
 
     @Override
     @PatchMapping("/me/badge")
-    public ApiResponse<MemberResponse.Badge> changeNickname(@RequestBody MemberRequest.Badge request,
-                                                            @RequestHeader("X-USER-ID") Long userId) {
+    public ApiResponse<MemberResponse.Badge> changeBadge(@RequestBody MemberRequest.Badge request,
+                                                         @RequestHeader("X-USER-ID") Long userId) {
         MemberResult.WithBadge result = memberFacade.changeBadge(
                 new MemberCriteria.ChangeBadge(userId, request.badgeId()));
         return ApiResponse.success(new MemberResponse.Badge(result.id(), result.badgeImageUrl()));

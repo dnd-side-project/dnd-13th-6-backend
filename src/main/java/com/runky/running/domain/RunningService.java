@@ -2,7 +2,6 @@ package com.runky.running.domain;
 
 import java.time.LocalDateTime;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 public class RunningService {
 
 	private final RunningRepository runningRepository;
-	private final ApplicationEventPublisher events;
 	private final RunningTrackRepository trackRepository;
 
 	@Transactional
@@ -55,5 +53,9 @@ public class RunningService {
 
 		return new RunningInfo.End(running.getId(), running.getRunnerId(), running.getStatus().toString(),
 			running.getStartedAt(), running.getEndedAt());
+	}
+
+	public boolean isActive(final Long runningId) {
+		return runningRepository.existsByIdAndStatus(runningId, Running.Status.RUNNING);
 	}
 }

@@ -15,6 +15,11 @@ public class RunningRepositoryImpl implements RunningRepository {
 	private final RunningJpaRepository jpaRepository;
 
 	@Override
+	public boolean existsByIdAndStatus(final Long id, final Running.Status status) {
+		return jpaRepository.existsByIdAndStatus(id, status);
+	}
+
+	@Override
 	public boolean existsByRunnerIdAndEndedAtIsNull(final Long runnerId) {
 		return jpaRepository.existsByRunnerIdAndEndedAtIsNull(runnerId);
 	}

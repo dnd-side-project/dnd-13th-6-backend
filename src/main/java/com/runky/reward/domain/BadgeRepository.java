@@ -5,11 +5,13 @@ import java.util.Optional;
 
 public interface BadgeRepository {
 
-    UserBadge save(UserBadge userBadge);
+    MemberBadge save(MemberBadge memberBadge);
 
     Badge save(Badge badge);
 
-    List<Badge> findBadgesOfUser(Long userId);
+    List<Badge> findBadgesOf(Long memberId);
 
     Optional<Badge> findBadge(Long badgeId);
+
+    boolean hasBadge(Long memberId, Long badgeId);
 }

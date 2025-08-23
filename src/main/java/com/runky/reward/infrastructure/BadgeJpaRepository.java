@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface BadgeJpaRepository extends JpaRepository<Badge, Long> {
 
-    @Query("SELECT b FROM Badge b JOIN UserBadge ub ON b.id = ub.badgeId WHERE ub.userId = :userId")
-    List<Badge> findBadgesOf(Long userId);
+    @Query("SELECT b FROM Badge b JOIN MemberBadge mb ON b.id = mb.badgeId WHERE mb.memberId = :memberId")
+    List<Badge> findBadgesOf(Long memberId);
 }

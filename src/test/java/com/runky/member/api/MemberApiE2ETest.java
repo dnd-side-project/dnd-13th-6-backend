@@ -62,7 +62,7 @@ class MemberApiE2ETest {
             ResponseEntity<ApiResponse<MemberResponse.Detail>> response = testRestTemplate.exchange(BASE_URL,
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
-            assertThat(response.getBody().getResult().id()).isEqualTo(member.getId());
+            assertThat(response.getBody().getResult().userId()).isEqualTo(member.getId());
             assertThat(response.getBody().getResult().nickname()).isEqualTo(member.getNickname().value());
             assertThat(response.getBody().getResult().badgeUrl()).isEqualTo(badge.getImageUrl());
         }
@@ -86,7 +86,7 @@ class MemberApiE2ETest {
                     "/api/members/me/nickname",
                     HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders), responseType);
 
-            assertThat(response.getBody().getResult().id()).isEqualTo(member.getId());
+            assertThat(response.getBody().getResult().userId()).isEqualTo(member.getId());
             assertThat(response.getBody().getResult().nickname()).isEqualTo("newNick");
         }
     }
@@ -117,7 +117,7 @@ class MemberApiE2ETest {
                     "/api/members/me/badge",
                     HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders), responseType);
 
-            assertThat(response.getBody().getResult().id()).isEqualTo(member.getId());
+            assertThat(response.getBody().getResult().userId()).isEqualTo(member.getId());
             assertThat(response.getBody().getResult().badgeImageUrl()).isEqualTo(badge2.getImageUrl());
         }
     }
@@ -145,7 +145,7 @@ class MemberApiE2ETest {
                     "/api/members/" + member1.getId() + "/badge",
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
-            assertThat(response.getBody().getResult().id()).isEqualTo(member1.getId());
+            assertThat(response.getBody().getResult().userId()).isEqualTo(member1.getId());
             assertThat(response.getBody().getResult().badgeImageUrl()).isEqualTo(badge1.getImageUrl());
         }
     }

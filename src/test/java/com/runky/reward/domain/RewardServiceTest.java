@@ -53,4 +53,19 @@ class RewardServiceTest {
                 .usingRecursiveComparison()
                 .isEqualTo(new GlobalException(RewardErrorCode.NOT_FOUND_BADGE));
     }
+
+    @Test
+    @DisplayName("사용자 뱃지 조회 시, 뱃지를 소유하고 있지 않으면, NOT_OWNED_BADGE 예외가 발생한다.")
+    void throwNotOwnedBadgeException_whenMemberNotOwnedBadge() {
+        given(badgeRepository.hasBadge(1L, 1L))
+                .willReturn(false);
+
+        RewardCommand.FindMemberBadge command = new RewardCommand.FindMemberBadge(1L, 1L);
+
+        GlobalException exception = assertThrows(GlobalException.class, () -> rewardService.getMemberBadge(command));
+
+        assertThat(exception)
+                .usingRecursiveComparison()
+                .isEqualTo(new GlobalException(RewardErrorCode.NOT_OWNED_BADGE));
+    }
 }

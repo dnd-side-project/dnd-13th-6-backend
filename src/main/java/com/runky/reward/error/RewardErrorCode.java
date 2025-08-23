@@ -11,7 +11,8 @@ public enum RewardErrorCode implements ErrorCode {
     INSUFFICIENT_CLOVER(HttpStatus.CONFLICT, "RE002", "클로버가 부족합니다."),
     NOT_FOUND_CLOVER(HttpStatus.NOT_FOUND, "RE003", "사용자의 클로버를 찾을 수 없습니다."),
     INVALID_CLOVER_ADD_REQUEST(HttpStatus.BAD_REQUEST, "RE004", "추가할 클로버 수량은 양수이어야 합니다."),
-    NOT_FOUND_BADGE(HttpStatus.NOT_FOUND, "RE005", "배지를 찾을 수 없습니다.")
+    NOT_FOUND_BADGE(HttpStatus.NOT_FOUND, "RE005", "배지를 찾을 수 없습니다."),
+    NOT_OWNED_BADGE(HttpStatus.FORBIDDEN, "RE006", "사용자가 소유한 배지가 아닙니다.")
     ;
 
     private final HttpStatus status;

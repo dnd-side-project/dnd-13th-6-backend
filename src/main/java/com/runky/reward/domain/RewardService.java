@@ -16,11 +16,20 @@ public class RewardService {
 
     @Transactional(readOnly = true)
     public List<Badge> getBadges(RewardCommand.GetBadges command) {
-        return badgeRepository.findBadgesOfUser(command.userId());
+        return badgeRepository.findBadgesOf(command.userId());
     }
 
     @Transactional(readOnly = true)
     public Badge getBadge(RewardCommand.Find command) {
+        return badgeRepository.findBadge(command.badgeId())
+                .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_BADGE));
+    }
+
+    @Transactional(readOnly = true)
+    public Badge getMemberBadge(RewardCommand.FindMemberBadge command) {
+        if (!badgeRepository.hasBadge(command.userId(), command.badgeId())) {
+            throw new GlobalException(RewardErrorCode.NOT_OWNED_BADGE);
+        }
         return badgeRepository.findBadge(command.badgeId())
                 .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_BADGE));
     }

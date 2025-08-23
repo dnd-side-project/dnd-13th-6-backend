@@ -12,6 +12,12 @@ public class RewardCommand {
     ) {
     }
 
+    public record FindMemberBadge(
+            Long userId,
+            Long badgeId
+    ) {
+    }
+
     public record GetClover(
             Long userId
     ) {

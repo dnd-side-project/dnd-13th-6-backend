@@ -11,4 +11,8 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 
 	Optional<Running> findByIdAndRunnerId(Long id, Long runnerId);
 
+	boolean existsByIdAndStatus(Long id, Running.Status status);
+
+	Optional<Long> findRunnerIdById(Long id);
+
 }

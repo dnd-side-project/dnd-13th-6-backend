@@ -1,12 +1,14 @@
 package com.runky.goal.batch;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.runky.crew.domain.Code;
 import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewRepository;
 import com.runky.goal.domain.CrewGoalSnapshot;
+import com.runky.goal.domain.Goal;
 import com.runky.goal.domain.GoalRepository;
 import com.runky.goal.domain.MemberGoal;
 import com.runky.goal.domain.MemberGoalSnapshot;
@@ -43,6 +45,9 @@ class SnapshotSchedulerTest {
     @Autowired
     @Qualifier("weeklyGoalSnapshotJobTest")
     private JobLauncherTestUtils weeklyGoalSnapshotJobTest;
+    @Autowired
+    @Qualifier("weeklyCrewGoalAchieveJobTest")
+    private JobLauncherTestUtils weeklyCrewGoalAchieveJobTest;
     @Autowired
     private CrewRepository crewRepository;
     @Autowired
@@ -134,11 +139,69 @@ class SnapshotSchedulerTest {
 
         Clover clover1 = cloverRepository.findByUserId(1L).orElseThrow();
         Clover clover2 = cloverRepository.findByUserId(2L).orElseThrow();
-        assertThat(clover1.getCount()).isEqualTo(3L);
+        assertThat(clover1.getCount()).isEqualTo(1L);
         assertThat(clover2.getCount()).isEqualTo(0L);
         MemberGoalSnapshot snapshot1 = goalRepository.findLatestMemberGoalSnapshot(1L).orElseThrow();
         MemberGoalSnapshot snapshot2 = goalRepository.findLatestMemberGoalSnapshot(2L).orElseThrow();
         assertThat(snapshot1.getAchieved()).isTrue();
         assertThat(snapshot2.getAchieved()).isFalse();
+    }
+
+    @Test
+    @DisplayName("크루 목표 달성 체크 시, 목표를 달성한 회원은 클로버 보상을 받는다.")
+    void checkCrewGoalAchieve() throws Exception {
+        Running running1 = Running.start(1L, LocalDate.of(2025, 8, 24).atStartOfDay());
+        LocalDateTime end1 = LocalDateTime.of(LocalDate.of(2025, 8, 24), LocalTime.of(0, 50));
+        running1.finish(9.00, 3600L, 2.78, end1);
+        runningRepository.save(running1);
+        Running running2 = Running.start(2L, LocalDate.of(2025, 8, 24).atStartOfDay());
+        LocalDateTime end2 = LocalDateTime.of(LocalDate.of(2025, 8, 24), LocalTime.of(0, 50));
+        running2.finish(10.00, 3600L, 2.78, end2);
+        runningRepository.save(running2);
+        Running running3 = Running.start(3L, LocalDate.of(2025, 8, 24).atStartOfDay());
+        LocalDateTime end3 = LocalDateTime.of(LocalDate.of(2025, 8, 24), LocalTime.of(0, 50));
+        running3.finish(11.00, 3600L, 2.78, end3);
+        runningRepository.save(running3);
+
+        MemberGoal memberGoal1 = MemberGoal.from(1L);
+        memberGoal1.updateGoal(new BigDecimal("10.00"));
+        goalRepository.save(memberGoal1.createSnapshot(LocalDate.of(2025, 8, 18)));
+        MemberGoal memberGoal2 = MemberGoal.from(2L);
+        memberGoal2.updateGoal(new BigDecimal("10.00"));
+        goalRepository.save(memberGoal2.createSnapshot(LocalDate.of(2025, 8, 18)));
+        MemberGoal memberGoal3 = MemberGoal.from(3L);
+        memberGoal3.updateGoal(new BigDecimal("10.00"));
+        goalRepository.save(memberGoal3.createSnapshot(LocalDate.of(2025, 8, 18)));
+
+        Crew crew = Crew.of(new CrewCommand.Create(1L, "crew1"), new Code("code12"));
+        crew.joinMember(2L);
+        crew.joinMember(3L);
+        Crew savedCrew = crewRepository.save(crew);
+        CrewGoalSnapshot crewGoalSnapshot = new CrewGoalSnapshot(savedCrew.getId(), new Goal(new BigDecimal("30.00")),
+                false, WeekUnit.from(LocalDate.of(2025, 8, 18)));
+        goalRepository.saveAllCrewGoalSnapshots(List.of(crewGoalSnapshot));
+
+        cloverRepository.save(Clover.of(1L));
+        cloverRepository.save(Clover.of(2L));
+        cloverRepository.save(Clover.of(3L));
+
+        LocalDate snapshotDate = LocalDate.of(2025, 8, 25);
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLocalDate("snapshotDate", snapshotDate)
+                .toJobParameters();
+
+        weeklyCrewGoalAchieveJobTest.launchJob(jobParameters);
+
+        Clover clover1 = cloverRepository.findByUserId(1L).orElseThrow();
+        Clover clover2 = cloverRepository.findByUserId(2L).orElseThrow();
+        Clover clover3 = cloverRepository.findByUserId(3L).orElseThrow();
+        assertAll(
+                () -> assertThat(clover1.getCount()).isEqualTo(3L),
+                () -> assertThat(clover2.getCount()).isEqualTo(3L),
+                () -> assertThat(clover3.getCount()).isEqualTo(3L)
+        );
+        CrewGoalSnapshot afterSnapshot = goalRepository.findCrewGoalSnapshot(savedCrew.getId(),
+                WeekUnit.from(LocalDate.of(2025, 8, 18))).orElseThrow();
+        assertThat(afterSnapshot.getAchieved()).isTrue();
     }
 }

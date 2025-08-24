@@ -1,7 +1,9 @@
 package com.runky.running.domain;
 
+import com.runky.running.domain.RunningInfo;
 import java.time.LocalDateTime;
 
+import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,4 +59,9 @@ public class RunningService {
 		return new RunningInfo.End(running.getId(), running.getRunnerId(), running.getStatus().toString(),
 			running.getStartedAt(), running.getEndedAt());
 	}
+
+    @Transactional(readOnly = true)
+    public List<RunningInfo.RunningResult> getTotalDistancesPeriod(LocalDateTime from, LocalDateTime to) {
+        return runningRepository.findTotalDistancesPeriod(from, to);
+    }
 }

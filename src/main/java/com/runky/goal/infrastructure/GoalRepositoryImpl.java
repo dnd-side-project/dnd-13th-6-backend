@@ -37,6 +37,11 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
+    public Optional<CrewGoalSnapshot> findCrewGoalSnapshot(Long crewId, WeekUnit weekUnit) {
+        return crewGoalSnapshotJpaRepository.findSnapshotOf(crewId, weekUnit);
+    }
+
+    @Override
     public Optional<MemberGoalSnapshot> findMemberGoalSnapshotOfWeek(Long memberId, WeekUnit weekUnit) {
         return memberGoalSnapshotJpaRepository.findSnapshotOf(memberId, weekUnit);
     }

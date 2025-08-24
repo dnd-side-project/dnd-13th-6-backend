@@ -24,4 +24,12 @@ public class TestBatchConfig {
         utils.setJob(job);
         return utils;
     }
+
+    @Bean
+    public JobLauncherTestUtils weeklyCrewGoalAchieveJobTest(
+            @Qualifier("weeklyCrewGoalAchieveJob") Job job) {
+        JobLauncherTestUtils utils = new JobLauncherTestUtils();
+        utils.setJob(job);
+        return utils;
+    }
 }

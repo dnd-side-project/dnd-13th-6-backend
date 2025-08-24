@@ -20,6 +20,8 @@ public interface GoalRepository {
 
     Optional<CrewGoalSnapshot> findLatestCrewGoalSnapshot(Long crewId);
 
+    Optional<CrewGoalSnapshot> findCrewGoalSnapshot(Long crewId, WeekUnit weekUnit);
+
     Optional<MemberGoalSnapshot> findMemberGoalSnapshotOfWeek(Long memberId, WeekUnit weekUnit);
 
     List<MemberGoalSnapshot> findLatestSnapshots(Set<Long> memberIds, WeekUnit weekUnit);

@@ -29,7 +29,16 @@ public class RewardService {
     public Clover achieveMemberGoal(Long memberId) {
         Clover clover = cloverRepository.findByUserIdWithLock(memberId)
                 .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_CLOVER));
-        clover.add(3L);
+        clover.add(1L);
         return clover;
+    }
+
+    @Transactional
+    public void achieveCrewGoal(List<Long> memberIds) {
+        for (Long memberId : memberIds) {
+            Clover clover = cloverRepository.findByUserIdWithLock(memberId)
+                    .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_CLOVER));
+            clover.add(3L);
+        }
     }
 }

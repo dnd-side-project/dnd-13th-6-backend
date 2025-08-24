@@ -51,4 +51,8 @@ public class CrewGoalSnapshot extends BaseTimeEntity {
 
         return new CrewGoalSnapshot(crewId, new Goal(crewGoal), false, WeekUnit.from(date));
     }
+
+    public void achieve() {
+        this.achieved = true;
+    }
 }

@@ -44,6 +44,8 @@ public class WeeklyGoalSnapshotJobConfig {
                     JobParameters jobParameters = contribution.getStepExecution()
                             .getJobParameters();
                     LocalDate snapshotDate = jobParameters.getLocalDate("snapshotDate");
+
+                    // 스냅샷 시간 기준, 이번주 목표 생성
                     goalService.saveAllMemberSnapshots(new GoalCommand.Snapshot(snapshotDate));
                     return RepeatStatus.FINISHED;
                 }, transactionManager)
@@ -58,15 +60,17 @@ public class WeeklyGoalSnapshotJobConfig {
                             .getJobParameters();
                     LocalDate snapshotDate = jobParameters.getLocalDate("snapshotDate");
 
+                    // 현재 크루 내 활동중인 멤버 조회
                     List<CrewActiveMemberInfo> infos = crewService.getActiveMembersInfo();
 
                     List<CrewGoalSnapshot> crewGoalSnapshots = new ArrayList<>();
                     for (CrewActiveMemberInfo info : infos) {
                         GoalCommand.CrewSnapshot command =
                                 new GoalCommand.CrewSnapshot(info.crewId(), info.memberIds(), snapshotDate);
+
+                        // 크루원들의 개인 목표들을 통해 이번주 크루 목표 생성
                         CrewGoalSnapshot crewSnapshot = goalService.createCrewSnapshot(command);
                         crewGoalSnapshots.add(crewSnapshot);
-
                     }
 
                     goalService.saveAllCrewSnapshots(crewGoalSnapshots);

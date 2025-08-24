@@ -56,10 +56,12 @@ public class WeeklyCrewGoalAchieveJobConfig {
                             .getJobParameters();
                     LocalDate snapshotDate = jobParameters.getLocalDate("snapshotDate");
 
+                    // 모든 사용자의 저번 주 뛴 거리 총합 조회
                     List<RunningInfo.RunningResult> results = runningService.getTotalDistancesPeriod(
                             snapshotDate.minusDays(7).atStartOfDay(),
                             snapshotDate.minusDays(1).atTime(LocalTime.MAX));
 
+                    // 유저 ID - 뛴 거리 Map으로 변환
                     Map<Long, Double> userDistanceMap = results.stream()
                             .collect(Collectors.toMap(
                                     RunningInfo.RunningResult::runnerId,
@@ -88,16 +90,22 @@ public class WeeklyCrewGoalAchieveJobConfig {
                     Map<Long, Double> map = (Map<Long, Double>) ctx.get("map");
 
                     List<Long> achieverIds = new ArrayList<>();
+                    // 모든 크루의 활동중 멤버 조회
                     List<CrewActiveMemberInfo> infos = crewService.getActiveMembersInfo();
                     for (CrewActiveMemberInfo info : infos) {
+
+                        // 크루 내 멤버들의 주간 거리 합산
                         Double sum = 0.0;
                         for (Long memberId : info.memberIds()) {
                             sum += map.getOrDefault(memberId, 0.0);
                         }
+
+                        // 저번 주 크루 목표 조회
                         Optional<CrewGoalSnapshot> crewSnapshot = goalService.findCrewGoalSnapshot(
                                 info.crewId(), snapshotDate.minusDays(7));
                         if (crewSnapshot.isPresent()) {
                             CrewGoalSnapshot snapshot = crewSnapshot.get();
+                            // 크루 목표 달성 시, 달성 멤버 ID 목록 추가 및 크루 목표 달성 처리
                             if (sum <= snapshot.getGoal().value().doubleValue()) {
                                 achieverIds.addAll(info.memberIds());
                                 snapshot.achieve();
@@ -117,7 +125,10 @@ public class WeeklyCrewGoalAchieveJobConfig {
                 .tasklet((contribution, chunkContext) -> {
                     ExecutionContext ctx = chunkContext.getStepContext().getStepExecution()
                             .getJobExecution().getExecutionContext();
+
                     List<Long> achieverIds = (List<Long>) ctx.get("achieverIds");
+
+                    // 달성한 멤버들에게 클로버 보상 지급
                     rewardService.achieveCrewGoal(achieverIds);
                     return RepeatStatus.FINISHED;
                 }, txManager)

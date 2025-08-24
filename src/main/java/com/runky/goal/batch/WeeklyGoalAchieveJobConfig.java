@@ -61,8 +61,8 @@ public class WeeklyGoalAchieveJobConfig {
                 )
                 .parameterValues(Map.of(
                         "status", Running.Status.FINISHED,
-                        "from", snapshotDate.minusDays(7).atStartOfDay(),
-                        "to", snapshotDate.minusDays(1).atTime(LocalTime.MAX)
+                        "from", snapshotDate.minusDays(7).atStartOfDay(), // 전 주 월요일
+                        "to", snapshotDate.minusDays(1).atTime(LocalTime.MAX) // 전 주 일요일
                 ))
                 .build();
     }
@@ -72,16 +72,21 @@ public class WeeklyGoalAchieveJobConfig {
     public ItemProcessor<TotalDistance, Long> goalAchieveProcessor(
             @Value("#{jobParameters['snapshotDate']}") String dateString) {
         LocalDate snapshotDate = LocalDate.parse(dateString);
+
         return totalDistance -> {
             Optional<MemberGoalSnapshot> snapshot =
                     goalService.findLastWeekMemberGoalSnapshot(totalDistance.runnerId(), snapshotDate);
             if (snapshot.isEmpty()) {
                 return null;
             }
+
+            // 목표 달성 여부 확인
             if (snapshot.get().getGoal().value().doubleValue() <= totalDistance.totalDistance()) {
                 snapshot.get().achieve();
                 return totalDistance.runnerId();
             }
+
+            // 목표 미달성 시, 클로버 증가 X
             return null;
         };
     }

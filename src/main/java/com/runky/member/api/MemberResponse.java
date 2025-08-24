@@ -3,21 +3,21 @@ package com.runky.member.api;
 public class MemberResponse {
 
     public record Detail(
-            Long id,
+            Long userId,
             String nickname,
-            String character
+            String badgeUrl
     ) {
     }
 
     public record Nickname(
-            Long id,
+            Long userId,
             String nickname
     ) {
     }
 
-    public record Character(
-            Long id,
-            String character
+    public record Badge(
+            Long userId,
+            String badgeImageUrl
     ) {
     }
 

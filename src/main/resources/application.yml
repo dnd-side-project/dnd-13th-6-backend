@@ -103,11 +103,11 @@ runky:
 
     cookie:
       common:
-        path: "/"
-        domain: ~
-        http-only: true
-        secure: true
-        same-site: None
+        path: ${COOKIE_COMMON_PATH:/}
+        domain: ${COOKIE_COMMON_DOMAIN:}
+        http-only: ${COOKIE_COMMON_HTTPONLY:true}
+        secure: ${COOKIE_COMMON_SECURE:true}
+        same-site: ${COOKIE_COMMON_SAMESITE:None}
       access:
         name: "accessToken"
         max-age-minutes: 1440

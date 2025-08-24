@@ -4,8 +4,13 @@ import java.util.List;
 
 public class RewardResponse {
 
-    public record Characters(
-            List<String> characters
+    public record Images(
+            List<Image> badges
+    ) {
+    }
+
+    public record Image(
+            String badge
     ) {
     }
 

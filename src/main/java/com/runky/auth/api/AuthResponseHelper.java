@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
@@ -43,5 +44,29 @@ public class AuthResponseHelper {
 			map.put(c.getName(), c);
 		}
 		return List.copyOf(map.values());
+	}
+
+	public <T> ApiResponse<T> successWithCookiesAndRedirect(
+		ApiResponse<T> body,
+		List<ResponseCookie> cookies,
+		String location,
+		HttpServletResponse response
+	) {
+		return successWithCookiesAndRedirect(body, cookies, location, HttpStatus.SEE_OTHER, response);
+	}
+
+	public <T> ApiResponse<T> successWithCookiesAndRedirect(
+		ApiResponse<T> body,
+		List<ResponseCookie> cookies,
+		String location,
+		HttpStatus status,
+		HttpServletResponse response
+	) {
+		for (ResponseCookie cookie : dedupByName(cookies)) {
+			response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+		}
+		response.setStatus(status.value());
+		response.setHeader(HttpHeaders.LOCATION, location);
+		return body;
 	}
 }

@@ -43,7 +43,19 @@ public class NotificationFacade {
 		);
 
 		List<Summary> summaries = info.values().stream()
-			.map(s -> new Summary(s.id(), s.title(), s.message(), s.senderId(), s.read(), s.createdAt()))
+			.map(s -> new Summary(
+				s.id(),
+				s.title(),
+				s.message(),
+				s.senderId(),
+				s.read(),
+				s.createdAt(),
+				new Message(
+					s.template().name(),
+					s.template().raw(),
+					s.variables()
+				)
+			))
 			.toList();
 		return new NotificationResult.Items(summaries);
 	}

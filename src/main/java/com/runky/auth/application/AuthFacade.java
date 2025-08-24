@@ -10,7 +10,7 @@ import com.runky.auth.domain.port.TokenDecoder;
 import com.runky.auth.domain.signup.SignupTokenService;
 import com.runky.auth.domain.vo.OAuthUserInfo;
 import com.runky.auth.domain.vo.RefreshTokenClaims;
-import com.runky.member.domain.dto.MemberCommand;
+import com.runky.member.domain.MemberCommand;
 import com.runky.member.domain.dto.MemberInfo;
 import com.runky.member.domain.service.MemberReader;
 import com.runky.member.domain.service.MemberRegistrar;

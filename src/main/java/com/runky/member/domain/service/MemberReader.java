@@ -4,8 +4,8 @@ import org.springframework.stereotype.Component;
 
 import com.runky.member.domain.Member;
 import com.runky.member.domain.dto.MemberInfo;
-import com.runky.member.domain.exception.MemberNotFoundException;
-import com.runky.member.domain.port.MemberRepository;
+import com.runky.member.error.MemberNotFoundException;
+import com.runky.member.domain.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +22,6 @@ public class MemberReader {
 		Member member = memberRepository.findByExternalAccountProviderAndExternalAccountProviderId(provider, providerId)
 			.orElseThrow(MemberNotFoundException::new);
 
-		return new MemberInfo.Summary(member.getId(), member.getRole(), member.getNickname());
+		return new MemberInfo.Summary(member.getId(), member.getRole(), member.getNickname().value());
 	}
 }

@@ -1,4 +1,4 @@
-package com.runky.member.domain.exception;
+package com.runky.member.error;
 
 import com.runky.global.error.GlobalException;
 

@@ -44,7 +44,7 @@ public class Badge {
         return new Badge(null, imageUrl, name);
     }
 
-    public UserBadge issue(Long userId) {
-        return UserBadge.of(userId, this.id);
+    public MemberBadge issue(Long userId) {
+        return MemberBadge.of(userId, this.id);
     }
 }

@@ -57,9 +57,8 @@ runky:
     cookie:
       common:
         path: "/"
-        domain: ~
         http-only: true
-        secure: true
+        secure: false
         same-site: None
       access:
         name: "accessToken"

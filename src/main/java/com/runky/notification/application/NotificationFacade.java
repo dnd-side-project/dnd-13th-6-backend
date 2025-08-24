@@ -7,10 +7,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.runky.notification.domain.aggregate.PushCommand;
+import com.runky.notification.domain.aggregate.PushService;
 import com.runky.notification.domain.notification.NotificationCommand;
 import com.runky.notification.domain.notification.NotificationService;
-import com.runky.notification.domain.push.PushCommand;
-import com.runky.notification.domain.push.PushService;
 
 import lombok.RequiredArgsConstructor;
 

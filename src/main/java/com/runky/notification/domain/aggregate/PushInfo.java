@@ -1,4 +1,4 @@
-package com.runky.notification.domain.push;
+package com.runky.notification.domain.aggregate;
 
 import java.util.List;
 

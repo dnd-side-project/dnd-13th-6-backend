@@ -2,7 +2,7 @@ package com.runky.member.domain;
 
 import org.hibernate.annotations.Comment;
 
-import com.runky.member.domain.exception.InvalidExternalAccountException;
+import com.runky.member.error.InvalidExternalAccountException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

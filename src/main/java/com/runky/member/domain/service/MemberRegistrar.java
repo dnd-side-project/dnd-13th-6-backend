@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 
 import com.runky.member.domain.ExternalAccount;
 import com.runky.member.domain.Member;
-import com.runky.member.domain.dto.MemberCommand;
+import com.runky.member.domain.MemberCommand;
 import com.runky.member.domain.dto.MemberInfo;
-import com.runky.member.domain.port.MemberRepository;
+import com.runky.member.domain.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,12 +25,12 @@ public class MemberRegistrar {
 			.findByExternalAccountProviderAndExternalAccountProviderId(account.provider(), account.providerId());
 		if (existing.isPresent()) {
 			Member m = existing.get();
-			return new MemberInfo.Summary(m.getId(), m.getRole(), m.getNickname());
+			return new MemberInfo.Summary(m.getId(), m.getRole(), m.getNickname().value());
 		}
 
 		Member member = Member.register(account, nickname);
 		Member saved = memberRepository.save(member);
-		return new MemberInfo.Summary(saved.getId(), saved.getRole(), saved.getNickname());
+		return new MemberInfo.Summary(saved.getId(), saved.getRole(), saved.getNickname().value());
 
 	}
 }

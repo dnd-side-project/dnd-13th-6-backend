@@ -7,8 +7,8 @@ public class MemberRequest {
     ) {
     }
 
-    public record Character(
-            Long characterId
+    public record Badge(
+            Long badgeId
     ) {
     }
 

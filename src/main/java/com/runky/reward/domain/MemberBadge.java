@@ -7,31 +7,33 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Entity
-@Table(name = "user_badge")
-public class UserBadge extends BaseTimeEntity {
+@Getter
+@Table(name = "member_badge")
+public class MemberBadge extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @Column(name = "badge_id", nullable = false)
     private Long badgeId;
 
-    protected UserBadge() {
+    protected MemberBadge() {
     }
 
-    private UserBadge(Long id, Long userId, Long badgeId) {
+    private MemberBadge(Long id, Long memberId, Long badgeId) {
         this.id = id;
-        this.userId = userId;
+        this.memberId = memberId;
         this.badgeId = badgeId;
     }
 
-    public static UserBadge of(Long userId, Long badgeId) {
-        return new UserBadge(null, userId, badgeId);
+    public static MemberBadge of(Long userId, Long badgeId) {
+        return new MemberBadge(null, userId, badgeId);
     }
 }

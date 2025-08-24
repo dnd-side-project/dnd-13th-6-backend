@@ -37,6 +37,11 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
+    public Optional<MemberGoalSnapshot> findMemberGoalSnapshotOfWeek(Long memberId, WeekUnit weekUnit) {
+        return memberGoalSnapshotJpaRepository.findSnapshotOf(memberId, weekUnit);
+    }
+
+    @Override
     public List<MemberGoalSnapshot> findLatestSnapshots(Set<Long> memberIds, WeekUnit weekUnit) {
         return memberGoalSnapshotJpaRepository.findSnapshotsOf(memberIds, weekUnit);
     }
@@ -44,6 +49,11 @@ public class GoalRepositoryImpl implements GoalRepository {
     @Override
     public void save(MemberGoal memberGoal) {
         memberGoalJpaRepository.save(memberGoal);
+    }
+
+    @Override
+    public void save(MemberGoalSnapshot memberGoalSnapshot) {
+        memberGoalSnapshotJpaRepository.save(memberGoalSnapshot);
     }
 
     @Override

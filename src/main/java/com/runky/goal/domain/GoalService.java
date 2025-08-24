@@ -1,7 +1,9 @@
 package com.runky.goal.domain;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,5 +37,10 @@ public class GoalService {
     @Transactional
     public void saveAllCrewSnapshots(List<CrewGoalSnapshot> crewSnapshots) {
         goalRepository.saveAllCrewGoalSnapshots(crewSnapshots);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<MemberGoalSnapshot> findLastWeekMemberGoalSnapshot(Long memberId, LocalDate date) {
+        return goalRepository.findMemberGoalSnapshotOfWeek(memberId, WeekUnit.from(date.minusWeeks(1)));
     }
 }

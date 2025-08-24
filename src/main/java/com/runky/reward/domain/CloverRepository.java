@@ -7,4 +7,6 @@ public interface CloverRepository {
     Clover save(Clover clover);
 
     Optional<Clover> findByUserId(Long userId);
+
+    Optional<Clover> findByUserIdWithLock(Long userId);
 }

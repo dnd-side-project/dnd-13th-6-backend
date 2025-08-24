@@ -41,4 +41,8 @@ public class MemberGoalSnapshot extends BaseTimeEntity {
         this.achieved = achieved;
         this.weekUnit = WeekUnit.from(localDate);
     }
+
+    public void achieve() {
+        this.achieved = true;
+    }
 }

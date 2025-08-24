@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController implements AuthApiSpec {
+	private static final String NEW_USER_REDIRECT = "http://localhost:3000/onboarding/terms";
 
 	private final AuthFacade authFacade;
 	private final TokenCookieProvider cookieProvider;
@@ -43,9 +44,10 @@ public class AuthController implements AuthApiSpec {
 		return switch (result.authStatus()) {
 			case NEW_USER -> {
 				ResponseCookie st = cookieProvider.signupToken(result.signupToken());
-				yield responseHelper.successWithCookies(
+				yield responseHelper.successWithCookiesAndRedirect(
 					ApiResponse.success(new AuthResponse.NewUser()),
 					List.of(st),
+					NEW_USER_REDIRECT,
 					servletResponse
 				);
 			}

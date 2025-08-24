@@ -44,10 +44,9 @@ public class AuthController implements AuthApiSpec {
 		return switch (result.authStatus()) {
 			case NEW_USER -> {
 				ResponseCookie st = cookieProvider.signupToken(result.signupToken());
-				yield responseHelper.successWithCookiesAndRedirect(
+				yield responseHelper.successWithCookies(
 					ApiResponse.success(new AuthResponse.NewUser()),
 					List.of(st),
-					NEW_USER_REDIRECT,
 					servletResponse
 				);
 			}

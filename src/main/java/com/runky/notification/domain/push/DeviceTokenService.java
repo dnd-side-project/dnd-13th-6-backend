@@ -1,12 +1,13 @@
 package com.runky.notification.domain.push;
 
-import static com.runky.notification.domain.push.PushInfo.*;
+import static com.runky.notification.domain.aggregate.PushInfo.*;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.runky.global.error.GlobalException;
+import com.runky.notification.domain.aggregate.PushCommand;
 import com.runky.notification.error.NotificationErrorCode;
 
 import lombok.RequiredArgsConstructor;

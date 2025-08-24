@@ -18,10 +18,13 @@ public enum NotificationErrorCode implements ErrorCode {
 	/* NDT2xx: DeviceToken  저장/포맷 */
 	DUPLICATE_UNIQUE_KEY_DEVICE_TOKEN(HttpStatus.CONFLICT, "NDT201", "같은 디바이스 토큰을 중복 저장할 수 없습니다."),
 
-
 	/* NDT3xx: 권한/입력 검증 */
 
-	/* NDT9xx: 인프라/제약 위반/기타 */;
+	/* NDT9xx: 인프라/제약 위반/기타 */
+
+	/** notification Message**/
+	/*NM2xx: 저장/포맷 */
+	EMPTY_VAR_KEY_NOTIFICATION_MESSAGE(HttpStatus.INTERNAL_SERVER_ERROR, "NM101", "알림 메세지 상수를 채워주세요.");
 	private final HttpStatus status;
 	private final String code;
 	private final String message;

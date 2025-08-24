@@ -4,7 +4,7 @@ import java.time.Instant;
 
 public sealed interface CheerResult {
 
-	record Sent(Long cheerId, Long runningId, Long senderId, Long receiverId, String message, Instant sentAt)
+	record Sent(Long cheerId, Long runningId, Long senderId, Long receiverId, Instant sentAt)
 		implements CheerResult {
 	}
 

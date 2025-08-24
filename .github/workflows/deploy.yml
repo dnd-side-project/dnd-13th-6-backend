@@ -58,6 +58,11 @@ jobs:
           echo "SIGNUP_TTL=${{ secrets.SIGNUP_TTL }}" >> ./docker/.env
           echo "TAG=${{ github.sha }}" >> ./docker/.env
           echo "FCM_PRIVATE_KEY=${{ secrets.FCM_PRIVATE_KEY }}" >> ./docker/.env 
+          echo "COOKIE_COMMON_PATH=${{ secrets.COOKIE_COMMON_PATH }}/" >> ./docker/.env
+          echo "COOKIE_COMMON_DOMAIN=${{ secrets.COOKIE_COMMON_DOMAIN }}" >> ./docker/.env
+          echo "COOKIE_COMMON_HTTPONLY=${{ secrets.COOKIE_COMMON_HTTPONLY }}" >> ./docker/.env
+          echo "COOKIE_COMMON_SECURE=${{ secrets.COOKIE_COMMON_SECURE }}" >> ./docker/.env
+          echo "COOKIE_COMMON_SAMESITE=${{ secrets.COOKIE_COMMON_SAMESITE }}" >> ./docker/.env
 
       - name: Docker 이미지 빌드 및 푸시
         run: |

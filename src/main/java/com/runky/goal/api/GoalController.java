@@ -4,6 +4,7 @@ import com.runky.global.response.ApiResponse;
 import com.runky.goal.application.CrewGoalSnapshotResult;
 import com.runky.goal.application.GoalCriteria;
 import com.runky.goal.application.GoalFacade;
+import com.runky.goal.application.MemberGoalResult;
 import com.runky.goal.application.MemberGoalSnapshotResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,8 @@ public class GoalController implements GoalApiSpec {
     @PatchMapping("/me")
     public ApiResponse<GoalResponse.Goal> updateGoal(@RequestBody GoalRequest.Goal request,
                                                      @RequestHeader("X-USER-ID") Long userId) {
-        return ApiResponse.success(new GoalResponse.Goal(request.goal()));
+        MemberGoalResult result = goalFacade.updateMemberGoal(new GoalCriteria.Update(userId, request.goal()));
+        return ApiResponse.success(new GoalResponse.Goal(result.goal()));
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.runky.global.response.ApiResponse;
 import com.runky.goal.domain.CrewGoalSnapshot;
 import com.runky.goal.domain.Goal;
 import com.runky.goal.domain.GoalRepository;
+import com.runky.goal.domain.MemberGoal;
 import com.runky.goal.domain.MemberGoalSnapshot;
 import com.runky.utils.DatabaseCleanUp;
 import java.math.BigDecimal;
@@ -38,6 +39,31 @@ public class GoalApiE2ETest {
     @AfterEach
     void tearDown() {
         databaseCleanUp.truncateAllTables();
+    }
+
+    @Nested
+    @DisplayName("PATCH /api/goals/me")
+    class Update {
+        private final String BASE_URL = "/api/goals/me";
+
+        @Test
+        @DisplayName("유저의 이번주 목표를 수정한다.")
+        void updateGoal() {
+            goalRepository.save(MemberGoal.from(1L));
+
+            ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", "1");
+            GoalRequest.Goal request = new GoalRequest.Goal(BigDecimal.TEN);
+
+            ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
+                    HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders), responseType);
+
+            MemberGoal memberGoal = goalRepository.findMemberGoalByMemberId(1L).orElseThrow();
+            assertThat(response.getBody().getResult().goal()).isEqualTo(new BigDecimal("10.00"));
+            assertThat(memberGoal.getGoal().value()).isEqualTo(new BigDecimal("10.00"));
+        }
     }
 
     @Nested

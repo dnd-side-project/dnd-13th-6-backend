@@ -47,6 +47,11 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
+    public Optional<MemberGoal> findMemberGoalByMemberId(Long memberId) {
+        return memberGoalJpaRepository.findByMemberId(memberId);
+    }
+
+    @Override
     public MemberGoal save(MemberGoal memberGoal) {
         return memberGoalJpaRepository.save(memberGoal);
     }

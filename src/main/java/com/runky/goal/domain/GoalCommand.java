@@ -1,5 +1,6 @@
 package com.runky.goal.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -24,6 +25,12 @@ public class GoalCommand {
     public record GetCrewSnapshot(
             Long crewId,
             LocalDate localDate
+    ) {
+    }
+
+    public record Update(
+            Long memberId,
+            BigDecimal goal
     ) {
     }
 }

@@ -1,5 +1,7 @@
 package com.runky.goal.domain;
 
+import com.runky.global.error.GlobalErrorCode;
+import com.runky.global.error.GlobalException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,5 +62,13 @@ public class GoalService {
     public CrewGoalSnapshot getCrewGoalSnapshot(GoalCommand.GetCrewSnapshot command) {
         return goalRepository.findCrewGoalSnapshot(command.crewId(), WeekUnit.from(command.localDate()))
                 .orElse(CrewGoalSnapshot.empty(command.crewId(), command.localDate()));
+    }
+
+    @Transactional
+    public MemberGoal updateMemberGoal(GoalCommand.Update command) {
+        MemberGoal memberGoal = goalRepository.findMemberGoalByMemberId(command.memberId())
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+        memberGoal.updateGoal(command.goal());
+        return memberGoal;
     }
 }

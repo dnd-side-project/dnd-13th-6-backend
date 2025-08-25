@@ -3,6 +3,7 @@ package com.runky.goal.application;
 import com.runky.goal.domain.CrewGoalSnapshot;
 import com.runky.goal.domain.GoalCommand;
 import com.runky.goal.domain.GoalService;
+import com.runky.goal.domain.MemberGoal;
 import com.runky.goal.domain.MemberGoalSnapshot;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,10 @@ public class GoalFacade {
         CrewGoalSnapshot snapshot = goalService.getCrewGoalSnapshot(
                 new GoalCommand.GetCrewSnapshot(criteria.crewId(), LocalDate.now()));
         return CrewGoalSnapshotResult.from(snapshot);
+    }
+
+    public MemberGoalResult updateMemberGoal(GoalCriteria.Update criteria) {
+        MemberGoal goal = goalService.updateMemberGoal(new GoalCommand.Update(criteria.memberId(), criteria.goal()));
+        return MemberGoalResult.from(goal);
     }
 }

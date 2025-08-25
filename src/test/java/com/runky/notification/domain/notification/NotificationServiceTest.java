@@ -67,6 +67,6 @@ class NotificationServiceTest {
 		var first = summaries.values().get(0);
 		Assertions.assertThat(first.template()).isEqualTo(NotificationTemplate.CHEER);
 		Assertions.assertThat(first.variables().get("NICKNAME")).isEqualTo("닉네임20");
-		Assertions.assertThat(first.message()).isEqualTo("닉네임20님이 응원을 보내셨어요!");
+		Assertions.assertThat(first.message()).isEqualTo("닉네임20님이 행운을 보냈어요!🍀");
 	}
 }

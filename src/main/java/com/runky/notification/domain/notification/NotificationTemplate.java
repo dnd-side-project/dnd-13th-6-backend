@@ -10,46 +10,49 @@ import com.runky.global.error.GlobalException;
 import com.runky.notification.error.NotificationErrorCode;
 
 public enum NotificationTemplate {
-	// 응원: "${NICKNAME}님이 응원을 보내셨어요!"
+	// 런닝 행운
 	CHEER(
-		"응원",
-		"${NICKNAME}님이 응원을 보내셨어요!",
+		"행운 보내기",
+		"${NICKNAME}님이 행운을 보냈어요!🍀",
 		EnumSet.of(VarKey.NICKNAME)
 	),
 
-	// 목표 달성
-	GOAL_WEEKLY_ACHIEVED(
-		"목표 달성",
-		"우리 크루, 이번 주도 완주 GO! 크루가 이번 주 목표를 달성 했어요!",
+	// 개인 목표
+	PERSONAL_GOAL_ACHIEVED(
+		"개인 목표 달성 성공",
+		"이번 주 ${KM} 목표를 달성 했어요! 행운이 도착했어요.✨",
+		EnumSet.of(VarKey.KM)
+	),
+	PERSONAL_GOAL_FAILED(
+		"개인 목표 달성 실패",
+		"클로버는 놓쳤지만, 꾸준함이 곧 행운이에요.🌱",
 		EnumSet.noneOf(VarKey.class)
 	),
 
-	// 크루 새 멤버
-	CREW_NEW_MEMBER(
-		"크루",
-		"우리 크루, 이번 주도 완주 GO! 크루에 새 멤버 ${NICKNAME}님이 들어왔어요.",
-		EnumSet.of(VarKey.NICKNAME)
+	// 크루 목표
+	CREW_GOAL_ACHIEVED(
+		"크루 목표 달성 성공",
+		"이번주 크루 목표를 확인해보세요.🎉",
+		EnumSet.noneOf(VarKey.class)
 	),
-
-	// 새로운 크루 리더
-	CREW_NEW_LEADER(
-		"크루",
-		"${NICKNAME} 님이 새로운 크루 리더가 되었어요.",
-		EnumSet.of(VarKey.NICKNAME)
+	CREW_GOAL_FAILED(
+		"크루 목표 달성 실패",
+		"이번엔 놓쳤지만, 꾸준함이 곧 행운이에요.🌱",
+		EnumSet.noneOf(VarKey.class)
 	),
 
 	// 크루 해체
 	CREW_DISBANDED(
 		"크루",
-		"${CREW_NAME} 크루가 크루 리더에 의해 해체되었어요.",
+		"${CREW_NAME이 크루 리더의 결정으로 해체되었어요.",
 		EnumSet.of(VarKey.CREW_NAME)
 	),
 
 	// 런닝 시작
 	RUN_STARTED(
-		"런닝",
-		"${CREW_NAME}의 ${NICKNAME}님이 런닝을 시작했어요!",
-		EnumSet.of(VarKey.CREW_NAME, VarKey.NICKNAME)
+		"런닝 시작",
+		"${NICKNAME}님이 런닝을 시작했어요!🏃🏻",
+		EnumSet.of(VarKey.NICKNAME)
 	);
 
 	private final String title;
@@ -79,7 +82,7 @@ public enum NotificationTemplate {
 		return NotificationFormatter.render(this.raw, this.required, vars);
 	}
 
-	public enum VarKey {NICKNAME, CREW_NAME}
+	public enum VarKey {NICKNAME, CREW_NAME, KM}
 
 	public static class NotificationFormatter {
 		private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\$\\{(.+?)\\}");

@@ -1,26 +1,17 @@
 package com.runky.notification.domain.notification;
 
-import static com.runky.notification.domain.notification.NotificationMessage.*;
 import static com.runky.notification.domain.notification.NotificationMessageType.*;
 import static com.runky.notification.domain.notification.NotificationTemplate.VarKey.*;
 
 import java.util.Map;
 
-import com.runky.notification.domain.notification.NotificationTemplate.VarKey;
-
-public sealed interface NotificationMessage
-	permits Cheer,
-	GoalWeeklyAchieved,
-	CrewNewMember,
-	CrewNewLeader,
-	CrewDisbanded,
-	RunStarted {
+public sealed interface NotificationMessage {
 
 	/** 알림의 의미/종류 */
 	NotificationMessageType type();
 
 	/** 템플릿 치환에 사용할 변수 집합 */
-	Map<VarKey, String> variables();
+	Map<NotificationTemplate.VarKey, String> variables();
 
 	/** 응원 알림 */
 	record Cheer(Nickname nickname) implements NotificationMessage {
@@ -30,47 +21,62 @@ public sealed interface NotificationMessage
 		}
 
 		@Override
-		public Map<VarKey, String> variables() {
+		public Map<NotificationTemplate.VarKey, String> variables() {
 			return Map.of(NICKNAME, nickname.value());
 		}
 	}
 
-	/** 주간 목표 달성 알림 */
-	record GoalWeeklyAchieved() implements NotificationMessage {
+	/** 개인 목표 달성 알림 */
+	record PersonalGoalAchieved() implements NotificationMessage {
 		@Override
 		public NotificationMessageType type() {
-			return GOAL_WEEKLY_ACHIEVED;
+			return PERSONAL_GOAL_ACHIEVED;
 		}
 
 		@Override
-		public Map<VarKey, String> variables() {
+		public Map<NotificationTemplate.VarKey, String> variables() {
 			return Map.of();
 		}
 	}
 
-	/** 크루 신규 멤버 알림 */
-	record CrewNewMember(Nickname nickname) implements NotificationMessage {
+	/** 개인 목표 실패 알림 */
+	record PersonalGoalFailed() implements NotificationMessage {
 		@Override
 		public NotificationMessageType type() {
-			return CREW_NEW_MEMBER;
+			return PERSONAL_GOAL_FAILED;
 		}
 
 		@Override
-		public Map<VarKey, String> variables() {
-			return Map.of(NICKNAME, nickname.value());
+		public Map<NotificationTemplate.VarKey, String> variables() {
+			return Map.of();
 		}
 	}
 
-	/** 새로운 크루 리더 알림 */
-	record CrewNewLeader(Nickname nickname) implements NotificationMessage {
+	/** 크루 묵표 달성 알림 */
+	record CrewGoalAchieved() implements NotificationMessage {
 		@Override
 		public NotificationMessageType type() {
-			return CREW_NEW_LEADER;
+			return CREW_GOAL_ACHIEVED;
 		}
 
 		@Override
-		public Map<VarKey, String> variables() {
-			return Map.of(NICKNAME, nickname.value());
+		public Map<NotificationTemplate.VarKey, String> variables() {
+			return Map.of();
+		}
+
+	}
+
+	/** 크루 묵표 실패 알림 */
+
+	record CrewGoalFailed() implements NotificationMessage {
+		@Override
+		public NotificationMessageType type() {
+			return CREW_GOAL_FAILED;
+		}
+
+		@Override
+		public Map<NotificationTemplate.VarKey, String> variables() {
+			return Map.of();
 		}
 	}
 
@@ -82,21 +88,21 @@ public sealed interface NotificationMessage
 		}
 
 		@Override
-		public Map<VarKey, String> variables() {
+		public Map<NotificationTemplate.VarKey, String> variables() {
 			return Map.of(CREW_NAME, crewName.value());
 		}
 	}
 
 	/** 런닝 시작 알림 */
-	record RunStarted(CrewName crewName, Nickname nickname) implements NotificationMessage {
+	record RunStarted(Nickname nickname) implements NotificationMessage {
 		@Override
 		public NotificationMessageType type() {
 			return RUN_STARTED;
 		}
 
 		@Override
-		public Map<VarKey, String> variables() {
-			return Map.of(CREW_NAME, crewName.value(), NICKNAME, nickname.value());
+		public Map<NotificationTemplate.VarKey, String> variables() {
+			return Map.of(NICKNAME, nickname.value());
 		}
 	}
 }

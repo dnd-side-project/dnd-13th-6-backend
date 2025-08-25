@@ -1,11 +1,7 @@
 package com.runky.cheer.application;
 
-import static java.util.Map.*;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.runky.cheer.domain.CheerCommand;
 import com.runky.cheer.domain.CheerInfo;
@@ -13,8 +9,10 @@ import com.runky.cheer.domain.CheerService;
 import com.runky.crew.domain.CrewService;
 import com.runky.global.error.GlobalException;
 import com.runky.member.infrastructure.persistence.JpaMemberRepository;
-import com.runky.notification.domain.push.PushCommand;
-import com.runky.notification.domain.push.PushService;
+import com.runky.notification.domain.aggregate.PushCommand;
+import com.runky.notification.domain.aggregate.PushService;
+import com.runky.notification.domain.notification.Nickname;
+import com.runky.notification.domain.notification.NotificationMessage;
 import com.runky.running.domain.RunningService;
 import com.runky.running.error.RunningErrorCode;
 
@@ -50,15 +48,12 @@ public class CheerFacade {
 			new CheerCommand.Create(criteria.runningId(), criteria.senderId(), criteria.receiverId(),
 				criteria.message()));
 
-		pushService.pushToOne(new PushCommand.Push.ToOne(
-			criteria.senderId(), criteria.receiverId(),
-			"응원 도착!", criteria.message(),
-			of("type", "CHEER", "runningId", String.valueOf(criteria.runningId()))
+		pushService.pushToOne(new PushCommand.Notify.ToOne(
+			criteria.senderId(), criteria.receiverId(), new NotificationMessage.Cheer(new Nickname(nickname)), null
 		));
-		String message = nickname + "님이 응원을 보내셨어요!";
 
 		return new CheerResult.Sent(
-			sentInfo.cheerId(), sentInfo.runningId(), criteria.senderId(), sentInfo.receiverId(), message,
+			sentInfo.cheerId(), sentInfo.runningId(), criteria.senderId(), sentInfo.receiverId(),
 			sentInfo.sentAt()
 		);
 	}
@@ -76,16 +71,4 @@ public class CheerFacade {
 		}
 	}
 
-	private void afterCommit(Runnable task) {
-		if (TransactionSynchronizationManager.isActualTransactionActive()) {
-			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-				@Override
-				public void afterCommit() {
-					task.run();
-				}
-			});
-		} else {
-			task.run();
-		}
-	}
 }

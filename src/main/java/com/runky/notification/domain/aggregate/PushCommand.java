@@ -1,19 +1,27 @@
-package com.runky.notification.domain.push;
+package com.runky.notification.domain.aggregate;
 
 import java.util.List;
 import java.util.Map;
 
+import com.runky.notification.domain.notification.NotificationMessage;
+
 public sealed interface PushCommand {
 
-	sealed interface Push extends PushCommand {
-		record ToOne(Long senderId, Long receiverId, String title, String body, Map<String, String> data)
-			implements Push {
-
+	sealed interface Notify extends PushCommand {
+		record ToOne(
+			Long senderId,
+			Long receiverId,
+			NotificationMessage args,
+			Map<String, String> data
+		) implements Notify {
 		}
 
-		record ToMany(Long senderId, List<Long> receiverIds, String title, String body, Map<String, String> data)
-			implements Push {
-
+		record ToMany(
+			Long senderId,
+			List<Long> receiverIds,
+			NotificationMessage args,
+			Map<String, String> data
+		) implements Notify {
 		}
 	}
 

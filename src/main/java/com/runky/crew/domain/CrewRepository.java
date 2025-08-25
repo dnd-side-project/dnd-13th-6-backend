@@ -6,23 +6,26 @@ import java.util.Set;
 
 public interface CrewRepository {
 
-    Optional<Crew> findById(Long crewId);
+	Optional<Crew> findById(Long crewId);
 
-    Optional<Crew> findCrewByCode(Code code);
+	Optional<Crew> findCrewByCode(Code code);
 
-    List<Crew> findCrewsByMemberId(Long memberId);
+	List<Crew> findCrewsByMemberId(Long memberId);
 
-    Optional<CrewMember> findByCrewAndMember(Long crewId, Long memberId);
+	Optional<CrewMember> findByCrewAndMember(Long crewId, Long memberId);
 
-    List<CrewMember> findCrewMemberOfUser(Long memberId);
+	List<CrewMember> findCrewMemberOfUser(Long memberId);
 
-    Optional<CrewMemberCount> findCountByMemberId(Long memberId);
+	Optional<CrewMemberCount> findCountByMemberId(Long memberId);
 
-    Crew save(Crew crew);
+	Crew save(Crew crew);
 
-    CrewMemberCount save(CrewMemberCount crewMemberCount);
+	CrewMemberCount save(CrewMemberCount crewMemberCount);
 
-    List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds);
+	List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds);
 
-    List<Crew> findAll();
+	List<Long> findAllCrewMembersOfUserWithoutUserId(Long userId);
+
+	List<Crew> findAll();
+
 }

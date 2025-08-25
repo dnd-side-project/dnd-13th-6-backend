@@ -1,6 +1,6 @@
 package com.runky.notification.domain.push;
 
-import static com.runky.notification.domain.push.PushInfo.*;
+import static com.runky.notification.domain.aggregate.PushInfo.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import com.runky.global.error.GlobalException;
+import com.runky.notification.domain.aggregate.PushCommand;
 import com.runky.notification.error.NotificationErrorCode;
 
 @ExtendWith(MockitoExtension.class)

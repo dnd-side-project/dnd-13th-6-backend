@@ -16,13 +16,11 @@ public interface GoalRepository {
 
     List<MemberGoal> findAllMemberGoals();
 
-    Optional<MemberGoalSnapshot> findLatestMemberGoalSnapshot(Long memberId);
-
-    Optional<CrewGoalSnapshot> findLatestCrewGoalSnapshot(Long crewId);
+    Optional<CrewGoalSnapshot> findCrewGoalSnapshotOfWeek(Long crewId, WeekUnit weekUnit);
 
     Optional<CrewGoalSnapshot> findCrewGoalSnapshot(Long crewId, WeekUnit weekUnit);
 
     Optional<MemberGoalSnapshot> findMemberGoalSnapshotOfWeek(Long memberId, WeekUnit weekUnit);
 
-    List<MemberGoalSnapshot> findLatestSnapshots(Set<Long> memberIds, WeekUnit weekUnit);
+    List<MemberGoalSnapshot> findLatestSnapshotsOfWeek(Set<Long> memberIds, WeekUnit weekUnit);
 }

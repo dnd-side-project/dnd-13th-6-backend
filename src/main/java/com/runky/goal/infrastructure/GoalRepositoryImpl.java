@@ -27,13 +27,8 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public Optional<MemberGoalSnapshot> findLatestMemberGoalSnapshot(Long memberId) {
-        return Optional.ofNullable(memberGoalSnapshotJpaRepository.findLatestSnapshot(memberId));
-    }
-
-    @Override
-    public Optional<CrewGoalSnapshot> findLatestCrewGoalSnapshot(Long crewId) {
-        return Optional.ofNullable(crewGoalSnapshotJpaRepository.findLatestSnapshot(crewId));
+    public Optional<CrewGoalSnapshot> findCrewGoalSnapshotOfWeek(Long crewId, WeekUnit weekUnit) {
+        return crewGoalSnapshotJpaRepository.findCrewSnapshotOfWeek(crewId, weekUnit);
     }
 
     @Override
@@ -47,7 +42,7 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public List<MemberGoalSnapshot> findLatestSnapshots(Set<Long> memberIds, WeekUnit weekUnit) {
+    public List<MemberGoalSnapshot> findLatestSnapshotsOfWeek(Set<Long> memberIds, WeekUnit weekUnit) {
         return memberGoalSnapshotJpaRepository.findSnapshotsOf(memberIds, weekUnit);
     }
 

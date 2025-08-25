@@ -30,7 +30,7 @@ public class GoalService {
     @Transactional(readOnly = true)
     public CrewGoalSnapshot createCrewSnapshot(GoalCommand.CrewSnapshot command) {
         WeekUnit weekUnit = WeekUnit.from(command.localDate());
-        List<MemberGoalSnapshot> snapshots = goalRepository.findLatestSnapshots(command.memberIds(), weekUnit);
+        List<MemberGoalSnapshot> snapshots = goalRepository.findLatestSnapshotsOfWeek(command.memberIds(), weekUnit);
         return CrewGoalSnapshot.of(snapshots, command.crewId(), command.localDate());
     }
 
@@ -40,8 +40,8 @@ public class GoalService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<MemberGoalSnapshot> findLastWeekMemberGoalSnapshot(Long memberId, LocalDate date) {
-        return goalRepository.findMemberGoalSnapshotOfWeek(memberId, WeekUnit.from(date.minusWeeks(1)));
+    public Optional<MemberGoalSnapshot> findMemberGoalSnapshot(Long memberId, LocalDate localDate) {
+        return goalRepository.findMemberGoalSnapshotOfWeek(memberId, WeekUnit.from(localDate));
     }
 
     @Transactional(readOnly = true)

@@ -42,14 +42,15 @@ class GoalServiceIntegrationTest {
             memberGoal2.updateGoal(new BigDecimal("10.05"));
             goalRepository.save(memberGoal2);
 
-            goalService.saveAllMemberSnapshots(new GoalCommand.Snapshot(LocalDate.of(2025, 8, 24)));
+            LocalDate date = LocalDate.of(2025, 8, 24);
+            goalService.saveAllMemberSnapshots(new GoalCommand.Snapshot(date));
 
-            Optional<MemberGoalSnapshot> latest1 = goalRepository.findLatestMemberGoalSnapshot(1L);
+            Optional<MemberGoalSnapshot> latest1 = goalRepository.findMemberGoalSnapshotOfWeek(1L, WeekUnit.from(date));
             assertThat(latest1).isPresent();
             assertThat(latest1.get().getGoal().value()).isEqualTo(new BigDecimal("12.05"));
             assertThat(latest1.get().getWeekUnit().isoYear()).isEqualTo(2025);
             assertThat(latest1.get().getWeekUnit().isoWeek()).isEqualTo(34);
-            Optional<MemberGoalSnapshot> latest2 = goalRepository.findLatestMemberGoalSnapshot(2L);
+            Optional<MemberGoalSnapshot> latest2 = goalRepository.findMemberGoalSnapshotOfWeek(2L, WeekUnit.from(date));
             assertThat(latest2).isPresent();
             assertThat(latest2.get().getGoal().value()).isEqualTo(new BigDecimal("10.05"));
             assertThat(latest2.get().getWeekUnit().isoYear()).isEqualTo(2025);

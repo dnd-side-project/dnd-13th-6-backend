@@ -75,7 +75,7 @@ public class WeeklyGoalAchieveJobConfig {
 
         return totalDistance -> {
             Optional<MemberGoalSnapshot> snapshot =
-                    goalService.findLastWeekMemberGoalSnapshot(totalDistance.runnerId(), snapshotDate);
+                    goalService.findMemberGoalSnapshot(totalDistance.runnerId(), snapshotDate.minusWeeks(1));
             if (snapshot.isEmpty()) {
                 return null;
             }

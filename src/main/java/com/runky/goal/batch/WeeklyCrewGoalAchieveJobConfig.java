@@ -1,4 +1,3 @@
-// src/main/java/com/runky/goal/batch/WeeklyCrewGoalAchieveJobConfig.java
 package com.runky.goal.batch;
 
 import com.runky.crew.domain.CrewActiveMemberInfo;
@@ -103,7 +102,7 @@ public class WeeklyCrewGoalAchieveJobConfig {
 
                         // 저번 주 크루 목표 조회
                         Optional<CrewGoalSnapshot> crewSnapshot = goalService.findCrewGoalSnapshot(
-                                info.crewId(), snapshotDate.minusDays(7));
+                                info.crewId(), snapshotDate.minusWeeks(1));
                         if (crewSnapshot.isPresent()) {
                             CrewGoalSnapshot snapshot = crewSnapshot.get();
                             // 크루 목표 달성 시, 달성 멤버 ID 목록 추가 및 크루 목표 달성 처리

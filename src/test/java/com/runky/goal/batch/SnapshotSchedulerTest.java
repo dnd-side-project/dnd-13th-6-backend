@@ -95,7 +95,7 @@ class SnapshotSchedulerTest {
 
         weeklyGoalSnapshotJobTest.launchJob(jobParameters);
 
-        List<MemberGoalSnapshot> snapshots = goalRepository.findLatestSnapshots(Set.of(1L, 2L, 3L, 4L),
+        List<MemberGoalSnapshot> snapshots = goalRepository.findLatestSnapshotsOfWeek(Set.of(1L, 2L, 3L, 4L),
                 WeekUnit.from(snapshotDate));
         assertThat(snapshots).hasSize(4);
         assertThat(snapshots).extracting("memberId")
@@ -104,7 +104,8 @@ class SnapshotSchedulerTest {
                 .containsExactlyInAnyOrder(memberGoal1.getGoal().value(), memberGoal2.getGoal().value(),
                         memberGoal3.getGoal().value(), memberGoal4.getGoal().value());
 
-        CrewGoalSnapshot crewGoalSnapshot = goalRepository.findLatestCrewGoalSnapshot(savedCrew.getId()).orElseThrow();
+        CrewGoalSnapshot crewGoalSnapshot = goalRepository.findCrewGoalSnapshotOfWeek(savedCrew.getId(),
+                WeekUnit.from(snapshotDate)).orElseThrow();
         assertThat(crewGoalSnapshot.getGoal().value()).isEqualTo(new BigDecimal("40.10"));
     }
 
@@ -141,8 +142,10 @@ class SnapshotSchedulerTest {
         Clover clover2 = cloverRepository.findByUserId(2L).orElseThrow();
         assertThat(clover1.getCount()).isEqualTo(1L);
         assertThat(clover2.getCount()).isEqualTo(0L);
-        MemberGoalSnapshot snapshot1 = goalRepository.findLatestMemberGoalSnapshot(1L).orElseThrow();
-        MemberGoalSnapshot snapshot2 = goalRepository.findLatestMemberGoalSnapshot(2L).orElseThrow();
+        MemberGoalSnapshot snapshot1 = goalRepository.findMemberGoalSnapshotOfWeek(1L,
+                WeekUnit.from(snapshotDate.minusWeeks(1))).orElseThrow();
+        MemberGoalSnapshot snapshot2 = goalRepository.findMemberGoalSnapshotOfWeek(2L,
+                WeekUnit.from(snapshotDate.minusWeeks(1))).orElseThrow();
         assertThat(snapshot1.getAchieved()).isTrue();
         assertThat(snapshot2.getAchieved()).isFalse();
     }

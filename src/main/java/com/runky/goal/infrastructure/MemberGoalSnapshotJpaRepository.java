@@ -10,10 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface MemberGoalSnapshotJpaRepository extends JpaRepository<MemberGoalSnapshot, Long> {
 
-    @Query("SELECT mgs FROM MemberGoalSnapshot mgs WHERE mgs.memberId = :memberId ORDER BY mgs.weekUnit.isoYear DESC, mgs.weekUnit.isoWeek DESC "
-            + "LIMIT 1")
-    MemberGoalSnapshot findLatestSnapshot(Long memberId);
-
     @Query("SELECT mgs FROM MemberGoalSnapshot mgs WHERE mgs.memberId IN :memberIds AND mgs.weekUnit = :weekUnit")
     List<MemberGoalSnapshot> findSnapshotsOf(Set<Long> memberIds, WeekUnit weekUnit);
 

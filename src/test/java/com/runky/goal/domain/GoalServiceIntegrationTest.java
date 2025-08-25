@@ -57,4 +57,22 @@ class GoalServiceIntegrationTest {
             assertThat(latest2.get().getWeekUnit().isoWeek()).isEqualTo(34);
         }
     }
+
+    @Nested
+    @DisplayName("멤버 이번주 목표 조회 시,")
+    class GetMemberGoalSnapshot {
+
+        @Test
+        @DisplayName("목표가 생성되지 않은 유저의 경우, 목표 거리가 0인 스냅샷을 반환한다.")
+        void returnZeroGoalSnapshot_whenMemberHasNoSnapshot() {
+            LocalDate date = LocalDate.of(2025, 8, 26);
+
+            MemberGoalSnapshot snapshot = goalService.getMemberGoalSnapshot(new GoalCommand.GetMemberSnapshot(1L, date));
+
+            assertThat(snapshot.getMemberId()).isEqualTo(1L);
+            assertThat(snapshot.getGoal().value()).isEqualTo(new BigDecimal("0.00"));
+            assertThat(snapshot.getWeekUnit().isoYear()).isEqualTo(2025);
+            assertThat(snapshot.getWeekUnit().isoWeek()).isEqualTo(35);
+        }
+    }
 }

@@ -48,4 +48,11 @@ public class GoalService {
     public Optional<CrewGoalSnapshot> findCrewGoalSnapshot(Long crewId, LocalDate date) {
         return goalRepository.findCrewGoalSnapshot(crewId, WeekUnit.from(date));
     }
+
+    @Transactional(readOnly = true)
+    public MemberGoalSnapshot getMemberGoalSnapshot(GoalCommand.GetMemberSnapshot command) {
+        return goalRepository.findMemberGoalSnapshotOfWeek(
+                command.memberId(), WeekUnit.from(command.localDate()))
+                .orElse(MemberGoalSnapshot.empty(command.memberId(), command.localDate()));
+    }
 }

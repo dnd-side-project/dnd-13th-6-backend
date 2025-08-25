@@ -47,13 +47,13 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public void save(MemberGoal memberGoal) {
-        memberGoalJpaRepository.save(memberGoal);
+    public MemberGoal save(MemberGoal memberGoal) {
+        return memberGoalJpaRepository.save(memberGoal);
     }
 
     @Override
-    public void save(MemberGoalSnapshot memberGoalSnapshot) {
-        memberGoalSnapshotJpaRepository.save(memberGoalSnapshot);
+    public MemberGoalSnapshot save(MemberGoalSnapshot memberGoalSnapshot) {
+        return memberGoalSnapshotJpaRepository.save(memberGoalSnapshot);
     }
 
     @Override

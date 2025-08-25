@@ -14,4 +14,10 @@ public class GoalCommand {
             LocalDate localDate
     ) {
     }
+
+    public record GetMemberSnapshot(
+            Long memberId,
+            LocalDate localDate
+    ) {
+    }
 }

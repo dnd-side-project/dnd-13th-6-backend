@@ -6,9 +6,9 @@ import java.util.Set;
 
 public interface GoalRepository {
 
-    void save(MemberGoal memberGoal);
+    MemberGoal save(MemberGoal memberGoal);
 
-    void save(MemberGoalSnapshot memberGoalSnapshot);
+    MemberGoalSnapshot save(MemberGoalSnapshot memberGoalSnapshot);
 
     void saveAll(List<MemberGoalSnapshot> snapshots);
 

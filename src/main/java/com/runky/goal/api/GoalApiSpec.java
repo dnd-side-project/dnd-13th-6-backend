@@ -26,10 +26,11 @@ public interface GoalApiSpec {
     );
 
     @Operation(
-            summary = "그룹 목표 조회",
-            description = "사용자가 속한 그룹의 목표를 조회합니다."
+            summary = "이번주 크루 목표 조회",
+            description = "크루의 목표를 조회합니다."
     )
-    ApiResponse<GoalResponse.Goal> getGroupGoal(
+    ApiResponse<GoalResponse.Goal> getCrewGoal(
+            @Schema(name = "크루 ID", description = "목표를 조회할 크루 ID") Long crewId,
             @Schema(name = "사용자 ID", description = "X-USER-ID로 로그인 대체") Long userId
     );
 }

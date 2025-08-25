@@ -10,6 +10,8 @@ public interface GoalRepository {
 
     MemberGoalSnapshot save(MemberGoalSnapshot memberGoalSnapshot);
 
+    CrewGoalSnapshot save(CrewGoalSnapshot crewGoalSnapshot);
+
     void saveAll(List<MemberGoalSnapshot> snapshots);
 
     void saveAllCrewGoalSnapshots(List<CrewGoalSnapshot> snapshots);

@@ -20,4 +20,10 @@ public class GoalCommand {
             LocalDate localDate
     ) {
     }
+
+    public record GetCrewSnapshot(
+            Long crewId,
+            LocalDate localDate
+    ) {
+    }
 }

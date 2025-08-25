@@ -57,6 +57,11 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
+    public CrewGoalSnapshot save(CrewGoalSnapshot crewGoalSnapshot) {
+        return crewGoalSnapshotJpaRepository.save(crewGoalSnapshot);
+    }
+
+    @Override
     public void saveAll(List<MemberGoalSnapshot> snapshots) {
         String sql = "INSERT INTO member_goal_snapshot "
                 + "(member_id, goal, achieved, iso_year, iso_week, created_at, updated_at) "

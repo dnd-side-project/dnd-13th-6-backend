@@ -55,4 +55,10 @@ public class GoalService {
                 command.memberId(), WeekUnit.from(command.localDate()))
                 .orElse(MemberGoalSnapshot.empty(command.memberId(), command.localDate()));
     }
+
+    @Transactional(readOnly = true)
+    public CrewGoalSnapshot getCrewGoalSnapshot(GoalCommand.GetCrewSnapshot command) {
+        return goalRepository.findCrewGoalSnapshot(command.crewId(), WeekUnit.from(command.localDate()))
+                .orElse(CrewGoalSnapshot.empty(command.crewId(), command.localDate()));
+    }
 }

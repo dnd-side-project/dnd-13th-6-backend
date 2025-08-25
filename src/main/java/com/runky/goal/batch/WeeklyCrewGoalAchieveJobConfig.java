@@ -65,7 +65,8 @@ public class WeeklyCrewGoalAchieveJobConfig {
                     Map<Long, Double> userDistanceMap = results.stream()
                             .collect(Collectors.toMap(
                                     RunningInfo.RunningResult::runnerId,
-                                    RunningInfo.RunningResult::distance)
+                                    RunningInfo.RunningResult::distance,
+                                    Double::sum)
                             );
 
                     ExecutionContext executionContext = chunkContext.getStepContext().getStepExecution()
@@ -106,7 +107,7 @@ public class WeeklyCrewGoalAchieveJobConfig {
                         if (crewSnapshot.isPresent()) {
                             CrewGoalSnapshot snapshot = crewSnapshot.get();
                             // 크루 목표 달성 시, 달성 멤버 ID 목록 추가 및 크루 목표 달성 처리
-                            if (sum <= snapshot.getGoal().value().doubleValue()) {
+                            if (sum >= snapshot.getGoal().value().doubleValue()) {
                                 achieverIds.addAll(info.memberIds());
                                 snapshot.achieve();
                             }

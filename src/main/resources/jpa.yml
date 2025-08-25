@@ -11,6 +11,11 @@ spring:
         timezone.default_storage: NORMALIZE_UTC
         jdbc.time_zone: UTC
 
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
 
 datasource:
   mysql-jpa:

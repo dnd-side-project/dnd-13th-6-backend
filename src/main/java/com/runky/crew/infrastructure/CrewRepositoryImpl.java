@@ -3,8 +3,8 @@ package com.runky.crew.infrastructure;
 import com.runky.crew.domain.Code;
 import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewMember;
-import com.runky.crew.domain.CrewRepository;
 import com.runky.crew.domain.CrewMemberCount;
+import com.runky.crew.domain.CrewRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -57,6 +57,11 @@ public class CrewRepositoryImpl implements CrewRepository {
     @Override
     public List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds) {
         return memberCrewCountJpaRepository.findByMemberIdIn(userIds);
+    }
+
+    @Override
+    public List<Crew> findAll() {
+        return crewJpaRepository.findAllCrewsJoinFetch();
     }
 
     @Override

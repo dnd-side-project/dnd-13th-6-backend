@@ -3,7 +3,10 @@ package com.runky.crew.domain;
 import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,5 +82,20 @@ public class CrewService {
                 .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
         crewMemberCount.decrement();
         return crew;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CrewActiveMemberInfo> getActiveMembersInfo() {
+        List<Crew> crews = crewRepository.findAll();
+
+        List<CrewActiveMemberInfo> infos = new ArrayList<>();
+        for (Crew crew : crews) {
+            List<CrewMember> activeMembers = crew.getActiveMembers();
+            Set<Long> activeMemberIds = activeMembers.stream()
+                    .map(CrewMember::getId)
+                    .collect(Collectors.toSet());
+            infos.add(new CrewActiveMemberInfo(crew.getId(), activeMemberIds));
+        }
+        return infos;
     }
 }

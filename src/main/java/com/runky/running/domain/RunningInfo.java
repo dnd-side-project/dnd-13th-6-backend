@@ -18,4 +18,10 @@ public sealed interface RunningInfo {
 	record End(Long runningId, Long runnerId, String status, LocalDateTime startedAt, LocalDateTime endedAt)
 		implements RunningInfo {
 	}
+
+    record TotalDistance(Long runnerId, Double totalDistance) implements RunningInfo {
+    }
+
+    record RunningResult(Long runnerId, Double distance) implements RunningInfo {
+    }
 }

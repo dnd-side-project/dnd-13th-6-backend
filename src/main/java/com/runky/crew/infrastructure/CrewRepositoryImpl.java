@@ -71,4 +71,9 @@ public class CrewRepositoryImpl implements CrewRepository {
 	public Optional<CrewMemberCount> findCountByMemberId(Long memberId) {
 		return memberCrewCountJpaRepository.findByMemberId(memberId);
 	}
+
+	@Override
+	public List<Crew> findAll() {
+		return crewJpaRepository.findAllCrewsJoinFetch();
+	}
 }

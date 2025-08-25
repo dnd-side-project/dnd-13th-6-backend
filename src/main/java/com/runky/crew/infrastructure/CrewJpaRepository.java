@@ -27,4 +27,7 @@ public interface CrewJpaRepository extends JpaRepository<Crew, Long> {
 		)
 		       """)
 	List<Long> findAllCrewMembersOfUserWithoutUserId(Long userId);
+
+	@Query("SELECT c FROM Crew c LEFT JOIN FETCH c.members")
+	List<Crew> findAllCrewsJoinFetch();
 }

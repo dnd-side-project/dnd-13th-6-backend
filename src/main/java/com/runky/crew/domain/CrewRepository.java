@@ -25,4 +25,7 @@ public interface CrewRepository {
 	List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds);
 
 	List<Long> findAllCrewMembersOfUserWithoutUserId(Long userId);
+
+	List<Crew> findAll();
+
 }

@@ -14,16 +14,16 @@ public enum GoalErrorCode implements ErrorCode {
 
     @Override
     public HttpStatus getStatus() {
-        return null;
+        return status;
     }
 
     @Override
     public String getCode() {
-        return "";
+        return code;
     }
 
     @Override
     public String getMessage() {
-        return "";
+        return message;
     }
 }

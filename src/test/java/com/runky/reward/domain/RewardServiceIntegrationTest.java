@@ -30,7 +30,7 @@ class RewardServiceIntegrationTest {
     @DisplayName("유저가 소유한 뱃지를 조회한다.")
     void getBadges() {
         Badge badge = badgeRepository.save(Badge.of("image.pvg", "뱃지1"));
-        badgeRepository.save(UserBadge.of(1L, badge.getId()));
+        badgeRepository.save(MemberBadge.of(1L, badge.getId()));
 
         List<Badge> badges = rewardService.getBadges(new GetBadges(1L));
 

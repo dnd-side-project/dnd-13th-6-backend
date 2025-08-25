@@ -3,6 +3,7 @@ package com.runky.running.domain;
 import com.runky.running.domain.RunningInfo;
 import java.time.LocalDateTime;
 
+
 import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 public class RunningService {
 
 	private final RunningRepository runningRepository;
-	private final ApplicationEventPublisher events;
 	private final RunningTrackRepository trackRepository;
 
 	@Transactional
@@ -64,4 +64,13 @@ public class RunningService {
     public List<RunningInfo.RunningResult> getTotalDistancesPeriod(LocalDateTime from, LocalDateTime to) {
         return runningRepository.findTotalDistancesPeriod(from, to);
     }
+
+	public boolean isActive(final Long runningId) {
+		return runningRepository.existsByIdAndStatus(runningId, Running.Status.RUNNING);
+	}
+
+	public Long getRunnerId(final Long runningId) {
+		return runningRepository.findRunnerIdById(runningId)
+			.orElseThrow(() -> new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING));
+	}
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class RunningRepositoryImpl implements RunningRepository {
+
     private final RunningJpaRepository jpaRepository;
 
     @Override
@@ -34,4 +35,14 @@ public class RunningRepositoryImpl implements RunningRepository {
     public List<RunningInfo.RunningResult> findTotalDistancesPeriod(LocalDateTime from, LocalDateTime to) {
         return jpaRepository.findRunnerDistanceResultsByPeriod(from, to);
     }
+
+	@Override
+	public boolean existsByIdAndStatus(final Long id, final Running.Status status) {
+		return jpaRepository.existsByIdAndStatus(id, status);
+	}
+
+	@Override
+	public Optional<Long> findRunnerIdById(final Long id) {
+		return jpaRepository.findRunnerIdById(id);
+	}
 }

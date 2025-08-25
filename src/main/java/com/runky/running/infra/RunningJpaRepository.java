@@ -23,4 +23,9 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
             LocalDateTime from,
             LocalDateTime to
     );
+  
+	boolean existsByIdAndStatus(Long id, Running.Status status);
+
+	Optional<Long> findRunnerIdById(Long id);
+
 }

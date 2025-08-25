@@ -43,8 +43,8 @@ public class Running {
 	@Column(name = "ended_at", nullable = true)
 	private LocalDateTime endedAt;
 
-	@Column(name = "total_distance_minutes")
-	private Double totalDistanceMinutes;
+	@Column(name = "total_distance_meter")
+	private Double totalDistanceMeter;
 
 	@Column(name = "duration_seconds")
 	private Long durationSeconds;
@@ -52,9 +52,9 @@ public class Running {
 	@Column(name = "avg_speed_mps")
 	private Double avgSpeedMPS;
 
-	public static Running start(Long runningId, LocalDateTime now) {
+	public static Running start(Long runnerId, LocalDateTime now) {
 		return Running.builder()
-			.runnerId(runningId)
+			.runnerId(runnerId)
 			.status(Status.RUNNING)
 			.startedAt(now)
 			.build();
@@ -64,13 +64,13 @@ public class Running {
 		return this.status == Status.RUNNING && this.endedAt == null;
 	}
 
-	public void finish(double totalDistanceMinutes, long durationSeconds, Double avgSpeedMps) {
+	public void finish(double totalDistanceMinutes, long durationSeconds, Double avgSpeedMps, LocalDateTime now) {
 		if (this.status != Status.RUNNING) {
 			throw new GlobalException(RunningErrorCode.NOT_ACTIVE_RUNNING);
 		}
-		this.endedAt = LocalDateTime.now();
+		this.endedAt = now;
 		this.status = Status.FINISHED;
-		this.totalDistanceMinutes = totalDistanceMinutes;
+		this.totalDistanceMeter = totalDistanceMinutes;
 		this.durationSeconds = durationSeconds;
 		this.avgSpeedMPS = avgSpeedMps;
 	}

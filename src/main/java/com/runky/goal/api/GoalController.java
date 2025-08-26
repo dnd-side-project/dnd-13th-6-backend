@@ -59,4 +59,12 @@ public class GoalController implements GoalApiSpec {
         CrewGoalSnapshotResult result = goalFacade.getLastWeekCrewGoalSnapshot(new GoalCriteria.CrewGoal(crewId));
         return ApiResponse.success(new GoalResponse.Achieve(result.achieved()));
     }
+
+    @Override
+    @GetMapping("/me/last/clovers")
+    public ApiResponse<GoalResponse.Clover> getMemberGoalClovers(@RequestHeader("X-USER-ID") Long userId) {
+        MemberGoalSnapshotResult.Clover result =
+                goalFacade.getLastWeekMemberGoalClover(new GoalCriteria.MemberGoal(userId));
+        return ApiResponse.success(new GoalResponse.Clover(result.count()));
+    }
 }

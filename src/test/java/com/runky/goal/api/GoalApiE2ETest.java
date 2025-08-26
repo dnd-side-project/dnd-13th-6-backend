@@ -145,7 +145,8 @@ public class GoalApiE2ETest {
         @Test
         @DisplayName("크루의 이번주 목표 달성 여부를 조회한다.")
         void getCrewAchieve() {
-            CrewGoalSnapshot crewGoalSnapshot = new CrewGoalSnapshot(1L, new Goal(BigDecimal.TEN), true, WeekUnit.from(LocalDate.now().minusWeeks(1)));
+            CrewGoalSnapshot crewGoalSnapshot = new CrewGoalSnapshot(1L, new Goal(BigDecimal.TEN), true,
+                    WeekUnit.from(LocalDate.now().minusWeeks(1)));
             goalRepository.save(crewGoalSnapshot);
 
             ParameterizedTypeReference<ApiResponse<GoalResponse.Achieve>> responseType = new ParameterizedTypeReference<>() {
@@ -158,6 +159,30 @@ public class GoalApiE2ETest {
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType, 1L);
 
             assertThat(response.getBody().getResult().achieved()).isTrue();
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/goals/me/last/clovers")
+    class GetMemberGoalClovers {
+        private final String BASE_URL = "/api/goals/me/last/clovers";
+
+        @Test
+        @DisplayName("유저의 지난주 클로버 개수를 조회한다.")
+        void getMemberGoalClovers() {
+            MemberGoalSnapshot memberGoalSnapshot = new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), true,
+                    LocalDate.now().minusWeeks(1));
+            goalRepository.save(memberGoalSnapshot);
+
+            ParameterizedTypeReference<ApiResponse<GoalResponse.Clover>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", "1");
+
+            ResponseEntity<ApiResponse<GoalResponse.Clover>> response = testRestTemplate.exchange(BASE_URL,
+                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+
+            assertThat(response.getBody().getResult().count()).isEqualTo(1);
         }
     }
 }

@@ -14,6 +14,11 @@ public class GoalResponse {
     ) {
     }
 
+    public record Clover(
+            Long count
+    ) {
+    }
+
     private GoalResponse() {
     }
 }

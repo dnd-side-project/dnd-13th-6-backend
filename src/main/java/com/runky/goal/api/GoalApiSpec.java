@@ -50,4 +50,12 @@ public interface GoalApiSpec {
             @Schema(name = "크루 ID", description = "목표 달성 여부를 조회할 크루 ID") Long crewId,
             @Schema(name = "사용자 ID", description = "X-USER-ID로 로그인 대체") Long userId
     );
+
+    @Operation(
+            summary = "저번주 개인 목표 클로버 획득 개수 조회",
+            description = "사용자의 저번주 개인 목표 클로버 획득 개수를 조회합니다."
+    )
+    ApiResponse<GoalResponse.Clover> getMemberGoalClovers(
+            @Schema(name = "사용자 ID", description = "X-USER-ID로 로그인 대체") Long userId
+    );
 }

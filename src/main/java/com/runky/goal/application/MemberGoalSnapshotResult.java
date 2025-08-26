@@ -17,4 +17,9 @@ public record MemberGoalSnapshotResult(
                 snapshot.getAchieved()
         );
     }
+
+    public record Clover(
+            Long count
+    ) {
+    }
 }

@@ -34,6 +34,14 @@ public class RewardService {
                 .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_BADGE));
     }
 
+    public long calculateMemberGoalClover(RewardCommand.Count command) {
+        return CloverRewardStrategy.MEMBER_GOAL.apply(command.count());
+    }
+
+    public long calculateCrewGoalClover(RewardCommand.Count command) {
+        return CloverRewardStrategy.CREW_GOAL.apply(command.count());
+    }
+
     @Transactional(readOnly = true)
     public Clover getClover(RewardCommand.GetClover command) {
         return cloverRepository.findByUserId(command.userId())

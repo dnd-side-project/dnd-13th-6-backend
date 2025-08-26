@@ -9,6 +9,7 @@ import com.runky.goal.domain.Goal;
 import com.runky.goal.domain.GoalRepository;
 import com.runky.goal.domain.MemberGoal;
 import com.runky.goal.domain.MemberGoalSnapshot;
+import com.runky.goal.domain.WeekUnit;
 import com.runky.utils.DatabaseCleanUp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -131,6 +132,30 @@ public class GoalApiE2ETest {
 
             ResponseEntity<ApiResponse<GoalResponse.Achieve>> response = testRestTemplate.exchange(BASE_URL,
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+
+            assertThat(response.getBody().getResult().achieved()).isTrue();
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/goals/crews/{crewId}/last/achieve")
+    class GetCrewAchieve {
+        private final String BASE_URL = "/api/goals/crews/{crewId}/last/achieve";
+
+        @Test
+        @DisplayName("크루의 이번주 목표 달성 여부를 조회한다.")
+        void getCrewAchieve() {
+            CrewGoalSnapshot crewGoalSnapshot = new CrewGoalSnapshot(1L, new Goal(BigDecimal.TEN), true, WeekUnit.from(LocalDate.now().minusWeeks(1)));
+            goalRepository.save(crewGoalSnapshot);
+
+            ParameterizedTypeReference<ApiResponse<GoalResponse.Achieve>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", "1");
+            String url = "/api/goals/crews/1/last/achieve";
+
+            ResponseEntity<ApiResponse<GoalResponse.Achieve>> response = testRestTemplate.exchange(url,
+                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType, 1L);
 
             assertThat(response.getBody().getResult().achieved()).isTrue();
         }

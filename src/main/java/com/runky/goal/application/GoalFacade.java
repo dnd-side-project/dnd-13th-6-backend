@@ -37,4 +37,10 @@ public class GoalFacade {
                 new GoalCommand.GetMemberSnapshot(criteria.memberId(), LocalDate.now().minusWeeks(1)));
         return MemberGoalSnapshotResult.from(memberGoalSnapshot);
     }
+
+    public CrewGoalSnapshotResult getLastWeekCrewGoalSnapshot(GoalCriteria.CrewGoal criteria) {
+        CrewGoalSnapshot snapshot = goalService.getCrewGoalSnapshot(
+                new GoalCommand.GetCrewSnapshot(criteria.crewId(), LocalDate.now().minusWeeks(1)));
+        return CrewGoalSnapshotResult.from(snapshot);
+    }
 }

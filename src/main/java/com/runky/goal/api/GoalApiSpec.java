@@ -41,4 +41,13 @@ public interface GoalApiSpec {
     ApiResponse<GoalResponse.Achieve> getAchieve(
             @Schema(name = "사용자 ID", description = "X-USER-ID로 로그인 대체") Long userId
     );
+
+    @Operation(
+            summary = "지난주 크루 목표 달성 여부 조회",
+            description = "크루의 지난주 목표 달성 여부를 조회합니다."
+    )
+    ApiResponse<GoalResponse.Achieve> getCrewAchieve(
+            @Schema(name = "크루 ID", description = "목표 달성 여부를 조회할 크루 ID") Long crewId,
+            @Schema(name = "사용자 ID", description = "X-USER-ID로 로그인 대체") Long userId
+    );
 }

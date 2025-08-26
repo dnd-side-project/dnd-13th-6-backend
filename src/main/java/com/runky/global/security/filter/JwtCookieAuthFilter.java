@@ -33,6 +33,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 		this.tokenDecoder = tokenDecoder;
 	}
 
+	// TODO: 쿠키 없을 때, 예외처리
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
 		throws ServletException, IOException {

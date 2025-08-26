@@ -47,13 +47,28 @@ public class GoalRepositoryImpl implements GoalRepository {
     }
 
     @Override
-    public void save(MemberGoal memberGoal) {
-        memberGoalJpaRepository.save(memberGoal);
+    public Optional<MemberGoal> findMemberGoalByMemberId(Long memberId) {
+        return memberGoalJpaRepository.findByMemberId(memberId);
     }
 
     @Override
-    public void save(MemberGoalSnapshot memberGoalSnapshot) {
-        memberGoalSnapshotJpaRepository.save(memberGoalSnapshot);
+    public List<CrewGoalSnapshot> findAllCrewGoalSnapshots(Set<Long> crewId, WeekUnit weekUnit) {
+        return crewGoalSnapshotJpaRepository.findAllSnapshotsOf(crewId, weekUnit);
+    }
+
+    @Override
+    public MemberGoal save(MemberGoal memberGoal) {
+        return memberGoalJpaRepository.save(memberGoal);
+    }
+
+    @Override
+    public MemberGoalSnapshot save(MemberGoalSnapshot memberGoalSnapshot) {
+        return memberGoalSnapshotJpaRepository.save(memberGoalSnapshot);
+    }
+
+    @Override
+    public CrewGoalSnapshot save(CrewGoalSnapshot crewGoalSnapshot) {
+        return crewGoalSnapshotJpaRepository.save(crewGoalSnapshot);
     }
 
     @Override

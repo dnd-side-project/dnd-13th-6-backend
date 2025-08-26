@@ -6,9 +6,11 @@ import java.util.Set;
 
 public interface GoalRepository {
 
-    void save(MemberGoal memberGoal);
+    MemberGoal save(MemberGoal memberGoal);
 
-    void save(MemberGoalSnapshot memberGoalSnapshot);
+    MemberGoalSnapshot save(MemberGoalSnapshot memberGoalSnapshot);
+
+    CrewGoalSnapshot save(CrewGoalSnapshot crewGoalSnapshot);
 
     void saveAll(List<MemberGoalSnapshot> snapshots);
 
@@ -23,4 +25,8 @@ public interface GoalRepository {
     Optional<MemberGoalSnapshot> findMemberGoalSnapshotOfWeek(Long memberId, WeekUnit weekUnit);
 
     List<MemberGoalSnapshot> findLatestSnapshotsOfWeek(Set<Long> memberIds, WeekUnit weekUnit);
+
+    Optional<MemberGoal> findMemberGoalByMemberId(Long memberId);
+
+    List<CrewGoalSnapshot> findAllCrewGoalSnapshots(Set<Long> crewId, WeekUnit weekUnit);
 }

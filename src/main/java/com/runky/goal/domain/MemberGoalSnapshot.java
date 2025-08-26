@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Getter;
 
@@ -40,6 +41,10 @@ public class MemberGoalSnapshot extends BaseTimeEntity {
         this.goal = goal;
         this.achieved = achieved;
         this.weekUnit = WeekUnit.from(localDate);
+    }
+
+    public static MemberGoalSnapshot empty(Long memberId, LocalDate localDate) {
+        return new MemberGoalSnapshot(memberId, new Goal(BigDecimal.ZERO), false, localDate);
     }
 
     public void achieve() {

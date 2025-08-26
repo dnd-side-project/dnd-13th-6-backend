@@ -9,6 +9,16 @@ public class GoalResponse {
     ) {
     }
 
+    public record Achieve(
+            boolean achieved
+    ) {
+    }
+
+    public record Clover(
+            Long count
+    ) {
+    }
+
     private GoalResponse() {
     }
 }

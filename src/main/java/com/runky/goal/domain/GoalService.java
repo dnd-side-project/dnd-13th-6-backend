@@ -1,5 +1,8 @@
 package com.runky.goal.domain;
 
+import com.runky.global.error.GlobalErrorCode;
+import com.runky.global.error.GlobalException;
+import com.runky.goal.domain.GoalCommand.CrewSnapshots;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,5 +50,32 @@ public class GoalService {
     @Transactional(readOnly = true)
     public Optional<CrewGoalSnapshot> findCrewGoalSnapshot(Long crewId, LocalDate date) {
         return goalRepository.findCrewGoalSnapshot(crewId, WeekUnit.from(date));
+    }
+
+    @Transactional(readOnly = true)
+    public MemberGoalSnapshot getMemberGoalSnapshot(GoalCommand.GetMemberSnapshot command) {
+        return goalRepository.findMemberGoalSnapshotOfWeek(
+                        command.memberId(), WeekUnit.from(command.localDate()))
+                .orElse(MemberGoalSnapshot.empty(command.memberId(), command.localDate()));
+    }
+
+    @Transactional(readOnly = true)
+    public CrewGoalSnapshot getCrewGoalSnapshot(GoalCommand.GetCrewSnapshot command) {
+        return goalRepository.findCrewGoalSnapshot(command.crewId(), WeekUnit.from(command.localDate()))
+                .orElse(CrewGoalSnapshot.empty(command.crewId(), command.localDate()));
+    }
+
+    @Transactional
+    public MemberGoal updateMemberGoal(GoalCommand.Update command) {
+        MemberGoal memberGoal = goalRepository.findMemberGoalByMemberId(command.memberId())
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+        memberGoal.updateGoal(command.goal());
+        return memberGoal;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CrewGoalSnapshot> getAllLastWeekCrewGoalSnapshots(CrewSnapshots command) {
+        return goalRepository.findAllCrewGoalSnapshots(command.crewIds(),
+                WeekUnit.from(command.localDate().minusWeeks(1)));
     }
 }

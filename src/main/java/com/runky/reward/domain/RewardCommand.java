@@ -23,6 +23,11 @@ public class RewardCommand {
     ) {
     }
 
+    public record Count(
+            Long count
+    ) {
+    }
+
     private RewardCommand() {
     }
 }

@@ -3,6 +3,7 @@ package com.runky.auth.api;
 import java.util.List;
 
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController implements AuthApiSpec {
+public class AuthController {
 	private static final String NEW_USER_REDIRECT = "https://localhost:3000/onboarding/terms";
 
 	private final AuthFacade authFacade;
@@ -34,10 +35,37 @@ public class AuthController implements AuthApiSpec {
 	 * - NEW_USER: signupToken 쿠키 + AuthResponse.NewUser
 	 * - EXISTING_USER: AT/RT 쿠키 + AuthResponse.ExistingUser
 	 */
+	//	@GetMapping("/login/oauth2/code/kakao")
+	//	public ApiResponse<AuthResponse> kakaoCallback(
+	//		@RequestParam("code") String code,
+	//		HttpServletResponse servletResponse
+	//	) {
+	//		AuthResult.OAuthLogin result = authFacade.handleOAuthLogin(code);
+	//
+	//		return switch (result.authStatus()) {
+	//			case NEW_USER -> {
+	//				ResponseCookie st = cookieProvider.signupToken(result.signupToken());
+	//				yield responseHelper.successWithCookiesAndRedirect(
+	//					ApiResponse.success(new AuthResponse.NewUser()),
+	//					List.of(st),
+	//					NEW_USER_REDIRECT,
+	//					servletResponse
+	//				);
+	//			}
+	//			case EXISTING_USER -> {
+	//				ResponseCookie at = cookieProvider.accessToken(result.accessToken());
+	//				ResponseCookie rt = cookieProvider.refreshToken(result.refreshToken());
+	//				yield responseHelper.successWithCookies(
+	//					ApiResponse.success(new AuthResponse.ExistingUser()),
+	//					List.of(at, rt),
+	//					servletResponse
+	//				);
+	//			}
+	//		};
+	//	}
 	@GetMapping("/login/oauth2/code/kakao")
-	public ApiResponse<AuthResponse> kakaoCallback(
-		@RequestParam("code") String code,
-		HttpServletResponse servletResponse
+	public ResponseEntity<ApiResponse<AuthResponse>> kakaoCallback(
+		@RequestParam("code") String code
 	) {
 		AuthResult.OAuthLogin result = authFacade.handleOAuthLogin(code);
 
@@ -47,8 +75,7 @@ public class AuthController implements AuthApiSpec {
 				yield responseHelper.successWithCookiesAndRedirect(
 					ApiResponse.success(new AuthResponse.NewUser()),
 					List.of(st),
-					NEW_USER_REDIRECT,
-					servletResponse
+					NEW_USER_REDIRECT
 				);
 			}
 			case EXISTING_USER -> {
@@ -56,8 +83,7 @@ public class AuthController implements AuthApiSpec {
 				ResponseCookie rt = cookieProvider.refreshToken(result.refreshToken());
 				yield responseHelper.successWithCookies(
 					ApiResponse.success(new AuthResponse.ExistingUser()),
-					List.of(at, rt),
-					servletResponse
+					List.of(at, rt)
 				);
 			}
 		};

@@ -1,21 +1,28 @@
 package com.runky.running.domain;
 
-import com.runky.running.domain.RunningInfo.RunningResult;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import com.runky.running.domain.RunningInfo.RunningResult;
 
 public interface RunningRepository {
-    boolean existsByRunnerIdAndEndedAtIsNull(Long runnerId);
-  
-    boolean existsByIdAndStatus(Long id, Running.Status status);
+	boolean existsByRunnerIdAndEndedAtIsNull(Long runnerId);
 
-    Optional<Running> findByIdAndRunnerId(Long id, Long runnerId);
+	boolean existsByIdAndStatus(Long id, Running.Status status);
 
-    Running save(Running running);
+	Optional<Running> findByIdAndRunnerId(Long id, Long runnerId);
 
-    List<RunningResult> findTotalDistancesPeriod(LocalDateTime from, LocalDateTime to);
-  
-	  Optional<Long> findRunnerIdById(Long id);
+	Running save(Running running);
 
+	List<RunningResult> findTotalDistancesPeriod(LocalDateTime from, LocalDateTime to);
+
+	Optional<Long> findRunnerIdById(Long id);
+
+	boolean existsByRunnerIdAndStatusAndEndedAtIsNull(Long memberId, Running.Status status);
+
+	Set<Long> findRunnerIdsByStatusAndEndedAtIsNull(final Collection<Long> runnerIds, final Running.Status status);
+	
 }

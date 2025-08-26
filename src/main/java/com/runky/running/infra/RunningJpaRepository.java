@@ -1,8 +1,10 @@
 package com.runky.running.infra;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -31,4 +33,14 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 	@Query("select r.runnerId from Running r where r.id = :id")
 	Optional<Long> findRunnerIdById(Long id);
 
+	boolean existsByRunnerIdAndStatusAndEndedAtIsNull(Long runnerId, Running.Status status);
+
+	@Query("""
+		select distinct r.runnerId
+		  from Running r
+		 where r.status = :status
+		   and r.endedAt is null
+		   and r.runnerId in :runnerIds
+		""")
+	Set<Long> findRunnerIdsByStatusAndEndedAtIsNull(Collection<Long> runnerIds, Running.Status status);
 }

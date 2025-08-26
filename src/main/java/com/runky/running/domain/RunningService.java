@@ -2,6 +2,7 @@ package com.runky.running.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,5 +72,23 @@ public class RunningService {
 	public Long getRunnerId(final Long runningId) {
 		return runningRepository.findRunnerIdById(runningId)
 			.orElseThrow(() -> new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING));
+	}
+
+	@Transactional(readOnly = true)
+	public boolean getRunnerStatus(final Long runnerId) {
+		return runningRepository.existsByRunnerIdAndStatusAndEndedAtIsNull(runnerId, Running.Status.RUNNING);
+	}
+
+	@Transactional(readOnly = true)
+	public List<RunningInfo.RunnerStatus> getRunnerStatuses(List<Long> runnerIds) {
+
+		List<Long> distinctIds = runnerIds.stream().distinct().toList();
+
+		Set<Long> activeIds = runningRepository
+			.findRunnerIdsByStatusAndEndedAtIsNull(distinctIds, Running.Status.RUNNING);
+
+		return distinctIds.stream()
+			.map(id -> new RunningInfo.RunnerStatus(id, activeIds.contains(id)))
+			.toList();
 	}
 }

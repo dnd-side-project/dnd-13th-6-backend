@@ -19,9 +19,12 @@ public sealed interface RunningInfo {
 		implements RunningInfo {
 	}
 
-    record TotalDistance(Long runnerId, Double totalDistance) implements RunningInfo {
-    }
+	record TotalDistance(Long runnerId, Double totalDistance) implements RunningInfo {
+	}
 
-    record RunningResult(Long runnerId, Double distance) implements RunningInfo {
-    }
+	record RunningResult(Long runnerId, Double distance) implements RunningInfo {
+	}
+
+	record RunnerStatus(Long runnerId, boolean isRunning) implements RunningInfo {
+	}
 }

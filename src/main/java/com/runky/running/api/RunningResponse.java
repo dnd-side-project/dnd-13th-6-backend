@@ -20,4 +20,10 @@ public sealed interface RunningResponse {
 				result.endedAt());
 		}
 	}
+
+	record TodaySummary(Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMps) {
+		public static TodaySummary from(RunningResult.TodaySummary r) {
+			return new RunningResponse.TodaySummary(r.totalDistanceMeters(), r.durationSeconds(), r.avgSpeedMps());
+		}
+	}
 }

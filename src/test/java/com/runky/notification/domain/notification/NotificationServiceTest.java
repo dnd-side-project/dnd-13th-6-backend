@@ -1,15 +1,16 @@
 package com.runky.notification.domain.notification;
 
-import static org.assertj.core.api.Assertions.*;
+import java.util.Map;
 
-import java.util.List;
-
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.runky.notification.domain.aggregate.PushCommand;
+import com.runky.notification.domain.aggregate.PushService;
 import com.runky.utils.DatabaseCleanUp;
 
 @SpringBootTest
@@ -22,6 +23,9 @@ class NotificationServiceTest {
 	NotificationRepository notificationRepository;
 
 	@Autowired
+	PushService pushService;
+
+	@Autowired
 	private DatabaseCleanUp databaseCleanUp;
 
 	@AfterEach
@@ -29,38 +33,40 @@ class NotificationServiceTest {
 		databaseCleanUp.truncateAllTables();
 	}
 
-	@DisplayName("최신순(생성일 내림차순, id 내림차순)으로 최대 10개의 알림을 조회한다.")
+	@DisplayName("20건 발송 후 getRecentTopN(10)은 최신 10건을 반환한다(내림차순).")
 	@Test
-	void recentTop10_returns_latest_first() throws Exception {
+	void push_20_then_recentTop10_desc() {
 		// given
-		Long receiverId = 1L;
+		Long receiverId = 2L;
+		Long senderId = 10L;
 
-		// senderId 1..20을 저장 (최신이 뒤에서 들어오게함)
-		for (long senderId = 1; senderId <= 20; senderId++) {
-			notificationRepository.save(
-				Notification.record(senderId, receiverId, "제목" + senderId, "메세지" + senderId)
+		pushService.registerDeviceToken(new PushCommand.DeviceToken.Register(receiverId, "token-xyz", "IOS"));
+
+		for (int i = 1; i <= 20; i++) {
+			var cmd = new PushCommand.Notify.ToOne(
+				senderId,
+				receiverId,
+				new NotificationMessage.Cheer(new Nickname("닉네임" + i)),
+				Map.of("no", String.valueOf(i))
 			);
-
+			pushService.pushToOne(cmd);
 		}
 
-		NotificationCommand.GetRecentTopN command =
-			new NotificationCommand.GetRecentTopN(receiverId, 10);
-
-		// when
-		NotificationInfo.Summaries summaries = notificationService.getRecentTopN(command);
-		List<NotificationInfo.Summary> values = summaries.values();
+		// when 최근 10건 조회
+		NotificationInfo.Summaries summaries =
+			notificationService.getRecentTopN(new NotificationCommand.GetRecentTopN(receiverId, 10));
 
 		// then
-		assertThat(values).hasSize(10);
-
-		// 최신순으로 20..11의 senderId가 와야 한다.
-		assertThat(values)
-			.extracting(NotificationInfo.Summary::senderId)
-			.containsExactly(20L, 19L, 18L, 17L, 16L, 15L, 14L, 13L, 12L, 11L);
-
-		assertThat(values)
-			.extracting(NotificationInfo.Summary::title)
-			.containsExactly("제목20", "제목19", "제목18", "제목17", "제목16",
-				"제목15", "제목14", "제목13", "제목12", "제목11");
+		Assertions.assertThat(summaries.values()).hasSize(10);
+		// createdAt 내림차순
+		for (int i = 0; i < summaries.values().size() - 1; i++) {
+			Assertions.assertThat(summaries.values().get(i).createdAt())
+				.isAfterOrEqualTo(summaries.values().get(i + 1).createdAt());
+		}
+		// 가장 최근 건은 닉네임20
+		var first = summaries.values().get(0);
+		Assertions.assertThat(first.template()).isEqualTo(NotificationTemplate.CHEER);
+		Assertions.assertThat(first.variables().get("NICKNAME")).isEqualTo("닉네임20");
+		Assertions.assertThat(first.message()).isEqualTo("닉네임20님이 행운을 보냈어요!🍀");
 	}
 }

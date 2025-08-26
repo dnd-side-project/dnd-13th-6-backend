@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController implements AuthApiSpec {
-	private static final String NEW_USER_REDIRECT = "http://localhost:3000/onboarding/terms";
+	private static final String NEW_USER_REDIRECT = "https://localhost:3000/onboarding/terms";
 
 	private final AuthFacade authFacade;
 	private final TokenCookieProvider cookieProvider;

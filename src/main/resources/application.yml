@@ -33,43 +33,6 @@ kakao:
   client-id: ${KAKAO_CLIENT_ID}
   redirect-url: ${KAKAO_REDIRECT_URL}
 
-
-runky:
-  security:
-    signup-token:
-      ttlMinutes: ${SIGNUP_TTL}
-    jwt:
-      access:
-        secret-key: ${JWT_ACCESS_SECRET}
-        expiration-minutes: ${ACCESS_EXPIRATION}
-        algorithm: ${ACCESS_ALGORITHM}
-      refresh:
-        secret-key: ${JWT_REFRESH_SECRET}
-        expiration-minutes: ${REFRESH_EXPIRATION}
-        algorithm: ${REFRESH_ALGORITHM}
-
-    refresh-token:
-      hash:
-        mode: ${REFRESH_HASH_MODE}
-        algorithm: ${REFRESH_HASH_ALGORITHM}
-        pepper: ${REFRESH_TOKEN_PEPPER}
-
-    cookie:
-      common:
-        path: "/"
-        http-only: true
-        secure: false
-        same-site: None
-      access:
-        name: "accessToken"
-        max-age-minutes: 1440
-      refresh:
-        name: "refreshToken"
-        max-age-minutes: 10080
-      signup:
-        name: "signupToken"
-        max-age-minutes: 10
-
 ---
 spring:
   config:
@@ -105,7 +68,7 @@ runky:
       common:
         path: ${COOKIE_COMMON_PATH:/}
         domain: ${COOKIE_COMMON_DOMAIN:}
-        http-only: ${COOKIE_COMMON_HTTPONLY:true}
+        http-only: ${COOKIE_COMMON_HTTPONLY:false}
         secure: ${COOKIE_COMMON_SECURE:true}
         same-site: ${COOKIE_COMMON_SAMESITE:None}
       access:
@@ -126,3 +89,40 @@ spring:
 
 fcm:
   private-key: ${FCM_PRIVATE_KEY}
+
+runky:
+  security:
+    signup-token:
+      ttlMinutes: ${SIGNUP_TTL}
+    jwt:
+      access:
+        secret-key: ${JWT_ACCESS_SECRET}
+        expiration-minutes: ${ACCESS_EXPIRATION}
+        algorithm: ${ACCESS_ALGORITHM}
+      refresh:
+        secret-key: ${JWT_REFRESH_SECRET}
+        expiration-minutes: ${REFRESH_EXPIRATION}
+        algorithm: ${REFRESH_ALGORITHM}
+
+    refresh-token:
+      hash:
+        mode: ${REFRESH_HASH_MODE}
+        algorithm: ${REFRESH_HASH_ALGORITHM}
+        pepper: ${REFRESH_TOKEN_PEPPER}
+
+    cookie:
+      common:
+        path: ${COOKIE_COMMON_PATH}
+        domain: ${COOKIE_COMMON_DOMAIN}
+        http-only: ${COOKIE_COMMON_HTTPONLY}
+        secure: ${COOKIE_COMMON_SECURE}
+        same-site: ${COOKIE_COMMON_SAMESITE}
+      access:
+        name: "accessToken"
+        max-age-minutes: 1440
+      refresh:
+        name: "refreshToken"
+        max-age-minutes: 10080
+      signup:
+        name: "signupToken"
+        max-age-minutes: 10

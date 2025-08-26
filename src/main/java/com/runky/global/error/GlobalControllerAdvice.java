@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.runky.global.response.ApiResponse;
 
@@ -102,6 +103,17 @@ public class GlobalControllerAdvice {
 	protected ResponseEntity<ApiResponse<Void>> handleNoHandlerFoundException(NoHandlerFoundException ex) {
 		log.warn("요청 URL을 찾을 수 없습니다. method={}, uri={}", ex.getHttpMethod(), ex.getRequestURL());
 
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+			.body(ApiResponse.error(GlobalErrorCode.NOT_FOUND));
+	}
+
+	/**
+	 * 아래 예외 무시하기 위해 추가
+	 * org.springframework.web.servlet.resource.NoResourceFoundException: No static resource favicon.ico.
+	 */
+	@ExceptionHandler(NoResourceFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	protected ResponseEntity<ApiResponse<Void>> handleNoResourceFoundException(NoResourceFoundException ex) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND)
 			.body(ApiResponse.error(GlobalErrorCode.NOT_FOUND));
 	}

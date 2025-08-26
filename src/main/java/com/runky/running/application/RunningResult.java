@@ -31,4 +31,10 @@ public sealed interface RunningResult {
 		}
 	}
 
+	record TodaySummary(Double totalDistanceMeters, Long durationSeconds, Double avgSpeedMps) {
+		public static TodaySummary from(RunningInfo.TodaySummary info) {
+			return new TodaySummary(info.totalDistanceMeters(), info.durationSeconds(), info.avgSpeedMps());
+		}
+
+	}
 }

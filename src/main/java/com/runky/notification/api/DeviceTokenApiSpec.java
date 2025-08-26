@@ -1,10 +1,10 @@
 package com.runky.notification.api;
 
 import com.runky.global.response.ApiResponse;
+import com.runky.global.security.auth.MemberPrincipal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -18,15 +18,8 @@ public interface DeviceTokenApiSpec {
 			- 이미 등록된 토큰(유니크 키 충돌)일 경우 409 응답으로 처리됩니다.
 			"""
 	)
-	@Parameter(
-		name = "X-USER-ID",
-		description = "사용자 ID",
-		required = true,
-		in = ParameterIn.HEADER,
-		schema = @Schema(type = "integer", format = "int64", example = "123")
-	)
 	ApiResponse<Void> register(
-		Long userId,
+		@Parameter(hidden = true) MemberPrincipal requester,
 		@Schema(description = "디바이스 토큰 등록 요청 바디") DeviceTokenRequest.Register request
 	);
 
@@ -37,15 +30,8 @@ public interface DeviceTokenApiSpec {
 			- 요청된 토큰이 존재하지 않으면 404 또는 사내 규약의 에러 코드로 응답됩니다.
 			"""
 	)
-	@Parameter(
-		name = "X-USER-ID",
-		description = "사용자 ID",
-		required = true,
-		in = ParameterIn.HEADER,
-		schema = @Schema(type = "integer", format = "int64", example = "123")
-	)
 	ApiResponse<DeviceTokenResponse.Delete> delete(
-		Long userId,
+		@Parameter(hidden = true) MemberPrincipal requester,
 		@Schema(description = "디바이스 토큰 삭제 요청 바디") DeviceTokenRequest.Delete request
 	);
 }

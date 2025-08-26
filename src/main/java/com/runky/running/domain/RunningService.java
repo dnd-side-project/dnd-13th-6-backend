@@ -1,11 +1,10 @@
 package com.runky.running.domain;
 
-import com.runky.running.domain.RunningInfo;
 import java.time.LocalDateTime;
-
-
 import java.util.List;
-import org.springframework.context.ApplicationEventPublisher;
+import java.util.Objects;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class RunningService {
-
 	private final RunningRepository runningRepository;
 	private final RunningTrackRepository trackRepository;
 
@@ -40,7 +38,7 @@ public class RunningService {
 			throw new GlobalException(RunningErrorCode.NOT_ACTIVE_RUNNING);
 		}
 
-        LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.now();
 		running.finish(command.totalDistanceMinutes(), command.durationSeconds(), command.avgSpeedMPS(), now);
 		runningRepository.save(running);
 
@@ -60,17 +58,62 @@ public class RunningService {
 			running.getStartedAt(), running.getEndedAt());
 	}
 
-    @Transactional(readOnly = true)
-    public List<RunningInfo.RunningResult> getTotalDistancesPeriod(LocalDateTime from, LocalDateTime to) {
-        return runningRepository.findTotalDistancesPeriod(from, to);
-    }
+	@Transactional(readOnly = true)
+	public List<RunningInfo.RunningResult> getTotalDistancesPeriod(LocalDateTime from, LocalDateTime to) {
+		return runningRepository.findTotalDistancesPeriod(from, to);
+	}
 
+	@Transactional(readOnly = true)
 	public boolean isActive(final Long runningId) {
 		return runningRepository.existsByIdAndStatus(runningId, Running.Status.RUNNING);
 	}
 
+	@Transactional(readOnly = true)
 	public Long getRunnerId(final Long runningId) {
 		return runningRepository.findRunnerIdById(runningId)
 			.orElseThrow(() -> new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING));
+	}
+
+	@Transactional(readOnly = true)
+	public boolean getRunnerStatus(final Long runnerId) {
+		return runningRepository.existsByRunnerIdAndStatusAndEndedAtIsNull(runnerId, Running.Status.RUNNING);
+	}
+
+	@Transactional(readOnly = true)
+	public List<RunningInfo.RunnerStatus> getRunnerStatuses(List<Long> runnerIds) {
+
+		List<Long> distinctIds = runnerIds.stream().distinct().toList();
+
+		Set<Long> activeIds = runningRepository
+			.findRunnerIdsByStatusAndEndedAtIsNull(distinctIds, Running.Status.RUNNING);
+
+		return distinctIds.stream()
+			.map(id -> new RunningInfo.RunnerStatus(id, activeIds.contains(id)))
+			.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public RunningInfo.TodaySummary getTodaySummary(final Long runnerId, final LocalDateTime now) {
+
+		List<Running> runs = runningRepository.findFinishedOnDate(runnerId, now);
+		if (runs.isEmpty()) {
+			throw new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING);
+		}
+
+		double totalDistance = runs.stream()
+			.map(Running::getTotalDistanceMeter)
+			.filter(Objects::nonNull)
+			.mapToDouble(Double::doubleValue)
+			.sum();
+
+		long totalSeconds = runs.stream()
+			.map(Running::getDurationSeconds)
+			.filter(Objects::nonNull)
+			.mapToLong(Long::longValue)
+			.sum();
+
+		Double avgSpeedMps = (totalSeconds == 0) ? null : totalDistance / totalSeconds;
+
+		return new RunningInfo.TodaySummary(totalDistance, totalSeconds, avgSpeedMps);
 	}
 }

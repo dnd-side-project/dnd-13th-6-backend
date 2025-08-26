@@ -1,6 +1,7 @@
 package com.runky.cheer.api;
 
 import com.runky.global.response.ApiResponse;
+import com.runky.global.security.auth.MemberPrincipal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,13 +19,6 @@ public interface CheerApiSpec {
 			"""
 	)
 	@Parameter(
-		name = "X-USER-ID",
-		description = "응원을 보내는 사용자 ID",
-		required = true,
-		in = ParameterIn.HEADER,
-		schema = @Schema(type = "integer", format = "int64", example = "100")
-	)
-	@Parameter(
 		name = "runningId",
 		description = "응원할 달리기의 ID",
 		required = true,
@@ -32,7 +26,7 @@ public interface CheerApiSpec {
 		schema = @Schema(type = "integer", format = "int64", example = "1")
 	)
 	ApiResponse<CheerResponse.Sent> send(
-		Long senderId,
+		@Parameter(hidden = true) MemberPrincipal requester,
 		Long runningId,
 		@Schema(description = "응원 메시지 전송 요청 바디") CheerRequest.Send request
 	);

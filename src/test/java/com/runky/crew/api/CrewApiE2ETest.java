@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.runky.auth.domain.port.TokenIssuer;
 import com.runky.crew.domain.Code;
 import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewCommand;
@@ -29,6 +30,8 @@ class CrewApiE2ETest {
 	private final TestRestTemplate testRestTemplate;
 	private final DatabaseCleanUp databaseCleanUp;
 	private final CrewRepository crewRepository;
+	@Autowired
+	private TokenIssuer tokenIssuer;
 
 	@Autowired
 	public CrewApiE2ETest(TestRestTemplate testRestTemplate, DatabaseCleanUp databaseCleanUp,
@@ -43,6 +46,15 @@ class CrewApiE2ETest {
 		databaseCleanUp.truncateAllTables();
 	}
 
+	private HttpHeaders authHeaders(long memberId, String role) {
+		var issued = tokenIssuer.issue(memberId, role);
+		String accessToken = issued.access().token();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.COOKIE, "accessToken=" + accessToken);
+		return headers;
+	}
+
 	@Nested
 	@DisplayName("POST /api/crews")
 	class Create {
@@ -55,8 +67,8 @@ class CrewApiE2ETest {
 			crewRepository.save(CrewMemberCount.of(userId));
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Create>> responseType = new ParameterizedTypeReference<>() {
 			};
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(userId));
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
+
 			CrewRequest.Create request = new CrewRequest.Create("Test Crew");
 
 			ResponseEntity<ApiResponse<CrewResponse.Create>> response =
@@ -85,8 +97,8 @@ class CrewApiE2ETest {
 			crewRepository.save(CrewMemberCount.of(userId));
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Join>> responseType = new ParameterizedTypeReference<>() {
 			};
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(userId));
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
+
 			CrewRequest.Join request = new CrewRequest.Join(crew.getCode().value());
 
 			ResponseEntity<ApiResponse<CrewResponse.Join>> response =
@@ -111,8 +123,8 @@ class CrewApiE2ETest {
 			Crew crew1 = crewRepository.save(Crew.of(new CrewCommand.Create(userId, "Crew 1"), new Code("abc123")));
 			Crew crew2 = crewRepository.save(Crew.of(new CrewCommand.Create(userId, "Crew 2"), new Code("abc456")));
 
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(userId));
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
+
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Cards>> responseType = new ParameterizedTypeReference<>() {
 			};
 
@@ -139,8 +151,8 @@ class CrewApiE2ETest {
 			crewRepository.save(CrewMemberCount.of(userId));
 			Crew crew = crewRepository.save(Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123")));
 
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(userId));
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
+
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Detail>> responseType = new ParameterizedTypeReference<>() {
 			};
 
@@ -174,8 +186,8 @@ class CrewApiE2ETest {
 			crewMemberCount.increment();
 			crewRepository.save(crewMemberCount);
 
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(2L));
+			HttpHeaders httpHeaders = authHeaders(2L, "USER");
+
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Leave>> responseType = new ParameterizedTypeReference<>() {
 			};
 
@@ -207,8 +219,8 @@ class CrewApiE2ETest {
 			crew.leaveMember(4L);
 			Crew savedCrew = crewRepository.save(crew);
 
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(userId));
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
+
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Members>> responseType = new ParameterizedTypeReference<>() {
 			};
 
@@ -234,8 +246,8 @@ class CrewApiE2ETest {
 			Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
 			Crew savedCrew = crewRepository.save(crew);
 
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(userId));
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
+
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Notice>> responseType = new ParameterizedTypeReference<>() {
 			};
 
@@ -261,9 +273,8 @@ class CrewApiE2ETest {
 			crewRepository.save(CrewMemberCount.of(userId));
 			Crew crew = Crew.of(new CrewCommand.Create(userId, "Old Crew Name"), new Code("abc123"));
 			Crew savedCrew = crewRepository.save(crew);
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
 
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(userId));
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Name>> responseType = new ParameterizedTypeReference<>() {
 			};
 
@@ -296,8 +307,8 @@ class CrewApiE2ETest {
 			crew.joinMember(2L);
 			Crew savedCrew = crewRepository.save(crew);
 
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(userId));
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
+
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Disband>> responseType = new ParameterizedTypeReference<>() {
 			};
 
@@ -323,8 +334,8 @@ class CrewApiE2ETest {
 			crew.joinMember(2L);
 			Crew savedCrew = crewRepository.save(crew);
 
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(userId));
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
+
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Delegate>> responseType = new ParameterizedTypeReference<>() {
 			};
 
@@ -357,8 +368,8 @@ class CrewApiE2ETest {
 			crew.joinMember(2L);
 			Crew savedCrew = crewRepository.save(crew);
 
-			HttpHeaders httpHeaders = new HttpHeaders();
-			httpHeaders.add("X-USER-ID", String.valueOf(1L));
+			HttpHeaders httpHeaders = authHeaders(userId, "USER");
+
 			ParameterizedTypeReference<ApiResponse<CrewResponse.Ban>> responseType = new ParameterizedTypeReference<>() {
 			};
 

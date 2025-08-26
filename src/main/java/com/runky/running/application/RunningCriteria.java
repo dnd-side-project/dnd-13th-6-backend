@@ -1,5 +1,7 @@
 package com.runky.running.application;
 
+import java.time.LocalDateTime;
+
 import com.runky.running.domain.RunningCommand;
 
 public sealed interface RunningCriteria {
@@ -28,5 +30,8 @@ public sealed interface RunningCriteria {
 				runningId, runnerId, totalDistanceMinutes, durationSeconds, avgSpeedMPS, format, points, pointCount
 			);
 		}
+	}
+
+	record TodaySummary(Long runnerId, LocalDateTime now) implements RunningCriteria {
 	}
 }

@@ -7,6 +7,7 @@ import javax.crypto.SecretKey;
 import org.springframework.stereotype.Component;
 
 import com.runky.auth.domain.port.TokenDecoder;
+import com.runky.auth.domain.vo.AccessTokenClaims;
 import com.runky.auth.domain.vo.RefreshTokenClaims;
 import com.runky.auth.exception.domain.ExpiredTokenException;
 import com.runky.auth.exception.domain.InvalidTokenException;
@@ -22,6 +23,31 @@ import lombok.RequiredArgsConstructor;
 public class JwtTokenDecoder implements TokenDecoder {
 
 	private final JwtSigningKeyProvider signingKeyProvider;
+
+	@Override
+	public AccessTokenClaims decodeAccess(String accessToken) {
+		if (accessToken == null || accessToken.isBlank()) {
+			throw new InvalidTokenException();
+		}
+		try {
+			SecretKey key = signingKeyProvider.accessKey();
+
+			Claims claims = Jwts.parser()
+				.verifyWith(key)
+				.build()
+				.parseSignedClaims(accessToken)
+				.getPayload();
+
+			Long memberId = Long.valueOf(claims.getSubject());
+			String role = claims.get("role", String.class);
+
+			return new AccessTokenClaims(memberId, role);
+		} catch (ExpiredJwtException e) {
+			throw new ExpiredTokenException();
+		} catch (JwtException | IllegalArgumentException e) {
+			throw new InvalidTokenException();
+		}
+	}
 
 	@Override
 	public RefreshTokenClaims decodeRefresh(String refreshToken) {

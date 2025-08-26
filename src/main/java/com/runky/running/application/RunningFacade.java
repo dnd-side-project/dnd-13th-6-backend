@@ -1,5 +1,6 @@
 package com.runky.running.application;
 
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class RunningFacade {
+	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 	private final RunningService runningService;
 	private final PushService pushService;
 	private final MemberService memberService;
@@ -47,6 +49,12 @@ public class RunningFacade {
 	public RunningResult.End end(RunningCriteria.End criteria) {
 		RunningInfo.End info = runningService.end(criteria.toCommand());
 		return RunningResult.End.from(info);
+	}
+
+	@Transactional(readOnly = true)
+	public RunningResult.TodaySummary getTodaySummary(RunningCriteria.TodaySummary criteria) {
+
+		return RunningResult.TodaySummary.from(runningService.getTodaySummary(criteria.runnerId(), criteria.now()));
 	}
 
 }

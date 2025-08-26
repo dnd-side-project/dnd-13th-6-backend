@@ -43,4 +43,14 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 		   and r.runnerId in :runnerIds
 		""")
 	Set<Long> findRunnerIdsByStatusAndEndedAtIsNull(Collection<Long> runnerIds, Running.Status status);
+
+	@Query("""
+			select r
+			  from Running r
+			 where r.runnerId = :runnerId
+			   and r.status = com.runky.running.domain.Running$Status.FINISHED
+			   and r.endedAt >= :from and r.endedAt < :to
+			 order by r.endedAt desc
+		""")
+	List<Running> findFinishedByEndedAtBetween(Long runnerId, LocalDateTime from, LocalDateTime to);
 }

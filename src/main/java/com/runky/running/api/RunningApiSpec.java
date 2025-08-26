@@ -22,5 +22,13 @@ public interface RunningApiSpec {
 		@Schema(description = "종료할 런닝 ID") Long runningId,
 		@Schema(description = "런닝 요약 및 트랙 정보") RunningRequest.End request
 	);
+
+	@Operation(
+		summary = "오늘 달린 기록 요약 조회",
+		description = "요청자 기준 KST(UTC+9) ‘오늘’에 **완료된** 모든 런닝 기록을 합산하여 요약을 반환합니다."
+	)
+	ApiResponse<RunningResponse.TodaySummary> getToday(
+		@Parameter(hidden = true) MemberPrincipal requester
+	);
 }
 

@@ -1,6 +1,10 @@
 package com.runky.running.api;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/runnings")
 @RequiredArgsConstructor
 public class RunningController implements RunningApiSpec {
+	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
 	private final RunningFacade runningFacade;
 
@@ -45,5 +50,14 @@ public class RunningController implements RunningApiSpec {
 
 		RunningResponse.End response = RunningResponse.End.from(result);
 		return ApiResponse.success(response);
+	}
+
+	@GetMapping("/today")
+	public ApiResponse<RunningResponse.TodaySummary> getToday(
+		@AuthenticationPrincipal MemberPrincipal requester
+	) {
+		var result = runningFacade.getTodaySummary(new RunningCriteria.TodaySummary(requester.memberId(),
+			LocalDateTime.now().atZone(KST).toLocalDateTime()));
+		return ApiResponse.success(RunningResponse.TodaySummary.from(result));
 	}
 }

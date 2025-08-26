@@ -1,5 +1,6 @@
 package com.runky.running.infra;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -61,4 +62,13 @@ public class RunningRepositoryImpl implements RunningRepository {
 		final Running.Status status) {
 		return jpaRepository.findRunnerIdsByStatusAndEndedAtIsNull(runnerIds, status);
 	}
+
+	@Override
+	public List<Running> findFinishedOnDate(final Long runnerId, final LocalDateTime now) {
+		LocalDate day = now.toLocalDate();
+		LocalDateTime from = day.atStartOfDay();
+		LocalDateTime to = day.plusDays(1).atStartOfDay();
+		return jpaRepository.findFinishedByEndedAtBetween(runnerId, from, to);
+	}
+
 }

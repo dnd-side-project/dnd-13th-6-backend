@@ -2,6 +2,7 @@ package com.runky.running.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
@@ -15,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class RunningService {
-
 	private final RunningRepository runningRepository;
 	private final RunningTrackRepository trackRepository;
 
@@ -90,5 +90,30 @@ public class RunningService {
 		return distinctIds.stream()
 			.map(id -> new RunningInfo.RunnerStatus(id, activeIds.contains(id)))
 			.toList();
+	}
+
+	@Transactional(readOnly = true)
+	public RunningInfo.TodaySummary getTodaySummary(final Long runnerId, final LocalDateTime now) {
+
+		List<Running> runs = runningRepository.findFinishedOnDate(runnerId, now);
+		if (runs.isEmpty()) {
+			throw new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING);
+		}
+
+		double totalDistance = runs.stream()
+			.map(Running::getTotalDistanceMeter)
+			.filter(Objects::nonNull)
+			.mapToDouble(Double::doubleValue)
+			.sum();
+
+		long totalSeconds = runs.stream()
+			.map(Running::getDurationSeconds)
+			.filter(Objects::nonNull)
+			.mapToLong(Long::longValue)
+			.sum();
+
+		Double avgSpeedMps = (totalSeconds == 0) ? null : totalDistance / totalSeconds;
+
+		return new RunningInfo.TodaySummary(totalDistance, totalSeconds, avgSpeedMps);
 	}
 }

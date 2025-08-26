@@ -1,5 +1,7 @@
 package com.runky.goal.application;
 
+import com.runky.crew.domain.Crew;
+import com.runky.crew.domain.CrewService;
 import com.runky.goal.domain.CrewGoalSnapshot;
 import com.runky.goal.domain.GoalCommand;
 import com.runky.goal.domain.GoalService;
@@ -8,6 +10,9 @@ import com.runky.goal.domain.MemberGoalSnapshot;
 import com.runky.reward.domain.RewardCommand;
 import com.runky.reward.domain.RewardService;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +22,7 @@ public class GoalFacade {
 
     private final GoalService goalService;
     private final RewardService rewardService;
+    private final CrewService crewService;
 
     public MemberGoalSnapshotResult getMemberGoalSnapshot(GoalCriteria.MemberGoal criteria) {
         MemberGoalSnapshot memberGoalSnapshot = goalService.getMemberGoalSnapshot(
@@ -47,7 +53,7 @@ public class GoalFacade {
         return CrewGoalSnapshotResult.from(snapshot);
     }
 
-    public MemberGoalSnapshotResult.Clover getLastWeekMemberGoalClover(GoalCriteria.MemberGoal criteria) {
+    public MemberGoalSnapshotResult.Clover getLastWeekMemberGoalClover(GoalCriteria.LastWeekClover criteria) {
         MemberGoalSnapshot memberGoalSnapshot = goalService.getMemberGoalSnapshot(
                 new GoalCommand.GetMemberSnapshot(criteria.memberId(), LocalDate.now().minusWeeks(1)));
         if (!memberGoalSnapshot.getAchieved()) {
@@ -55,5 +61,22 @@ public class GoalFacade {
         }
         long clover = rewardService.calculateMemberGoalClover(new RewardCommand.Count(1L));
         return new MemberGoalSnapshotResult.Clover(clover);
+    }
+
+    public CrewGoalSnapshotResult.Clover getLastWeekCrewGoalClover(GoalCriteria.LastWeekClover criteria) {
+        List<Crew> crews = crewService.getCrewsOfUser(criteria.memberId());
+
+        Set<Long> crewIds = crews.stream()
+                .map(Crew::getId)
+                .collect(Collectors.toSet());
+
+        GoalCommand.CrewSnapshots command = new GoalCommand.CrewSnapshots(crewIds, LocalDate.now());
+        List<CrewGoalSnapshot> achievedSnapshots = goalService.getAllLastWeekCrewGoalSnapshots(command).stream()
+                .filter(CrewGoalSnapshot::getAchieved)
+                .toList();
+
+        long count = rewardService.calculateCrewGoalClover(new RewardCommand.Count((long) achievedSnapshots.size()));
+
+        return new CrewGoalSnapshotResult.Clover(count);
     }
 }

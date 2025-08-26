@@ -3,6 +3,7 @@ package com.runky.goal.api;
 import com.runky.global.response.ApiResponse;
 import com.runky.goal.application.CrewGoalSnapshotResult;
 import com.runky.goal.application.GoalCriteria;
+import com.runky.goal.application.GoalCriteria.LastWeekClover;
 import com.runky.goal.application.GoalFacade;
 import com.runky.goal.application.MemberGoalResult;
 import com.runky.goal.application.MemberGoalSnapshotResult;
@@ -64,7 +65,14 @@ public class GoalController implements GoalApiSpec {
     @GetMapping("/me/last/clovers")
     public ApiResponse<GoalResponse.Clover> getMemberGoalClovers(@RequestHeader("X-USER-ID") Long userId) {
         MemberGoalSnapshotResult.Clover result =
-                goalFacade.getLastWeekMemberGoalClover(new GoalCriteria.MemberGoal(userId));
+                goalFacade.getLastWeekMemberGoalClover(new GoalCriteria.LastWeekClover(userId));
+        return ApiResponse.success(new GoalResponse.Clover(result.count()));
+    }
+
+    @Override
+    @GetMapping("/crews/last/clovers")
+    public ApiResponse<GoalResponse.Clover> getCrewGoalClovers(@RequestHeader("X-USER-ID") Long userId) {
+        CrewGoalSnapshotResult.Clover result = goalFacade.getLastWeekCrewGoalClover(new LastWeekClover(userId));
         return ApiResponse.success(new GoalResponse.Clover(result.count()));
     }
 }

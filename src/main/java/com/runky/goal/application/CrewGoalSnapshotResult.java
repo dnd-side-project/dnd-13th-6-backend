@@ -17,4 +17,7 @@ public record CrewGoalSnapshotResult(
                 snapshot.getAchieved()
         );
     }
+
+    public record Clover(Long count) {
+    }
 }

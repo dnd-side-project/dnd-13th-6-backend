@@ -12,4 +12,7 @@ public class GoalCriteria {
 
     public record Update(Long memberId, BigDecimal goal) {
     }
+
+    public record LastWeekClover(Long memberId) {
+    }
 }

@@ -3,6 +3,10 @@ package com.runky.goal.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.runky.crew.domain.Code;
+import com.runky.crew.domain.Crew;
+import com.runky.crew.domain.CrewCommand;
+import com.runky.crew.domain.CrewRepository;
 import com.runky.global.response.ApiResponse;
 import com.runky.goal.domain.CrewGoalSnapshot;
 import com.runky.goal.domain.Goal;
@@ -36,6 +40,8 @@ public class GoalApiE2ETest {
     private DatabaseCleanUp databaseCleanUp;
     @Autowired
     private GoalRepository goalRepository;
+    @Autowired
+    private CrewRepository crewRepository;
 
     @AfterEach
     void tearDown() {
@@ -183,6 +189,38 @@ public class GoalApiE2ETest {
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
             assertThat(response.getBody().getResult().count()).isEqualTo(1);
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/goals/crews/last/clovers")
+    class GetCrewGoalClovers {
+        private final String BASE_URL = "/api/goals/crews/last/clovers";
+
+        @Test
+        @DisplayName("크루의 지난주 클로버 개수를 조회한다.")
+        void getCrewGoalClovers() {
+            Crew crew1 = crewRepository.save(Crew.of(new CrewCommand.Create(1L, "name1"), new Code("abc123")));
+            Crew crew2 = crewRepository.save(Crew.of(new CrewCommand.Create(1L, "name2"), new Code("abc123")));
+            Crew crew3 = crewRepository.save(Crew.of(new CrewCommand.Create(1L, "name3"), new Code("abc123")));
+            CrewGoalSnapshot snapshot1 = CrewGoalSnapshot.empty(crew1.getId(), LocalDate.now().minusWeeks(1));
+            snapshot1.achieve();
+            goalRepository.save(snapshot1);
+            CrewGoalSnapshot snapshot2 = CrewGoalSnapshot.empty(crew2.getId(), LocalDate.now().minusWeeks(1));
+            snapshot2.achieve();
+            goalRepository.save(snapshot2);
+            CrewGoalSnapshot snapshot3 = CrewGoalSnapshot.empty(crew3.getId(), LocalDate.now().minusWeeks(1));
+            goalRepository.save(snapshot3);
+
+            ParameterizedTypeReference<ApiResponse<GoalResponse.Clover>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", "1");
+
+            ResponseEntity<ApiResponse<GoalResponse.Clover>> response = testRestTemplate.exchange(BASE_URL,
+                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+
+            assertThat(response.getBody().getResult().count()).isEqualTo(6);
         }
     }
 }

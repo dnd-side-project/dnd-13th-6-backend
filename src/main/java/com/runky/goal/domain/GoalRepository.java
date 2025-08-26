@@ -27,4 +27,6 @@ public interface GoalRepository {
     List<MemberGoalSnapshot> findLatestSnapshotsOfWeek(Set<Long> memberIds, WeekUnit weekUnit);
 
     Optional<MemberGoal> findMemberGoalByMemberId(Long memberId);
+
+    List<CrewGoalSnapshot> findAllCrewGoalSnapshots(Set<Long> crewId, WeekUnit weekUnit);
 }

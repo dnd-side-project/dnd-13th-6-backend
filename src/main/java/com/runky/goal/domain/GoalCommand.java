@@ -33,4 +33,10 @@ public class GoalCommand {
             BigDecimal goal
     ) {
     }
+
+    public record CrewSnapshots(
+            Set<Long> crewIds,
+            LocalDate localDate
+    ) {
+    }
 }

@@ -9,6 +9,11 @@ public class GoalResponse {
     ) {
     }
 
+    public record Achieve(
+            boolean achieved
+    ) {
+    }
+
     private GoalResponse() {
     }
 }

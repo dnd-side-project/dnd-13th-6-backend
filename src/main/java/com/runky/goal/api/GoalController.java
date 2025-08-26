@@ -44,4 +44,14 @@ public class GoalController implements GoalApiSpec {
         CrewGoalSnapshotResult result = goalFacade.getCrewGoalSnapshot(new GoalCriteria.CrewGoal(crewId));
         return ApiResponse.success(new GoalResponse.Goal(result.goal()));
     }
+
+    @Override
+    @GetMapping("/me/last/achieve")
+    public ApiResponse<GoalResponse.Achieve> getAchieve(@RequestHeader("X-USER-ID") Long userId) {
+        MemberGoalSnapshotResult result = goalFacade.getLastWeekMemberGoalSnapshot(new GoalCriteria.MemberGoal(userId));
+        return ApiResponse.success(new GoalResponse.Achieve(result.achieved()));
+    }
+
+    // TODO 크루/개인 지난주 목표 달성 여부 API
+
 }

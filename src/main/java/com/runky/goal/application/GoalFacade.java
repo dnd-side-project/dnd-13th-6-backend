@@ -31,4 +31,10 @@ public class GoalFacade {
         MemberGoal goal = goalService.updateMemberGoal(new GoalCommand.Update(criteria.memberId(), criteria.goal()));
         return MemberGoalResult.from(goal);
     }
+
+    public MemberGoalSnapshotResult getLastWeekMemberGoalSnapshot(GoalCriteria.MemberGoal criteria) {
+        MemberGoalSnapshot memberGoalSnapshot = goalService.getMemberGoalSnapshot(
+                new GoalCommand.GetMemberSnapshot(criteria.memberId(), LocalDate.now().minusWeeks(1)));
+        return MemberGoalSnapshotResult.from(memberGoalSnapshot);
+    }
 }

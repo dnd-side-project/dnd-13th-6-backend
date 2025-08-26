@@ -112,4 +112,27 @@ public class GoalApiE2ETest {
             assertThat(response.getBody().getResult().goal()).isEqualTo(crewGoalSnapshot.getGoal().value());
         }
     }
+
+    @Nested
+    @DisplayName("GET /api/goals/me/last/achieve")
+    class GetAchieve {
+        private final String BASE_URL = "/api/goals/me/last/achieve";
+
+        @Test
+        @DisplayName("유저의 이번주 목표 달성 여부를 조회한다.")
+        void getAchieve() {
+            goalRepository.save(
+                    new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), true, LocalDate.now().minusWeeks(1)));
+
+            ParameterizedTypeReference<ApiResponse<GoalResponse.Achieve>> responseType = new ParameterizedTypeReference<>() {
+            };
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.set("X-USER-ID", "1");
+
+            ResponseEntity<ApiResponse<GoalResponse.Achieve>> response = testRestTemplate.exchange(BASE_URL,
+                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+
+            assertThat(response.getBody().getResult().achieved()).isTrue();
+        }
+    }
 }

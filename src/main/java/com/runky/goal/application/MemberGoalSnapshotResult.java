@@ -6,13 +6,15 @@ import java.math.BigDecimal;
 public record MemberGoalSnapshotResult(
         Long id,
         Long memberId,
-        BigDecimal goal
+        BigDecimal goal,
+        Boolean achieved
 ) {
     public static MemberGoalSnapshotResult from(MemberGoalSnapshot snapshot) {
         return new MemberGoalSnapshotResult(
                 snapshot.getId(),
                 snapshot.getMemberId(),
-                snapshot.getGoal().value()
+                snapshot.getGoal().value(),
+                snapshot.getAchieved()
         );
     }
 }

@@ -7,10 +7,11 @@ import com.runky.running.application.RunningResult;
 
 public sealed interface RunningResponse {
 
-	record Start(Long runningId, Long runnerId, String status, String publishDestination, LocalDateTime startedAt)
+	record Start(Long runningId, Long runnerId, String status, String pub, String sub,
+				 LocalDateTime startedAt)
 		implements RunningResponse {
-		static Start from(String pub, RunningResult.Start result) {
-			return new Start(result.runningId(), result.runnerId(), result.status(), pub, result.startedAt());
+		static Start from(String pub, String sub, RunningResult.Start result) {
+			return new Start(result.runningId(), result.runnerId(), result.status(), pub, sub, result.startedAt());
 		}
 	}
 

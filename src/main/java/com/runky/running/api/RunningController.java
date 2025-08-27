@@ -32,9 +32,10 @@ public class RunningController implements RunningApiSpec {
 	public ApiResponse<RunningResponse.Start> start(@AuthenticationPrincipal MemberPrincipal requester) {
 		RunningResult.Start result = runningFacade.start(new RunningCriteria.Start(requester.memberId()));
 
-		String publish = "/app/runnings/" + result.runningId() + "/location";
+		String publish = WsDestinations.publish(result.runningId());
+		String subscribe = WsDestinations.subscribe(result.runningId());
 
-		RunningResponse.Start response = RunningResponse.Start.from(publish, result);
+		RunningResponse.Start response = RunningResponse.Start.from(publish, subscribe, result);
 		return ApiResponse.success(response);
 	}
 

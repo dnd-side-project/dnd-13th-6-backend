@@ -164,9 +164,8 @@ public class CrewFacade {
     public CrewResult.Ban banMember(CrewCriteria.Ban criteria) {
         CrewMember bannedMember = crewLeaderService.ban(criteria.toCommand());
 
-        // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
-        String bannedNickname = "Banned Nickname";
+        Member member = memberService.getMember(new MemberCommand.Find(bannedMember.getMemberId()));
 
-        return new CrewResult.Ban(bannedMember.getMemberId(), bannedNickname);
+        return new CrewResult.Ban(bannedMember.getMemberId(), member.getNickname().value());
     }
 }

@@ -28,7 +28,8 @@ public record CrewResult(
             String crewName,
             Long memberCount,
             boolean isLeader,
-            List<String> characters
+            List<String> badgeImageUrls,
+            boolean isRunning
     ) {
     }
 

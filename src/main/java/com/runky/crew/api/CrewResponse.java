@@ -39,7 +39,8 @@ public class CrewResponse {
             String name,
             Long memberCount,
             boolean isLeader,
-            List<String> characters
+            List<String> badgeImageUrls,
+            boolean isRunning
     ) {
         public static Card from(CrewResult.Card card) {
             return new Card(
@@ -47,7 +48,8 @@ public class CrewResponse {
                     card.crewName(),
                     card.memberCount(),
                     card.isLeader(),
-                    card.characters()
+                    card.badgeImageUrls(),
+                    card.isRunning()
             );
         }
     }

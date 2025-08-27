@@ -1,7 +1,9 @@
 package com.runky.member.infrastructure.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
+import java.util.Set;
 import org.springframework.stereotype.Repository;
 
 import com.runky.member.domain.Member;
@@ -33,5 +35,10 @@ public class MemberRepositoryImpl implements MemberRepository {
     @Override
     public Optional<Member> findById(Long id) {
         return jpaMemberRepository.findById(id);
+    }
+
+    @Override
+    public List<Member> findMembers(Set<Long> ids) {
+        return jpaMemberRepository.findByIdIn(ids);
     }
 }

@@ -22,6 +22,8 @@ public interface CrewRepository {
 
 	CrewMemberCount save(CrewMemberCount crewMemberCount);
 
+    CrewMember save(CrewMember crewMember);
+
 	List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds);
 
 	List<Long> findAllCrewMembersOfUserWithoutUserId(Long userId);

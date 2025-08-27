@@ -4,16 +4,30 @@ import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewLeaderService;
 import com.runky.crew.domain.CrewMember;
 import com.runky.crew.domain.CrewService;
+import com.runky.member.domain.Member;
+import com.runky.member.domain.MemberCommand;
+import com.runky.member.domain.MemberService;
+import com.runky.reward.domain.Badge;
+import com.runky.reward.domain.RewardCommand;
+import com.runky.reward.domain.RewardService;
+import com.runky.running.domain.RunningService;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
 public class CrewFacade {
     private final CrewService crewService;
+    private final MemberService memberService;
     private final CrewLeaderService crewLeaderService;
+    private final RewardService rewardService;
+    private final RunningService runningService;
 
     public CrewResult create(CrewCriteria.Create criteria) {
         Crew crew = crewService.create(criteria.toCommand());
@@ -25,13 +39,34 @@ public class CrewFacade {
         return CrewResult.from(crew);
     }
 
+    @Transactional(readOnly = true)
     public List<CrewResult.Card> getCrews(Long userId) {
         List<Crew> crews = crewService.getCrewsOfUser(userId);
-        // TODO 크루원 대표 캐릭터 이미지 불러오는 작업 추가
-        return crews.stream()
-                .map(crew -> new CrewResult.Card(crew.getId(), crew.getName(), crew.getActiveMemberCount(),
-                        crew.getLeaderId().equals(userId), List.of("runky/1.pvg", "runky/2.png")))
-                .toList();
+
+        List<CrewResult.Card> cards = new ArrayList<>();
+        for (Crew crew : crews) {
+            Set<Long> crewMemberIds = crew.getActiveMembers().stream()
+                    .map(CrewMember::getMemberId)
+                    .collect(Collectors.toSet());
+
+            List<Member> members = memberService.getMembers(new MemberCommand.GetMembers(crewMemberIds));
+
+            List<String> imageUrls = members.stream()
+                    .map(Member::getBadgeId)
+                    .map(badgeId -> {
+                        Badge badge = rewardService.getBadge(new RewardCommand.Find(badgeId));
+                        return badge.getImageUrl();
+                    })
+                    .toList();
+
+            boolean isRunning = crewMemberIds.stream()
+                            .anyMatch(runningService::getRunnerStatus);
+
+            cards.add(new CrewResult.Card(crew.getId(), crew.getName(), crew.getActiveMemberCount(),
+                    crew.getLeaderId().equals(userId), imageUrls, isRunning));
+        }
+
+        return cards;
     }
 
     public CrewResult.Detail getCrew(CrewCriteria.Detail criteria) {

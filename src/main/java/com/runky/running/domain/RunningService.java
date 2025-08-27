@@ -128,7 +128,7 @@ public class RunningService {
                 (command.runnerId(), command.from(), command.to());
 
         Double totalDistance = runnings.stream()
-                .filter(running -> running.getStatus() == Running.Status.FINISHED)
+                .filter(running -> running.getStatus() == Running.Status.ENDED)
                 .map(Running::getTotalDistanceMeter)
                 .mapToDouble(Double::doubleValue)
                 .sum();

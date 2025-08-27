@@ -138,7 +138,7 @@ class CrewApiE2ETest {
             Member saveMember4 = memberRepository.save(member4);
             Running running = Running.builder()
                     .runnerId(saveMember1.getId())
-                    .status(Running.Status.FINISHED)
+                    .status(Running.Status.ENDED)
                     .startedAt(LocalDateTime.now().minusHours(1))
                     .endedAt(LocalDateTime.now())
                     .totalDistanceMeter(10000.0)
@@ -147,7 +147,7 @@ class CrewApiE2ETest {
                     .build();
             Running running1 = Running.builder()
                     .runnerId(saveMember3.getId())
-                    .status(Running.Status.FINISHED)
+                    .status(Running.Status.ENDED)
                     .startedAt(LocalDateTime.now().minusHours(1))
                     .endedAt(LocalDateTime.now())
                     .totalDistanceMeter(10000.0)
@@ -231,7 +231,7 @@ class CrewApiE2ETest {
 
             Running running1 = Running.builder()
                     .runnerId(leader.getId())
-                    .status(Running.Status.FINISHED)
+                    .status(Running.Status.ENDED)
                     .startedAt(LocalDateTime.now().minusHours(1))
                     .endedAt(LocalDateTime.now())
                     .totalDistanceMeter(10000.0)
@@ -321,7 +321,7 @@ class CrewApiE2ETest {
 
             runningRepository.save(Running.builder()
                     .runnerId(member2.getId())
-                    .status(Running.Status.FINISHED)
+                    .status(Running.Status.ENDED)
                     .startedAt(now.minusHours(1))
                     .endedAt(now)
                     .totalDistanceMeter(10000.0)
@@ -336,7 +336,7 @@ class CrewApiE2ETest {
 
             runningRepository.save(Running.builder()
                     .runnerId(member3.getId())
-                    .status(Running.Status.FINISHED)
+                    .status(Running.Status.ENDED)
                     .startedAt(now.minusHours(1))
                     .endedAt(now)
                     .totalDistanceMeter(5000.0)

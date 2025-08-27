@@ -51,4 +51,11 @@ public class Clover extends BaseTimeEntity {
         }
         this.count -= count;
     }
+
+    public void useForGotcha() {
+        if (this.count < 10) {
+            throw new GlobalException(RewardErrorCode.INSUFFICIENT_CLOVER);
+        }
+        this.count -= 10;
+    }
 }

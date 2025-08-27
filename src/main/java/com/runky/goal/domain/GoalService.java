@@ -2,7 +2,6 @@ package com.runky.goal.domain;
 
 import com.runky.global.error.GlobalErrorCode;
 import com.runky.global.error.GlobalException;
-import com.runky.goal.domain.GoalCommand.CrewSnapshots;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,8 +73,14 @@ public class GoalService {
     }
 
     @Transactional(readOnly = true)
-    public List<CrewGoalSnapshot> getAllLastWeekCrewGoalSnapshots(CrewSnapshots command) {
+    public List<CrewGoalSnapshot> getAllLastWeekCrewGoalSnapshots(GoalCommand.CrewSnapshots command) {
         return goalRepository.findAllCrewGoalSnapshots(command.crewIds(),
                 WeekUnit.from(command.localDate().minusWeeks(1)));
+    }
+
+    @Transactional
+    public void init(GoalCommand.Init command) {
+        MemberGoal memberGoal = MemberGoal.from(command.memberId());
+        goalRepository.save(memberGoal);
     }
 }

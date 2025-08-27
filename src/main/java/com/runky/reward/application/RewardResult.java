@@ -13,4 +13,11 @@ public class RewardResult {
             Long count
     ) {
     }
+
+    public record Gotcha(
+            Long badgeId,
+            String name,
+            String imageUrl
+    ) {
+    }
 }

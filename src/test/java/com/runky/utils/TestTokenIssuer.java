@@ -13,7 +13,7 @@ public class TestTokenIssuer {
         this.tokenIssuer = tokenIssuer;
     }
 
-    public HttpHeaders authHeaders(long memberId, String role) {
+    public HttpHeaders issue(long memberId, String role) {
         var issued = tokenIssuer.issue(memberId, role);
         String accessToken = issued.access().token();
 

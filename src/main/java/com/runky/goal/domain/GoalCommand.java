@@ -39,4 +39,9 @@ public class GoalCommand {
             LocalDate localDate
     ) {
     }
+
+    public record Init(
+            Long memberId
+    ) {
+    }
 }

@@ -66,6 +66,11 @@ public class CrewCommand {
     ) {
     }
 
+    public record Init(
+            Long memberId
+    ) {
+    }
+
     private CrewCommand() {
     }
 }

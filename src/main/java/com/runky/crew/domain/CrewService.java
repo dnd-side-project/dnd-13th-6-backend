@@ -107,4 +107,9 @@ public class CrewService {
 		return infos;
 	}
 
+    @Transactional
+    public void init(CrewCommand.Init command) {
+        CrewMemberCount crewMemberCount = CrewMemberCount.of(command.memberId());
+        crewRepository.save(crewMemberCount);
+    }
 }

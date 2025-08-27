@@ -39,8 +39,13 @@ public record CrewResult(
             String leaderNickname,
             String notice,
             Long memberCount,
-            BigDecimal goal,
             String code
+    ) {
+    }
+
+    public record Running(
+            Long memberId,
+            boolean isRunning
     ) {
     }
 

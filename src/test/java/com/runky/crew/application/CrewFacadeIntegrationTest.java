@@ -4,8 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.runky.crew.domain.Code;
 import com.runky.crew.domain.Crew;
-import com.runky.crew.domain.CrewCommand.Create;
+import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewRepository;
+import com.runky.goal.domain.GoalRepository;
 import com.runky.member.domain.ExternalAccount;
 import com.runky.member.domain.Member;
 import com.runky.member.domain.MemberRepository;
@@ -36,6 +37,8 @@ class CrewFacadeIntegrationTest {
     private BadgeRepository badgeRepository;
     @Autowired
     private RunningRepository runningRepository;
+    @Autowired
+    private GoalRepository goalRepository;
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
@@ -72,10 +75,10 @@ class CrewFacadeIntegrationTest {
                     .build();
             runningRepository.save(running1);
 
-            Crew crew1 = Crew.of(new Create(saveMember1.getId(), "crew1"), new Code("abc123"));
+            Crew crew1 = Crew.of(new CrewCommand.Create(saveMember1.getId(), "crew1"), new Code("abc123"));
             crew1.joinMember(saveMember2.getId());
             crewRepository.save(crew1);
-            Crew crew2 = Crew.of(new Create(saveMember2.getId(), "crew2"), new Code("abc124"));
+            Crew crew2 = Crew.of(new CrewCommand.Create(saveMember2.getId(), "crew2"), new Code("abc124"));
             crew2.joinMember(saveMember1.getId());
             crew2.joinMember(saveMember3.getId());
             crew2.joinMember(saveMember4.getId());
@@ -118,6 +121,22 @@ class CrewFacadeIntegrationTest {
             assertThat(cards)
                     .extracting("isRunning")
                     .containsExactlyInAnyOrder(false, true);
+        }
+    }
+
+    @Nested
+    @DisplayName("크루 상세 조회 시,")
+    class GetCrewDetail {
+        @Test
+        @DisplayName("크루에 대한 상세 정보를 반환한다.")
+        void returnCrewDetail() {
+            Crew crew = Crew.of(new CrewCommand.Create(1L, "crew 1"), new Code("abc123"));
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+            crew.leaveMember(3L);
+            crew.joinMember(4L);
+            crew.banMember(4L);
+            crewRepository.save(crew);
         }
     }
 }

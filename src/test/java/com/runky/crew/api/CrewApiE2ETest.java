@@ -185,7 +185,7 @@ class CrewApiE2ETest {
         @DisplayName("크루의 상세 정보를 조회한다.")
         void getCrew() {
             long userId = 1L;
-            crewRepository.save(CrewMemberCount.of(userId));
+            Member leader = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id"), "leader"));
             Crew crew = crewRepository.save(Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123")));
 
             HttpHeaders httpHeaders = tokenIssuer.issue(userId, "USER");
@@ -201,6 +201,7 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().crewId()).isEqualTo(crew.getId());
             assertThat(response.getBody().getResult().name()).isEqualTo(crew.getName());
             assertThat(response.getBody().getResult().code()).isEqualTo(crew.getCode().value());
+            assertThat(response.getBody().getResult().leaderNickname()).isEqualTo(leader.getNickname().value());
             assertThat(response.getBody().getResult().memberCount()).isEqualTo(crew.getActiveMemberCount());
             assertThat(response.getBody().getResult().notice()).isEqualTo(crew.getNotice());
         }

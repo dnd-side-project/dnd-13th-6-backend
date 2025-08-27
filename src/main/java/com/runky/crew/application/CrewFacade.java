@@ -4,6 +4,7 @@ import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewLeaderService;
 import com.runky.crew.domain.CrewMember;
 import com.runky.crew.domain.CrewService;
+import com.runky.goal.domain.GoalService;
 import com.runky.member.domain.Member;
 import com.runky.member.domain.MemberCommand;
 import com.runky.member.domain.MemberService;
@@ -11,7 +12,6 @@ import com.runky.reward.domain.Badge;
 import com.runky.reward.domain.RewardCommand;
 import com.runky.reward.domain.RewardService;
 import com.runky.running.domain.RunningService;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +28,7 @@ public class CrewFacade {
     private final CrewLeaderService crewLeaderService;
     private final RewardService rewardService;
     private final RunningService runningService;
+    private final GoalService goalService;
 
     public CrewResult create(CrewCriteria.Create criteria) {
         Crew crew = crewService.create(criteria.toCommand());
@@ -60,7 +61,7 @@ public class CrewFacade {
                     .toList();
 
             boolean isRunning = crewMemberIds.stream()
-                            .anyMatch(runningService::getRunnerStatus);
+                    .anyMatch(runningService::getRunnerStatus);
 
             cards.add(new CrewResult.Card(crew.getId(), crew.getName(), crew.getActiveMemberCount(),
                     crew.getLeaderId().equals(userId), imageUrls, isRunning));
@@ -71,10 +72,11 @@ public class CrewFacade {
 
     public CrewResult.Detail getCrew(CrewCriteria.Detail criteria) {
         Crew crew = crewService.getCrew(criteria.toCrewCommand());
-        BigDecimal goal = new BigDecimal("10.00"); // TODO 그룹 목표 조합 작업 추가 : GoalService
-        String leaderNickname = "leader"; // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
-        return new CrewResult.Detail(crew.getId(), crew.getName(), leaderNickname, crew.getNotice(),
-                crew.getActiveMemberCount(), goal, crew.getCode().value());
+
+        Member leader = memberService.getMember(new MemberCommand.Find(crew.getLeaderId()));
+
+        return new CrewResult.Detail(crew.getId(), crew.getName(), leader.getNickname().value(), crew.getNotice(),
+                crew.getActiveMemberCount(), crew.getCode().value());
     }
 
     public List<CrewResult.CrewMember> getCrewMembers(CrewCriteria.Members criteria) {

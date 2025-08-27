@@ -29,7 +29,7 @@ public class CrewRepositoryImpl implements CrewRepository {
 
 	@Override
 	public Optional<Crew> findById(Long crewId) {
-		return crewJpaRepository.findById(crewId);
+		return crewJpaRepository.findCrewJoinFetch(crewId);
 	}
 
 	@Override

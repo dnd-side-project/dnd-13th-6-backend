@@ -4,4 +4,7 @@ public class RewardCriteria {
 
     public record Find(Long userId) {
     }
+
+    public record Gotcha(Long userId) {
+    }
 }

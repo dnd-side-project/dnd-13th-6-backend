@@ -4,6 +4,7 @@ import com.runky.global.error.GlobalException;
 import com.runky.reward.error.RewardErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,6 +25,9 @@ public class Badge {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Enumerated
+    private BadgeType type;
 
     protected Badge() {
     }
@@ -46,5 +50,10 @@ public class Badge {
 
     public MemberBadge issue(Long userId) {
         return MemberBadge.of(userId, this.id);
+    }
+
+    public enum BadgeType {
+        DEFAULT,
+        GOTCHA
     }
 }

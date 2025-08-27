@@ -13,6 +13,7 @@ import com.runky.notification.domain.aggregate.PushCommand;
 import com.runky.notification.domain.aggregate.PushService;
 import com.runky.notification.domain.notification.Nickname;
 import com.runky.notification.domain.notification.NotificationMessage;
+import com.runky.running.domain.RunningCommand;
 import com.runky.running.domain.RunningInfo;
 import com.runky.running.domain.RunningService;
 
@@ -35,7 +36,7 @@ public class RunningFacade {
 		if (receiverIds.isEmpty()) {
 			return RunningResult.Start.from(info);
 		}
-		
+
 		var memberFindCmd = new MemberCommand.Find(criteria.runnerId());
 		String runnerNickname = memberService.getMember(memberFindCmd).getNickname().value();
 
@@ -61,4 +62,13 @@ public class RunningFacade {
 		return RunningResult.TodaySummary.from(runningService.getTodaySummary(criteria.runnerId(), criteria.now()));
 	}
 
+	@Transactional(readOnly = true)
+	public RunningResult.MyWeeklyTotalDistance getMyWeeklyTotalDistance(
+		RunningCriteria.MyWeeklyTotalDistance criteria
+	) {
+		RunningInfo.MyWeek info = runningService.getMyWeeklyTotalDistance(
+			new RunningCommand.MyWeeklyTotalDistance(criteria.runnerId())
+		);
+		return RunningResult.MyWeeklyTotalDistance.from(info);
+	}
 }

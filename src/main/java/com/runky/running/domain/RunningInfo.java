@@ -1,5 +1,6 @@
 package com.runky.running.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public sealed interface RunningInfo {
@@ -30,4 +31,8 @@ public sealed interface RunningInfo {
 
 	record TodaySummary(Double totalDistanceMeters, Long durationSeconds, Double avgSpeedMps) {
 	}
+
+	public record MyWeek(Long runnerId, Double totalMeters, LocalDate weekStart, LocalDate weekEnd) {
+	}
+
 }

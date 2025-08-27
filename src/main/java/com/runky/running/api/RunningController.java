@@ -60,4 +60,13 @@ public class RunningController implements RunningApiSpec {
 			LocalDateTime.now().atZone(KST).toLocalDateTime()));
 		return ApiResponse.success(RunningResponse.TodaySummary.from(result));
 	}
+
+	@GetMapping("/me/weekly/total-distance")
+	public ApiResponse<RunningResponse.MyWeeklyTotalDistance> getMyWeeklyTotalDistance(
+		@AuthenticationPrincipal MemberPrincipal requester
+	) {
+		var result = runningFacade.getMyWeeklyTotalDistance(
+			new RunningCriteria.MyWeeklyTotalDistance(requester.memberId()));
+		return ApiResponse.success(RunningResponse.MyWeeklyTotalDistance.from(result));
+	}
 }

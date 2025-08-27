@@ -34,4 +34,7 @@ public sealed interface RunningCriteria {
 
 	record TodaySummary(Long runnerId, LocalDateTime now) implements RunningCriteria {
 	}
+
+	record MyWeeklyTotalDistance(Long runnerId) implements RunningCriteria {
+	}
 }

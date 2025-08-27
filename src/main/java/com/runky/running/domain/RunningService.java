@@ -53,8 +53,8 @@ public class RunningService {
 
 		RunningTrack runningTrack = new RunningTrack(
 			running,
-			command.format(),
 			command.points(),
+			command.format(),
 			command.pointCount()
 		);
 		trackRepository.save(runningTrack);

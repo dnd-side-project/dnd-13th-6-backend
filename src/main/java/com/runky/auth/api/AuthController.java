@@ -1,5 +1,7 @@
 package com.runky.auth.api;
 
+import static com.runky.auth.api.AuthConstants.*;
+
 import java.util.List;
 
 import org.springframework.http.ResponseCookie;
@@ -23,8 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
-	private static final String NEW_USER_REDIRECT = "https://localhost:3000/onboarding/terms";
+public class AuthController implements AuthApiSpec {
 
 	private final AuthFacade authFacade;
 	private final TokenCookieProvider cookieProvider;
@@ -81,9 +82,10 @@ public class AuthController {
 			case EXISTING_USER -> {
 				ResponseCookie at = cookieProvider.accessToken(result.accessToken());
 				ResponseCookie rt = cookieProvider.refreshToken(result.refreshToken());
-				yield responseHelper.successWithCookies(
+				yield responseHelper.successWithCookiesAndRedirect(
 					ApiResponse.success(new AuthResponse.ExistingUser()),
-					List.of(at, rt)
+					List.of(at, rt),
+					ALREADY_EXISTING_USER
 				);
 			}
 		};

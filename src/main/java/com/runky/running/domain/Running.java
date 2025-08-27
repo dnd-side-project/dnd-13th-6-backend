@@ -69,11 +69,11 @@ public class Running {
 			throw new GlobalException(RunningErrorCode.NOT_ACTIVE_RUNNING);
 		}
 		this.endedAt = now;
-		this.status = Status.FINISHED;
+		this.status = Status.ENDED;
 		this.totalDistanceMeter = totalDistanceMinutes;
 		this.durationSeconds = durationSeconds;
 		this.avgSpeedMPS = avgSpeedMps;
 	}
 
-	public enum Status {RUNNING, FINISHED}
+	public enum Status {RUNNING, ENDED}
 }

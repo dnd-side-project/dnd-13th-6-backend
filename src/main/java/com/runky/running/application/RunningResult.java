@@ -1,5 +1,6 @@
 package com.runky.running.application;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.runky.running.domain.RunningInfo;
@@ -36,5 +37,18 @@ public sealed interface RunningResult {
 			return new TodaySummary(info.totalDistanceMeters(), info.durationSeconds(), info.avgSpeedMps());
 		}
 
+	}
+
+	record MyWeeklyTotalDistance(
+		Long runnerId,
+		double totalDistanceMeter,
+		double totalDistanceKm,
+		LocalDate weekStart,
+		LocalDate weekEnd
+	) {
+		public static MyWeeklyTotalDistance from(RunningInfo.MyWeek info) {
+			double km = Math.round((info.totalMeters() / 1000.0) * 10.0) / 10.0; // 소수 1자리 반올림
+			return new MyWeeklyTotalDistance(info.runnerId(), info.totalMeters(), km, info.weekStart(), info.weekEnd());
+		}
 	}
 }

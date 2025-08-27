@@ -20,10 +20,15 @@ public sealed interface RunningCommand {
 	) implements RunningCommand {
 	}
 
-    record WeekDistance(
-            Long runnerId,
-            LocalDateTime from,
-            LocalDateTime to
-    ) {
-    }
+	record WeekDistance(
+		Long runnerId,
+		LocalDateTime from,
+		LocalDateTime to
+	) implements RunningCommand {
+	}
+
+	record MyWeeklyTotalDistance(
+		Long runnerId
+	) implements RunningCommand {
+	}
 }

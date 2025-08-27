@@ -1,6 +1,9 @@
 package com.runky.running.domain;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class RunningService {
+
 	private final RunningRepository runningRepository;
 	private final RunningTrackRepository trackRepository;
 
@@ -122,17 +126,48 @@ public class RunningService {
 		return new RunningInfo.TodaySummary(totalDistance, totalSeconds, avgSpeedMps);
 	}
 
-    @Transactional(readOnly = true)
-    public RunningInfo.TotalDistance getTotalDistancesOf(RunningCommand.WeekDistance command) {
-        List<Running> runnings = runningRepository.findBetweenFromAndToByRunnerId
-                (command.runnerId(), command.from(), command.to());
+	@Transactional(readOnly = true)
+	public RunningInfo.TotalDistance getTotalDistancesOf(RunningCommand.WeekDistance command) {
+		List<Running> runnings = runningRepository.findBetweenFromAndToByRunnerId
+			(command.runnerId(), command.from(), command.to());
 
-        Double totalDistance = runnings.stream()
-                .filter(running -> running.getStatus() == Running.Status.ENDED)
-                .map(Running::getTotalDistanceMeter)
-                .mapToDouble(Double::doubleValue)
-                .sum();
+		Double totalDistance = runnings.stream()
+			.filter(running -> running.getStatus() == Running.Status.ENDED)
+			.map(Running::getTotalDistanceMeter)
+			.mapToDouble(Double::doubleValue)
+			.sum();
 
-        return new RunningInfo.TotalDistance(command.runnerId(), totalDistance);
-    }
+		return new RunningInfo.TotalDistance(command.runnerId(), totalDistance);
+	}
+
+	@Transactional(readOnly = true)
+	public RunningInfo.MyWeek getMyWeeklyTotalDistance(RunningCommand.MyWeeklyTotalDistance command) {
+		LocalDate today = LocalDate.now();
+		LocalDate weekStart = toWeekStart(today);
+		LocalDate weekEnd = toWeekEnd(weekStart);
+
+		var from = weekStart.atStartOfDay(); // inclusive
+		var toExclusive = weekEnd.plusDays(1).atStartOfDay(); // exclusive
+
+		List<Running> runnings = runningRepository.findBetweenFromAndToByRunnerId(
+			command.runnerId(), from, toExclusive
+		);
+
+		double totalMeters = runnings.stream()
+			.filter(r -> r.getStatus() == Running.Status.ENDED)
+			.map(Running::getTotalDistanceMeter)
+			.filter(Objects::nonNull)
+			.mapToDouble(Double::doubleValue)
+			.sum();
+
+		return new RunningInfo.MyWeek(command.runnerId(), totalMeters, weekStart, weekEnd);
+	}
+
+	private LocalDate toWeekStart(LocalDate date) {
+		return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+	}
+
+	private LocalDate toWeekEnd(LocalDate weekStart) {
+		return weekStart.plusDays(6);
+	}
 }

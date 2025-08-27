@@ -1,5 +1,6 @@
 package com.runky.auth.api;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,10 +19,9 @@ public interface AuthApiSpec {
 		summary = "카카오 OAuth 콜백",
 		description = "카카오 Authorization Code를 교환하여 로그인 처리합니다. 신규 사용자는 signupToken 쿠키를, 기존 사용자는 AT/RT 쿠키를 발급합니다."
 	)
-	ApiResponse<AuthResponse> kakaoCallback(
+	ResponseEntity<ApiResponse<AuthResponse>> kakaoCallback(
 		@Schema(description = "카카오 OAuth Authorization Code", example = "SplxlOBeZQQYbYS6WxSbIA")
-		@RequestParam("code") String code,
-		HttpServletResponse servletResponse
+		@RequestParam("code") String code
 	);
 
 	@Operation(
@@ -34,7 +34,6 @@ public interface AuthApiSpec {
 
 		@Schema(description = "회원가입 추가 정보")
 		@RequestBody AuthRequest.Signup request,
-
 		HttpServletResponse servletResponse
 	);
 

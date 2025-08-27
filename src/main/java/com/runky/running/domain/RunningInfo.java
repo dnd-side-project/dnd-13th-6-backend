@@ -29,6 +29,9 @@ public sealed interface RunningInfo {
 	record RunnerStatus(Long runnerId, boolean isRunning) implements RunningInfo {
 	}
 
+	record RunnerStatusAndSub(Long runnerId, boolean isRunning, String sub) implements RunningInfo {
+	}
+
 	record TodaySummary(Double totalDistanceMeters, Long durationSeconds, Double avgSpeedMps) {
 	}
 

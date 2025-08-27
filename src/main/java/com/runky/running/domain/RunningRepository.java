@@ -23,6 +23,8 @@ public interface RunningRepository {
 
 	boolean existsByRunnerIdAndStatusAndEndedAtIsNull(Long memberId, Running.Status status);
 
+	Optional<Running> findByRunnerIdAndStatusAndEndedAtIsNull(Long memberId, Running.Status status);
+
 	Set<Long> findRunnerIdsByStatusAndEndedAtIsNull(final Collection<Long> runnerIds, final Running.Status status);
 
 	List<Running> findFinishedOnDate(Long runnerId, LocalDateTime now);

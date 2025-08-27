@@ -54,11 +54,13 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 		""")
 	List<Running> findFinishedByEndedAtBetween(Long runnerId, LocalDateTime from, LocalDateTime to);
 
-    @Query("""
-            select r
-            from Running r
-            where r.runnerId = :runnerId
-            and r.endedAt >= :from and r.endedAt < :to
-            """)
-    List<Running> findBetweenFromAndToByRunnerId(Long runnerId, LocalDateTime from, LocalDateTime to);
+	@Query("""
+		select r
+		from Running r
+		where r.runnerId = :runnerId
+		and r.endedAt >= :from and r.endedAt < :to
+		""")
+	List<Running> findBetweenFromAndToByRunnerId(Long runnerId, LocalDateTime from, LocalDateTime to);
+
+	Optional<Running> findByRunnerIdAndStatusAndEndedAtIsNull(Long memberId, Running.Status status);
 }

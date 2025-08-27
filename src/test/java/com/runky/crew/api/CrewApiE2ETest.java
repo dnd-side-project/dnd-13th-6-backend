@@ -471,6 +471,7 @@ class CrewApiE2ETest {
         @DisplayName("크루의 리더를 변경한다.")
         void updateLeader() {
             long userId = 1L;
+            Member delegate = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id2"), "name2"));
             Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
             crew.joinMember(2L);
             Crew savedCrew = crewRepository.save(crew);
@@ -480,13 +481,14 @@ class CrewApiE2ETest {
             ParameterizedTypeReference<ApiResponse<CrewResponse.Delegate>> responseType = new ParameterizedTypeReference<>() {
             };
 
-            CrewRequest.Delegate request = new CrewRequest.Delegate(2L);
+            CrewRequest.Delegate request = new CrewRequest.Delegate(delegate.getId());
             ResponseEntity<ApiResponse<CrewResponse.Delegate>> response =
                     testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders),
                             responseType, savedCrew.getId());
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody().getResult().leaderId()).isEqualTo(2L);
+            assertThat(response.getBody().getResult().leaderId()).isEqualTo(delegate.getId());
+            assertThat(response.getBody().getResult().leaderNickname()).isEqualTo(delegate.getNickname().value());
         }
     }
 
@@ -499,6 +501,8 @@ class CrewApiE2ETest {
         @DisplayName("크루에서 멤버를 추방한다.")
         void banMember() {
             long userId = 1L;
+            Member leader = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id2"), "name2"));
+            Member banMember = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id3"), "name3"));
             CrewMemberCount count1 = CrewMemberCount.of(1L);
             count1.increment();
             CrewMemberCount count2 = CrewMemberCount.of(2L);
@@ -506,7 +510,7 @@ class CrewApiE2ETest {
             crewRepository.save(count1);
             crewRepository.save(count2);
             Crew crew = Crew.of(new CrewCommand.Create(1L, "Crew"), new Code("abc123"));
-            crew.joinMember(2L);
+            crew.joinMember(banMember.getId());
             Crew savedCrew = crewRepository.save(crew);
 
             HttpHeaders httpHeaders = tokenIssuer.issue(userId, "USER");
@@ -516,10 +520,11 @@ class CrewApiE2ETest {
 
             ResponseEntity<ApiResponse<CrewResponse.Ban>> response =
                     testRestTemplate.exchange(BASE_URL, HttpMethod.DELETE, new HttpEntity<>(httpHeaders), responseType,
-                            savedCrew.getId(), 2L);
+                            savedCrew.getId(), banMember.getId());
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(response.getBody().getResult().targetId()).isEqualTo(2L);
+            assertThat(response.getBody().getResult().targetId()).isEqualTo(banMember.getId());
+            assertThat(response.getBody().getResult().nickname()).isEqualTo(banMember.getNickname().value());
         }
     }
 }

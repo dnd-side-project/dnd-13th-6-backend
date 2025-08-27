@@ -136,8 +136,8 @@ class CrewApiE2ETest {
             Member member4 = Member.register(ExternalAccount.of("kakao", "id4"), "name4");
             member4.changeBadge(4L);
             Member saveMember4 = memberRepository.save(member4);
-            Running running1 = Running.builder()
-                    .runnerId(saveMember2.getId())
+            Running running = Running.builder()
+                    .runnerId(saveMember1.getId())
                     .status(Running.Status.FINISHED)
                     .startedAt(LocalDateTime.now().minusHours(1))
                     .endedAt(LocalDateTime.now())
@@ -145,17 +145,33 @@ class CrewApiE2ETest {
                     .durationSeconds(3600L)
                     .avgSpeedMPS(2.5)
                     .build();
+            Running running1 = Running.builder()
+                    .runnerId(saveMember3.getId())
+                    .status(Running.Status.FINISHED)
+                    .startedAt(LocalDateTime.now().minusHours(1))
+                    .endedAt(LocalDateTime.now())
+                    .totalDistanceMeter(10000.0)
+                    .durationSeconds(3600L)
+                    .avgSpeedMPS(2.5)
+                    .build();
+            runningRepository.save(running);
             runningRepository.save(running1);
 
             Crew crew1 = Crew.of(new CrewCommand.Create(saveMember1.getId(), "crew1"), new Code("abc123"));
             crew1.joinMember(saveMember2.getId());
             crewRepository.save(crew1);
+            CrewGoalSnapshot snapshot1 = goalRepository.save(
+                    new CrewGoalSnapshot(crew1.getId(), new Goal(new BigDecimal("10.5")), false,
+                            WeekUnit.from(LocalDate.now().minusWeeks(1))));
             Crew crew2 = Crew.of(new CrewCommand.Create(saveMember2.getId(), "crew2"), new Code("abc124"));
             crew2.joinMember(saveMember1.getId());
             crew2.joinMember(saveMember3.getId());
             crew2.joinMember(saveMember4.getId());
             crew2.leaveMember(saveMember4.getId());
             crewRepository.save(crew2);
+            CrewGoalSnapshot snapshot2 = goalRepository.save(
+                    new CrewGoalSnapshot(crew2.getId(), new Goal(new BigDecimal("10.5")), false,
+                            WeekUnit.from(LocalDate.now().minusWeeks(1))));
 
             Running running2 = Running.builder()
                     .runnerId(saveMember3.getId())
@@ -182,6 +198,15 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().crews())
                     .extracting("crewId")
                     .containsExactlyInAnyOrder(crew1.getId(), crew2.getId());
+            assertThat(response.getBody().getResult().crews())
+                    .extracting("name")
+                    .containsExactlyInAnyOrder(crew1.getName(), crew2.getName());
+            assertThat(response.getBody().getResult().crews())
+                    .extracting("goal")
+                    .containsExactlyInAnyOrder(new BigDecimal("10.50"), new BigDecimal("10.50"));
+            assertThat(response.getBody().getResult().crews())
+                    .extracting("runningDistance")
+                    .containsExactlyInAnyOrder(10000.0, 20000.0);
         }
     }
 

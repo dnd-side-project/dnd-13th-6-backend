@@ -58,6 +58,9 @@ public class CrewFacade {
                     .map(CrewMember::getMemberId)
                     .collect(Collectors.toSet());
 
+            CrewGoalSnapshot snapshot = goalService.getCrewGoalSnapshot(
+                    new GoalCommand.GetCrewSnapshot(crew.getId(), LocalDate.now().minusWeeks(1)));
+
             List<Member> members = memberService.getMembers(new MemberCommand.GetMembers(crewMemberIds));
 
             List<String> imageUrls = members.stream()
@@ -71,8 +74,18 @@ public class CrewFacade {
             boolean isRunning = crewMemberIds.stream()
                     .anyMatch(runningService::getRunnerStatus);
 
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);
+            Double runningDistance = members.stream()
+                    .map(crewMember -> {
+                        RunningInfo.TotalDistance info = runningService.getTotalDistancesOf(
+                                new RunningCommand.WeekDistance(crewMember.getId(), start, now));
+                        return info.totalDistance();
+                    }).reduce(0.0, Double::sum);
+
             cards.add(new CrewResult.Card(crew.getId(), crew.getName(), crew.getActiveMemberCount(),
-                    crew.getLeaderId().equals(userId), imageUrls, isRunning));
+                    crew.getLeaderId().equals(userId), imageUrls, snapshot.getGoal().value(), runningDistance,
+                    isRunning));
         }
 
         return cards;
@@ -85,7 +98,6 @@ public class CrewFacade {
 
         CrewGoalSnapshot snapshot = goalService.getCrewGoalSnapshot(
                 new GoalCommand.GetCrewSnapshot(crew.getId(), LocalDate.now().minusWeeks(1)));
-
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);

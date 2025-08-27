@@ -29,6 +29,8 @@ public record CrewResult(
             Long memberCount,
             boolean isLeader,
             List<String> badgeImageUrls,
+            BigDecimal goal,
+            Double runningDistance,
             boolean isRunning
     ) {
     }

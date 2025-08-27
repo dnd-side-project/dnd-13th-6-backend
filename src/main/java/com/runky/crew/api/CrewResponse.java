@@ -40,6 +40,8 @@ public class CrewResponse {
             Long memberCount,
             boolean isLeader,
             List<String> badgeImageUrls,
+            BigDecimal goal,
+            Double runningDistance,
             boolean isRunning
     ) {
         public static Card from(CrewResult.Card card) {
@@ -49,6 +51,8 @@ public class CrewResponse {
                     card.memberCount(),
                     card.isLeader(),
                     card.badgeImageUrls(),
+                    card.goal(),
+                    card.runningDistance(),
                     card.isRunning()
             );
         }

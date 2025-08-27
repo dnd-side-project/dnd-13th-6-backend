@@ -71,4 +71,9 @@ public class RunningRepositoryImpl implements RunningRepository {
 		return jpaRepository.findFinishedByEndedAtBetween(runnerId, from, to);
 	}
 
+    @Override
+    public List<Running> findBetweenFromAndToByRunnerId(Long runnerId, LocalDateTime from, LocalDateTime to) {
+        return jpaRepository.findBetweenFromAndToByRunnerId(runnerId, from, to);
+    }
+
 }

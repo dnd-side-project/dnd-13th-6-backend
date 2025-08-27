@@ -129,7 +129,7 @@ class CrewServiceTest {
             given(crewRepository.findById(command.crewId()))
                     .willReturn(Optional.empty());
 
-            GlobalException thrown = assertThrows(GlobalException.class, () -> crewService.getCrewMembers(command));
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewService.getActiveCrewMembers(command));
 
             assertThat(thrown)
                     .usingRecursiveComparison()
@@ -144,7 +144,7 @@ class CrewServiceTest {
                     .willReturn(Optional.of(crew));
             CrewCommand.Members command = new CrewCommand.Members(crew.getId(), 3L);
 
-            GlobalException thrown = assertThrows(GlobalException.class, () -> crewService.getCrewMembers(command));
+            GlobalException thrown = assertThrows(GlobalException.class, () -> crewService.getActiveCrewMembers(command));
 
             assertThat(thrown)
                     .usingRecursiveComparison()
@@ -162,7 +162,7 @@ class CrewServiceTest {
                     .willReturn(Optional.of(crew));
             CrewCommand.Members command = new CrewCommand.Members(crew.getId(), 1L);
 
-            List<CrewMember> members = crewService.getCrewMembers(command);
+            List<CrewMember> members = crewService.getActiveCrewMembers(command);
 
             assertThat(members).hasSize(2);
             assertThat(members)

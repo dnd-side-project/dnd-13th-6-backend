@@ -13,8 +13,21 @@ public interface CrewJpaRepository extends JpaRepository<Crew, Long> {
 
 	Optional<Crew> findByCode(Code code);
 
-	@Query("SELECT c FROM Crew c JOIN c.members m WHERE m.memberId = :memberId AND (m.role = 'LEADER' OR m.role = 'MEMBER')")
+    @Query("""
+    SELECT DISTINCT c
+    FROM Crew c
+    JOIN FETCH c.members
+    WHERE c.id IN (
+        SELECT c2.id
+        FROM Crew c2
+        JOIN c2.members m2
+        WHERE m2.memberId = :memberId
+    )
+""")
 	List<Crew> findCrewsByMemberId(Long memberId);
+
+    @Query("SELECT c FROM Crew c LEFT JOIN FETCH c.members WHERE c.id = :crewId")
+    Optional<Crew> findCrewJoinFetch(Long crewId);
 
 	@Query("""
 			select distinct m2.memberId

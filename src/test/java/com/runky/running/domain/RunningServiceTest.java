@@ -39,7 +39,7 @@ class RunningServiceTest {
 
 		assertThat(runningJpaRepository.existsByRunnerIdAndStatusAndEndedAtIsNull(1L, Running.Status.RUNNING)).isTrue();
 		assertThat(
-			runningJpaRepository.existsByRunnerIdAndStatusAndEndedAtIsNull(1L, Running.Status.FINISHED)).isFalse();
+			runningJpaRepository.existsByRunnerIdAndStatusAndEndedAtIsNull(1L, Running.Status.ENDED)).isFalse();
 	}
 
 	@DisplayName("여러 멤버의 런닝 상태를 일괄 조회하면 (runnerId, isRunning)으로 반환한다 - 중복 runnerId는 제거")

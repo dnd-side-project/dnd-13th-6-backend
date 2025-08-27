@@ -19,7 +19,7 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 
 	@Query("SELECT new com.runky.running.domain.RunningInfo$RunningResult(r.runnerId, SUM(r.totalDistanceMeter)) " +
 		"FROM Running r " +
-		"WHERE r.status = com.runky.running.domain.Running.Status.FINISHED " +
+		"WHERE r.status = com.runky.running.domain.Running.Status.ENDED " +
 		"AND r.startedAt >= :from " +
 		"AND r.endedAt <= :to " +
 		"GROUP BY r.runnerId")
@@ -48,7 +48,7 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 			select r
 			  from Running r
 			 where r.runnerId = :runnerId
-			   and r.status = com.runky.running.domain.Running$Status.FINISHED
+			   and r.status = com.runky.running.domain.Running$Status.ENDED
 			   and r.endedAt >= :from and r.endedAt < :to
 			 order by r.endedAt desc
 		""")

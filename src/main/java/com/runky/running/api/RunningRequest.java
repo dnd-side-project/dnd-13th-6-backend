@@ -8,10 +8,10 @@ public sealed interface RunningRequest {
 		Summary summary,
 		Track track
 	) implements RunningRequest {
-		RunningCriteria.End toCriteria(Long runnerId, Long runningId) {
+		RunningCriteria.End toCriteria(Long runningId, Long runnerId) {
 			return new RunningCriteria.End(
-				runnerId,
 				runningId,
+				runnerId,
 				summary.totalDistanceMinutes,
 				summary.durationSeconds,
 				summary.avgSpeedMPS,

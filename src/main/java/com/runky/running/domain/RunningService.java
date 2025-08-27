@@ -116,4 +116,18 @@ public class RunningService {
 
 		return new RunningInfo.TodaySummary(totalDistance, totalSeconds, avgSpeedMps);
 	}
+
+    @Transactional(readOnly = true)
+    public RunningInfo.TotalDistance getTotalDistancesOf(RunningCommand.WeekDistance command) {
+        List<Running> runnings = runningRepository.findBetweenFromAndToByRunnerId
+                (command.runnerId(), command.from(), command.to());
+
+        Double totalDistance = runnings.stream()
+                .filter(running -> running.getStatus() == Running.Status.FINISHED)
+                .map(Running::getTotalDistanceMeter)
+                .mapToDouble(Double::doubleValue)
+                .sum();
+
+        return new RunningInfo.TotalDistance(command.runnerId(), totalDistance);
+    }
 }

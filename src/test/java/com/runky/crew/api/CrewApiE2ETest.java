@@ -1,5 +1,6 @@
 package com.runky.crew.api;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.runky.crew.domain.Code;
@@ -248,16 +249,50 @@ class CrewApiE2ETest {
         @Test
         @DisplayName("크루의 멤버 목록을 조회한다.")
         void getCrewMembers() {
-            long userId = 1L;
-            crewRepository.save(CrewMemberCount.of(userId));
-            Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
-            crew.joinMember(2L);
-            crew.joinMember(3L);
-            crew.joinMember(4L);
-            crew.leaveMember(4L);
+            Member leader = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id1"), "name1"));
+            Member member2 = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id2"), "name2"));
+            Member member3 = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id3"), "name3"));
+            Badge badge1 = badgeRepository.save(Badge.of("/badge1.png", "badge 1"));
+            leader.changeBadge(badge1.getId());
+            member2.changeBadge(badge1.getId());
+            member3.changeBadge(badge1.getId());
+            memberRepository.save(leader);
+            memberRepository.save(member2);
+            memberRepository.save(member3);
+
+            Crew crew = Crew.of(new CrewCommand.Create(leader.getId(), "crew 1"), new Code("abc123"));
+            crew.joinMember(member2.getId());
+            crew.joinMember(member3.getId());
             Crew savedCrew = crewRepository.save(crew);
 
-            HttpHeaders httpHeaders = tokenIssuer.issue(userId, "USER");
+            LocalDateTime now = LocalDateTime.now();
+
+            runningRepository.save(Running.builder()
+                    .runnerId(member2.getId())
+                    .status(Running.Status.FINISHED)
+                    .startedAt(now.minusHours(1))
+                    .endedAt(now)
+                    .totalDistanceMeter(10000.0)
+                    .durationSeconds(3600L)
+                    .avgSpeedMPS(2.5)
+                    .build());
+            runningRepository.save(Running.builder()
+                    .runnerId(member2.getId())
+                    .status(Running.Status.RUNNING)
+                    .startedAt(now.minusHours(1))
+                    .build());
+
+            runningRepository.save(Running.builder()
+                    .runnerId(member3.getId())
+                    .status(Running.Status.FINISHED)
+                    .startedAt(now.minusHours(1))
+                    .endedAt(now)
+                    .totalDistanceMeter(5000.0)
+                    .durationSeconds(3600L)
+                    .avgSpeedMPS(2.5)
+                    .build());
+
+            HttpHeaders httpHeaders = tokenIssuer.issue(leader.getId(), "USER");
 
             ParameterizedTypeReference<ApiResponse<CrewResponse.Members>> responseType = new ParameterizedTypeReference<>() {
             };
@@ -268,6 +303,22 @@ class CrewApiE2ETest {
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody().getResult().members()).hasSize(3);
+            assertThat(response.getBody().getResult().members())
+                    .extracting("memberId")
+                    .containsExactlyInAnyOrder(leader.getId(), member2.getId(), member3.getId());
+            assertThat(response.getBody().getResult().members())
+                    .extracting("nickname")
+                    .containsExactlyInAnyOrder(leader.getNickname().value(), member2.getNickname().value(),
+                            member3.getNickname().value());
+            assertThat(response.getBody().getResult().members())
+                    .extracting("badgeImageUrl")
+                    .containsExactlyInAnyOrder("/badge1.png", "/badge1.png", "/badge1.png");
+            assertThat(response.getBody().getResult().members())
+                    .extracting("isRunning")
+                    .containsExactlyInAnyOrder(false, true, false);
+            assertThat(response.getBody().getResult().members())
+                    .extracting("runningDistance")
+                    .containsExactlyInAnyOrder(0.0, 10000.0, 5000.0);
         }
     }
 

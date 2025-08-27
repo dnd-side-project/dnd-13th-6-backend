@@ -11,7 +11,12 @@ import com.runky.member.domain.MemberService;
 import com.runky.reward.domain.Badge;
 import com.runky.reward.domain.RewardCommand;
 import com.runky.reward.domain.RewardService;
+import com.runky.running.domain.RunningCommand;
+import com.runky.running.domain.RunningInfo;
 import com.runky.running.domain.RunningService;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -80,10 +85,23 @@ public class CrewFacade {
     }
 
     public List<CrewResult.CrewMember> getCrewMembers(CrewCriteria.Members criteria) {
-        List<CrewMember> members = crewService.getCrewMembers(criteria.toCommand());
-        // TODO 크루원 캐릭터 이미지 + 닉네임 불러오는 작업 추가
+        List<CrewMember> members = crewService.getActiveCrewMembers(criteria.toCommand());
+
         return members.stream()
-                .map(member -> new CrewResult.CrewMember(member.getId(), "nickname", "runky/1.png"))
+                .map(crewMember -> {
+                    Member member = memberService.getMember(new MemberCommand.Find(crewMember.getMemberId()));
+                    Badge badge = rewardService.getBadge(new RewardCommand.Find(member.getBadgeId()));
+                    boolean isRunning = runningService.getRunnerStatus(member.getId());
+
+                    LocalDateTime now = LocalDateTime.now();
+                    LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);
+
+                    RunningInfo.TotalDistance info = runningService.getTotalDistancesOf(
+                            new RunningCommand.WeekDistance(member.getId(), start, now));
+
+                    return new CrewResult.CrewMember(member.getId(), member.getNickname().value(), badge.getImageUrl(),
+                            info.totalDistance(), isRunning);
+                })
                 .toList();
     }
 

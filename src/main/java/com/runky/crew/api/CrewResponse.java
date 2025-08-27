@@ -88,14 +88,18 @@ public class CrewResponse {
     public record Member(
             Long memberId,
             String nickname,
-            String character
+            String badgeImageUrl,
+            Double runningDistance,
+            boolean isRunning
     ) {
 
         public static Member from(CrewResult.CrewMember member) {
             return new Member(
                     member.memberId(),
                     member.nickname(),
-                    member.character()
+                    member.badgeImageUrl(),
+                    member.runningDistance(),
+                    member.isRunning()
             );
         }
     }

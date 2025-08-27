@@ -1,7 +1,6 @@
 package com.runky.crew.application;
 
 import com.runky.crew.domain.Crew;
-import java.math.BigDecimal;
 import java.util.List;
 
 public record CrewResult(
@@ -52,7 +51,9 @@ public record CrewResult(
     public record CrewMember(
             Long memberId,
             String nickname,
-            String character
+            String badgeImageUrl,
+            Double runningDistance,
+            boolean isRunning
     ) {
     }
 

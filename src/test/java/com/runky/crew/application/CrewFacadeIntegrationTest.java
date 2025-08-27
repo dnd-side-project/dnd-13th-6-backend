@@ -139,4 +139,76 @@ class CrewFacadeIntegrationTest {
             crewRepository.save(crew);
         }
     }
+
+    @Nested
+    @DisplayName("크루원 목록 조회 시,")
+    class GetCrewMembers {
+
+        @Test
+        @DisplayName("크루원의 이번주 뛴 거리를 포함한 정보를 반환한다.")
+        void returnDistance() {
+            Member leader = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id1"), "name1"));
+            Member member2 = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id2"), "name2"));
+            Member member3 = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id3"), "name3"));
+            Badge badge1 = badgeRepository.save(Badge.of("/badge1.png", "badge 1"));
+            leader.changeBadge(badge1.getId());
+            member2.changeBadge(badge1.getId());
+            member3.changeBadge(badge1.getId());
+            memberRepository.save(leader);
+            memberRepository.save(member2);
+            memberRepository.save(member3);
+
+            Crew crew = Crew.of(new CrewCommand.Create(leader.getId(), "crew 1"), new Code("abc123"));
+            crew.joinMember(member2.getId());
+            crew.joinMember(member3.getId());
+            Crew savedCrew = crewRepository.save(crew);
+
+            LocalDateTime now = LocalDateTime.now();
+
+            runningRepository.save(Running.builder()
+                    .runnerId(member2.getId())
+                    .status(Running.Status.FINISHED)
+                    .startedAt(now.minusHours(1))
+                    .endedAt(now)
+                    .totalDistanceMeter(10000.0)
+                    .durationSeconds(3600L)
+                    .avgSpeedMPS(2.5)
+                    .build());
+            runningRepository.save(Running.builder()
+                    .runnerId(member2.getId())
+                    .status(Running.Status.RUNNING)
+                    .startedAt(now.minusHours(1))
+                    .build());
+
+            runningRepository.save(Running.builder()
+                    .runnerId(member3.getId())
+                    .status(Running.Status.FINISHED)
+                    .startedAt(now.minusHours(1))
+                    .endedAt(now)
+                    .totalDistanceMeter(5000.0)
+                    .durationSeconds(3600L)
+                    .avgSpeedMPS(2.5)
+                    .build());
+
+            CrewCriteria.Members criteria = new CrewCriteria.Members(savedCrew.getId(), leader.getId());
+            List<CrewResult.CrewMember> results = crewFacade.getCrewMembers(criteria);
+
+            assertThat(results.size()).isEqualTo(3);
+            assertThat(results)
+                    .extracting("memberId")
+                    .containsExactlyInAnyOrder(leader.getId(), member2.getId(), member3.getId());
+            assertThat(results)
+                    .extracting("nickname")
+                    .containsExactlyInAnyOrder("name1", "name2", "name3");
+            assertThat(results)
+                    .extracting("badgeImageUrl")
+                    .containsExactlyInAnyOrder("/badge1.png", "/badge1.png", "/badge1.png");
+            assertThat(results)
+                    .extracting("isRunning")
+                    .containsExactlyInAnyOrder(false, true, false);
+            assertThat(results)
+                    .extracting("runningDistance")
+                    .containsExactlyInAnyOrder(0.0, 10000.0, 5000.0);
+        }
+    }
 }

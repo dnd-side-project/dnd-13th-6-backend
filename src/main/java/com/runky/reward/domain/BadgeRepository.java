@@ -18,5 +18,7 @@ public interface BadgeRepository {
 
     Optional<Badge> findBadge(Long badgeId);
 
+    Optional<Badge> findBadgeByName(String name);
+
     boolean hasBadge(Long memberId, Long badgeId);
 }

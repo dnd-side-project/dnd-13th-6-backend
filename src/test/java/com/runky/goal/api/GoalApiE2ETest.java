@@ -63,7 +63,7 @@ public class GoalApiE2ETest {
 
             ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
             };
-            HttpHeaders httpHeaders = tokenIssuer.authHeaders(1L, "USER");
+            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
             GoalRequest.Goal request = new GoalRequest.Goal(BigDecimal.TEN);
 
             ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
@@ -88,7 +88,7 @@ public class GoalApiE2ETest {
 
             ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
             };
-            HttpHeaders httpHeaders = tokenIssuer.authHeaders(1L, "USER");
+            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
             ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
@@ -111,7 +111,7 @@ public class GoalApiE2ETest {
 
             ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
             };
-            HttpHeaders httpHeaders = tokenIssuer.authHeaders(1L, "USER");
+            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
 
             ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType, 1L);
@@ -134,7 +134,7 @@ public class GoalApiE2ETest {
             ParameterizedTypeReference<ApiResponse<GoalResponse.Achieve>> responseType = new ParameterizedTypeReference<>() {
             };
 
-            HttpHeaders httpHeaders = tokenIssuer.authHeaders(1L, "USER");
+            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
             ResponseEntity<ApiResponse<GoalResponse.Achieve>> response = testRestTemplate.exchange(BASE_URL,
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
@@ -156,7 +156,7 @@ public class GoalApiE2ETest {
 
             ParameterizedTypeReference<ApiResponse<GoalResponse.Achieve>> responseType = new ParameterizedTypeReference<>() {
             };
-            HttpHeaders httpHeaders = tokenIssuer.authHeaders(1L, "USER");
+            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
             String url = "/api/goals/crews/1/last/achieve";
 
             ResponseEntity<ApiResponse<GoalResponse.Achieve>> response = testRestTemplate.exchange(url,
@@ -181,7 +181,7 @@ public class GoalApiE2ETest {
             ParameterizedTypeReference<ApiResponse<GoalResponse.Clover>> responseType = new ParameterizedTypeReference<>() {
             };
 
-            HttpHeaders httpHeaders = tokenIssuer.authHeaders(1L, "USER");
+            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
             ResponseEntity<ApiResponse<GoalResponse.Clover>> response = testRestTemplate.exchange(BASE_URL,
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
@@ -212,7 +212,7 @@ public class GoalApiE2ETest {
             ParameterizedTypeReference<ApiResponse<GoalResponse.Clover>> responseType = new ParameterizedTypeReference<>() {
             };
 
-            HttpHeaders httpHeaders = tokenIssuer.authHeaders(1L, "USER");
+            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
             ResponseEntity<ApiResponse<GoalResponse.Clover>> response = testRestTemplate.exchange(BASE_URL,
                     HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 

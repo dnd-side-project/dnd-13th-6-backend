@@ -25,4 +25,9 @@ public class RewardFacade {
         Clover clover = rewardService.getClover(new RewardCommand.GetClover(criteria.userId()));
         return new RewardResult.Clover(clover.getUserId(), clover.getCount());
     }
+
+    public RewardResult.Gotcha gotcha(RewardCriteria.Gotcha criteria) {
+        Badge badge = rewardService.gotcha(new RewardCommand.Gotcha(criteria.userId()));
+        return new RewardResult.Gotcha(badge.getId(), badge.getName(), badge.getImageUrl());
+    }
 }

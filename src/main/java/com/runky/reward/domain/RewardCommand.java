@@ -33,6 +33,11 @@ public class RewardCommand {
     ) {
     }
 
+    public record Gotcha(
+            Long memberId
+    ) {
+    }
+
     private RewardCommand() {
     }
 }

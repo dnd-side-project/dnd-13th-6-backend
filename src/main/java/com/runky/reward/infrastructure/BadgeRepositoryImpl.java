@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -17,6 +19,7 @@ public class BadgeRepositoryImpl implements BadgeRepository {
     private final MemberBadgeJpaRepository memberBadgeJpaRepository;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public MemberBadge save(MemberBadge memberBadge) {
         return memberBadgeJpaRepository.save(memberBadge);
     }
@@ -44,6 +47,11 @@ public class BadgeRepositoryImpl implements BadgeRepository {
     @Override
     public Optional<Badge> findBadge(Long badgeId) {
         return badgeJpaRepository.findById(badgeId);
+    }
+
+    @Override
+    public Optional<Badge> findBadgeByName(String name) {
+        return badgeJpaRepository.findByName(name);
     }
 
     @Override

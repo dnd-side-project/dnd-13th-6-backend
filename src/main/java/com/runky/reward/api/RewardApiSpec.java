@@ -2,6 +2,7 @@ package com.runky.reward.api;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
+import com.runky.reward.api.RewardResponse.Gotcha;
 import com.runky.reward.api.RewardResponse.Images;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +24,7 @@ public interface RewardApiSpec {
 		summary = "뱃지 뽑기",
 		description = "클로버를 사용해 뱃지를 뽑습니다."
 	)
-	ApiResponse<RewardResponse.Draw> drawBadge(
+	ApiResponse<Gotcha> drawBadge(
 		@Parameter(hidden = true) MemberPrincipal requester
 	);
 

@@ -2,6 +2,8 @@ package com.runky.reward.api;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.runky.utils.TestTokenIssuer;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +32,9 @@ class RewardApiE2ETest {
 	private TestRestTemplate testRestTemplate;
 	@Autowired
 	private DatabaseCleanUp databaseCleanUp;
-	@Autowired
+    @Autowired
+    private TestTokenIssuer testTokenIssuer;
+    @Autowired
 	private BadgeRepository badgeRepository;
 	@Autowired
 	private CloverRepository cloverRepository;
@@ -74,6 +78,39 @@ class RewardApiE2ETest {
 			assertThat(response.getBody().getResult().badges().get(0).badge()).isEqualTo(badge1.getImageUrl());
 		}
 	}
+
+    @Nested
+    @DisplayName("PATCH api/rewards/gotcha")
+    class Gotcha {
+        final String BASE_URL = "/api/rewards/gotcha";
+
+        @Test
+        @DisplayName("유저가 뽑기한 배지를 조회한다.")
+        void getGotchaBadge() {
+            badgeRepository.save(badgeRepository.save(Badge.of("badge1.pvg", "뱃지 1")));
+            badgeRepository.save(badgeRepository.save(Badge.of("badge2.pvg", "뱃지 2")));
+            badgeRepository.save(badgeRepository.save(Badge.of("badge3.pvg", "뱃지 3")));
+            badgeRepository.save(badgeRepository.save(Badge.of("badge4.pvg", "뱃지 4")));
+            badgeRepository.save(badgeRepository.save(Badge.of("badge5.pvg", "뱃지 5")));
+            Clover clover = Clover.of(1L);
+            clover.add(100L);
+            cloverRepository.save(clover);
+            ParameterizedTypeReference<ApiResponse<RewardResponse.Gotcha>> responseType = new ParameterizedTypeReference<>() {
+            };
+
+            testTokenIssuer.issue(1L, "USER");
+            HttpHeaders httpHeaders = authHeaders(1L, "USER");
+
+            ResponseEntity<ApiResponse<RewardResponse.Gotcha>> response =
+                testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(httpHeaders), responseType);
+
+            List<Badge> badges = badgeRepository.findBadgesOf(1L);
+            assertThat(badges).hasSize(1);
+            assertThat(response.getBody().getResult().id()).isEqualTo(badges.get(0).getId());
+            assertThat(response.getBody().getResult().imageUrl()).isEqualTo(badges.get(0).getImageUrl());
+            assertThat(response.getBody().getResult().name()).isEqualTo(badges.get(0).getName());
+        }
+    }
 
 	@Nested
 	@DisplayName("GET api/rewards/clovers")

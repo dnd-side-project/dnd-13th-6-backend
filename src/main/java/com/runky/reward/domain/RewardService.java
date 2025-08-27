@@ -1,15 +1,18 @@
 package com.runky.reward.domain;
 
 import com.runky.global.error.GlobalException;
+import com.runky.reward.domain.Gotcha.Capsule;
 import com.runky.reward.error.RewardErrorCode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class RewardService {
+    private static final Gotcha DEFAULT_GOTCHA = Gotcha.DEFAULT;
 
     private final BadgeRepository badgeRepository;
     private final CloverRepository cloverRepository;
@@ -57,6 +60,25 @@ public class RewardService {
         badgeRepository.save(memberBadges);
         Clover clover = Clover.of(command.memberId());
         cloverRepository.save(clover);
+    }
+
+    @Transactional
+    public Badge gotcha(RewardCommand.Gotcha command) {
+        Capsule capsule = DEFAULT_GOTCHA.random();
+
+        Badge badge = badgeRepository.findBadgeByName(capsule.getName())
+                .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_BADGE));
+        MemberBadge memberBadge = badge.issue(command.memberId());
+
+        Clover clover = cloverRepository.findByUserIdWithLock(command.memberId())
+                .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_CLOVER));
+        clover.useForGotcha();
+
+        try {
+            badgeRepository.save(memberBadge);
+        } catch (DataIntegrityViolationException ignored) {
+        }
+        return badge;
     }
 
     @Transactional

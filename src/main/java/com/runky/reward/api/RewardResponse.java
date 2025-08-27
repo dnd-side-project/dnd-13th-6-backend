@@ -14,8 +14,10 @@ public class RewardResponse {
     ) {
     }
 
-    public record Draw(
-            String character
+    public record Gotcha(
+            Long id,
+            String imageUrl,
+            String name
     ) {
     }
 

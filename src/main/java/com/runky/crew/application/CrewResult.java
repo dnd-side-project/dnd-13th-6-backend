@@ -28,7 +28,10 @@ public record CrewResult(
             String crewName,
             Long memberCount,
             boolean isLeader,
-            List<String> characters
+            List<String> badgeImageUrls,
+            BigDecimal goal,
+            Double runningDistance,
+            boolean isRunning
     ) {
     }
 
@@ -39,14 +42,23 @@ public record CrewResult(
             String notice,
             Long memberCount,
             BigDecimal goal,
+            Double runningDistance,
             String code
+    ) {
+    }
+
+    public record Running(
+            Long memberId,
+            boolean isRunning
     ) {
     }
 
     public record CrewMember(
             Long memberId,
             String nickname,
-            String character
+            String badgeImageUrl,
+            Double runningDistance,
+            boolean isRunning
     ) {
     }
 

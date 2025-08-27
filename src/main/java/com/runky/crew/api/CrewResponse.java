@@ -39,7 +39,10 @@ public class CrewResponse {
             String name,
             Long memberCount,
             boolean isLeader,
-            List<String> characters
+            List<String> badgeImageUrls,
+            BigDecimal goal,
+            Double runningDistance,
+            boolean isRunning
     ) {
         public static Card from(CrewResult.Card card) {
             return new Card(
@@ -47,7 +50,10 @@ public class CrewResponse {
                     card.crewName(),
                     card.memberCount(),
                     card.isLeader(),
-                    card.characters()
+                    card.badgeImageUrls(),
+                    card.goal(),
+                    card.runningDistance(),
+                    card.isRunning()
             );
         }
     }
@@ -59,6 +65,7 @@ public class CrewResponse {
             String notice,
             Long memberCount,
             BigDecimal goal,
+            Double runningDistance,
             String code
     ) {
         public static Detail from(CrewResult.Detail detail) {
@@ -69,6 +76,7 @@ public class CrewResponse {
                     detail.notice(),
                     detail.memberCount(),
                     detail.goal(),
+                    detail.runningDistance(),
                     detail.code()
             );
         }
@@ -85,17 +93,22 @@ public class CrewResponse {
     public record Members(List<Member> members) {
 
     }
+
     public record Member(
             Long memberId,
             String nickname,
-            String character
+            String badgeImageUrl,
+            Double runningDistance,
+            boolean isRunning
     ) {
 
         public static Member from(CrewResult.CrewMember member) {
             return new Member(
                     member.memberId(),
                     member.nickname(),
-                    member.character()
+                    member.badgeImageUrl(),
+                    member.runningDistance(),
+                    member.isRunning()
             );
         }
     }

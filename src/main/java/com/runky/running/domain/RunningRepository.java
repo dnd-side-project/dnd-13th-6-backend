@@ -27,4 +27,5 @@ public interface RunningRepository {
 
 	List<Running> findFinishedOnDate(Long runnerId, LocalDateTime now);
 
+    List<Running> findBetweenFromAndToByRunnerId(Long runnerId, LocalDateTime from, LocalDateTime to);
 }

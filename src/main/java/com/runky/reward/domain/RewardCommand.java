@@ -1,5 +1,7 @@
 package com.runky.reward.domain;
 
+import java.util.List;
+
 public class RewardCommand {
 
     public record Find(
@@ -35,6 +37,11 @@ public class RewardCommand {
 
     public record Gotcha(
             Long memberId
+    ) {
+    }
+
+    public record Images(
+            List<Long> badgeId
     ) {
     }
 

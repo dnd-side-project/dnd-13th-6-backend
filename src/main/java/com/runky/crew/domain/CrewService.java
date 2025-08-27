@@ -60,7 +60,7 @@ public class CrewService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<CrewMember> getCrewMembers(CrewCommand.Members command) {
+	public List<CrewMember> getActiveCrewMembers(CrewCommand.Members command) {
 		Crew crew = crewRepository.findById(command.crewId())
 			.orElseThrow(() -> new GlobalException(CrewErrorCode.NOT_FOUND_CREW));
 		if (crew.doesNotContainMember(command.userId())) {

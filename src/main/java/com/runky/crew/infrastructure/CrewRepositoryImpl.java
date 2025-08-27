@@ -29,7 +29,7 @@ public class CrewRepositoryImpl implements CrewRepository {
 
 	@Override
 	public Optional<Crew> findById(Long crewId) {
-		return crewJpaRepository.findById(crewId);
+		return crewJpaRepository.findCrewJoinFetch(crewId);
 	}
 
 	@Override
@@ -57,7 +57,12 @@ public class CrewRepositoryImpl implements CrewRepository {
 		return memberCrewCountJpaRepository.save(crewMemberCount);
 	}
 
-	@Override
+    @Override
+    public CrewMember save(CrewMember crewMember) {
+        return crewMemberJpaRepository.save(crewMember);
+    }
+
+    @Override
 	public List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds) {
 		return memberCrewCountJpaRepository.findByMemberIdIn(userIds);
 	}

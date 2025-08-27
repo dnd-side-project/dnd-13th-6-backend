@@ -1,5 +1,7 @@
 package com.runky.running.domain;
 
+import java.time.LocalDateTime;
+
 public sealed interface RunningCommand {
 	record Start(
 		Long runnerId
@@ -17,4 +19,11 @@ public sealed interface RunningCommand {
 		int pointCount
 	) implements RunningCommand {
 	}
+
+    record WeekDistance(
+            Long runnerId,
+            LocalDateTime from,
+            LocalDateTime to
+    ) {
+    }
 }

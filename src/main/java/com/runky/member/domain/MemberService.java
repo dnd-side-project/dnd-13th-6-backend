@@ -2,6 +2,7 @@ package com.runky.member.domain;
 
 import com.runky.global.error.GlobalException;
 import com.runky.member.error.MemberErrorCode;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -37,5 +38,10 @@ public class MemberService {
                 .orElseThrow(() -> new GlobalException(MemberErrorCode.MEMBER_NOT_FOUND));
         member.changeBadge(command.badgeId());
         return member;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Member> getMembers(MemberCommand.GetMembers command) {
+        return memberRepository.findMembers(command.memberIds());
     }
 }

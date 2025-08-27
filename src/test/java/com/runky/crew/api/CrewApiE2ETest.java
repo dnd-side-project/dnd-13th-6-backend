@@ -9,6 +9,10 @@ import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewMemberCount;
 import com.runky.crew.domain.CrewRepository;
 import com.runky.global.response.ApiResponse;
+import com.runky.goal.domain.CrewGoalSnapshot;
+import com.runky.goal.domain.Goal;
+import com.runky.goal.domain.GoalRepository;
+import com.runky.goal.domain.WeekUnit;
 import com.runky.member.domain.ExternalAccount;
 import com.runky.member.domain.Member;
 import com.runky.member.domain.MemberRepository;
@@ -18,6 +22,8 @@ import com.runky.running.domain.Running;
 import com.runky.running.domain.RunningRepository;
 import com.runky.utils.DatabaseCleanUp;
 import com.runky.utils.TestTokenIssuer;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,6 +53,8 @@ class CrewApiE2ETest {
     private BadgeRepository badgeRepository;
     @Autowired
     private RunningRepository runningRepository;
+    @Autowired
+    private GoalRepository goalRepository;
     @Autowired
     private TestTokenIssuer tokenIssuer;
 
@@ -185,12 +193,29 @@ class CrewApiE2ETest {
         @Test
         @DisplayName("크루의 상세 정보를 조회한다.")
         void getCrew() {
-            long userId = 1L;
-            Member leader = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id"), "leader"));
-            Crew crew = crewRepository.save(Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123")));
+            Member leader = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id1"), "name1"));
+            Crew crew = Crew.of(new CrewCommand.Create(leader.getId(), "crew 1"), new Code("abc123"));
+            crew.joinMember(2L);
+            crew.joinMember(3L);
+            crew.joinMember(4L);
+            crewRepository.save(crew);
 
-            HttpHeaders httpHeaders = tokenIssuer.issue(userId, "USER");
+            CrewGoalSnapshot snapshot = new CrewGoalSnapshot(crew.getId(), new Goal(new BigDecimal("10.5")), false,
+                    WeekUnit.from(LocalDate.now().minusWeeks(1)));
+            goalRepository.save(snapshot);
 
+            Running running1 = Running.builder()
+                    .runnerId(leader.getId())
+                    .status(Running.Status.FINISHED)
+                    .startedAt(LocalDateTime.now().minusHours(1))
+                    .endedAt(LocalDateTime.now())
+                    .totalDistanceMeter(10000.0)
+                    .durationSeconds(3600L)
+                    .avgSpeedMPS(2.5)
+                    .build();
+            runningRepository.save(running1);
+
+            HttpHeaders httpHeaders = tokenIssuer.issue(leader.getId(), "USER");
             ParameterizedTypeReference<ApiResponse<CrewResponse.Detail>> responseType = new ParameterizedTypeReference<>() {
             };
 
@@ -205,6 +230,8 @@ class CrewApiE2ETest {
             assertThat(response.getBody().getResult().leaderNickname()).isEqualTo(leader.getNickname().value());
             assertThat(response.getBody().getResult().memberCount()).isEqualTo(crew.getActiveMemberCount());
             assertThat(response.getBody().getResult().notice()).isEqualTo(crew.getNotice());
+            assertThat(response.getBody().getResult().goal()).isEqualTo(new BigDecimal("10.50"));
+            assertThat(response.getBody().getResult().runningDistance()).isEqualTo(10000.0);
         }
     }
 

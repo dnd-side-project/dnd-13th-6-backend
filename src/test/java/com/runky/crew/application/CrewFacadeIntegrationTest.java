@@ -1,12 +1,16 @@
 package com.runky.crew.application;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.runky.crew.domain.Code;
 import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewRepository;
+import com.runky.goal.domain.CrewGoalSnapshot;
+import com.runky.goal.domain.Goal;
 import com.runky.goal.domain.GoalRepository;
+import com.runky.goal.domain.WeekUnit;
 import com.runky.member.domain.ExternalAccount;
 import com.runky.member.domain.Member;
 import com.runky.member.domain.MemberRepository;
@@ -15,6 +19,8 @@ import com.runky.reward.domain.BadgeRepository;
 import com.runky.running.domain.Running;
 import com.runky.running.domain.RunningRepository;
 import com.runky.utils.DatabaseCleanUp;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -130,13 +136,36 @@ class CrewFacadeIntegrationTest {
         @Test
         @DisplayName("크루에 대한 상세 정보를 반환한다.")
         void returnCrewDetail() {
-            Crew crew = Crew.of(new CrewCommand.Create(1L, "crew 1"), new Code("abc123"));
+            Member member = memberRepository.save(Member.register(ExternalAccount.of("kakao", "id1"), "name1"));
+            Crew crew = Crew.of(new CrewCommand.Create(member.getId(), "crew 1"), new Code("abc123"));
             crew.joinMember(2L);
             crew.joinMember(3L);
-            crew.leaveMember(3L);
             crew.joinMember(4L);
-            crew.banMember(4L);
             crewRepository.save(crew);
+
+            CrewGoalSnapshot snapshot = new CrewGoalSnapshot(crew.getId(), new Goal(new BigDecimal("10.5")), false,
+                    WeekUnit.from(LocalDate.now().minusWeeks(1)));
+            goalRepository.save(snapshot);
+
+            Running running1 = Running.builder()
+                    .runnerId(member.getId())
+                    .status(Running.Status.FINISHED)
+                    .startedAt(LocalDateTime.now().minusHours(1))
+                    .endedAt(LocalDateTime.now())
+                    .totalDistanceMeter(10000.0)
+                    .durationSeconds(3600L)
+                    .avgSpeedMPS(2.5)
+                    .build();
+            runningRepository.save(running1);
+
+            CrewCriteria.Detail criteria = new CrewCriteria.Detail(crew.getId(), member.getId());
+            CrewResult.Detail result = crewFacade.getCrew(criteria);
+
+            assertThat(result.crewId()).isEqualTo(crew.getId());
+            assertThat(result.goal()).isEqualTo("10.50");
+            assertThat(result.runningDistance()).isEqualTo(10000.0);
+            assertThat(result.name()).isEqualTo("crew 1");
+            assertThat(result.leaderNickname()).isEqualTo("name1");
         }
     }
 

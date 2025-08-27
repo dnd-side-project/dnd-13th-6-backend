@@ -4,6 +4,8 @@ import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewLeaderService;
 import com.runky.crew.domain.CrewMember;
 import com.runky.crew.domain.CrewService;
+import com.runky.goal.domain.CrewGoalSnapshot;
+import com.runky.goal.domain.GoalCommand;
 import com.runky.goal.domain.GoalService;
 import com.runky.member.domain.Member;
 import com.runky.member.domain.MemberCommand;
@@ -15,6 +17,7 @@ import com.runky.running.domain.RunningCommand;
 import com.runky.running.domain.RunningInfo;
 import com.runky.running.domain.RunningService;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -80,8 +83,21 @@ public class CrewFacade {
 
         Member leader = memberService.getMember(new MemberCommand.Find(crew.getLeaderId()));
 
+        CrewGoalSnapshot snapshot = goalService.getCrewGoalSnapshot(
+                new GoalCommand.GetCrewSnapshot(crew.getId(), LocalDate.now().minusWeeks(1)));
+
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);
+        Double runningDistance = crew.getActiveMembers().stream()
+                .map(crewMember -> {
+                    RunningInfo.TotalDistance info = runningService.getTotalDistancesOf(
+                            new RunningCommand.WeekDistance(crewMember.getId(), start, now));
+                    return info.totalDistance();
+                }).reduce(0.0, Double::sum);
+
         return new CrewResult.Detail(crew.getId(), crew.getName(), leader.getNickname().value(), crew.getNotice(),
-                crew.getActiveMemberCount(), crew.getCode().value());
+                crew.getActiveMemberCount(), snapshot.getGoal().value(), runningDistance, crew.getCode().value());
     }
 
     public List<CrewResult.CrewMember> getCrewMembers(CrewCriteria.Members criteria) {

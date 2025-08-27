@@ -45,7 +45,7 @@ public class RunningController implements RunningApiSpec {
 		@PathVariable Long runningId,
 		@RequestBody RunningRequest.End request
 	) {
-		RunningCriteria.End criteria = request.toCriteria(requester.memberId(), runningId);
+		RunningCriteria.End criteria = request.toCriteria(runningId, requester.memberId());
 		RunningResult.End result = runningFacade.end(criteria);
 
 		RunningResponse.End response = RunningResponse.End.from(result);

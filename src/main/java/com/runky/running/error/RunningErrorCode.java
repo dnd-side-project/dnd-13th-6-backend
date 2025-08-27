@@ -14,6 +14,7 @@ public enum RunningErrorCode implements ErrorCode {
 	NOT_FOUND_RUNNING(HttpStatus.NOT_FOUND, "R101", "런닝을 찾을 수 없습니다."),
 	ALREADY_ACTIVE_RUNNING(HttpStatus.CONFLICT, "R102", "이미 진행 중인 런닝이 있습니다."),
 	NOT_ACTIVE_RUNNING(HttpStatus.CONFLICT, "R103", "시작 상태가 아니므로 종료할 수 없습니다."),
+	ALREADY_ENDED_RUNNING(HttpStatus.CONFLICT, "R104", "이미 종료된 런닝입니다."),
 
 	/* R2xx: Running Track 저장/포맷 */
 	TRACK_ALREADY_EXISTS(HttpStatus.CONFLICT, "R201", "이미 트랙이 저장되어 있습니다."),

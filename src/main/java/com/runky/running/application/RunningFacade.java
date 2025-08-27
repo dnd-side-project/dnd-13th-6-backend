@@ -32,6 +32,10 @@ public class RunningFacade {
 		RunningInfo.Start info = runningService.start(criteria.toCommand());
 		List<Long> receiverIds = crewService.getAllCrewMembersOfUser(criteria.runnerId());
 
+		if (receiverIds.isEmpty()) {
+			return RunningResult.Start.from(info);
+		}
+		
 		var memberFindCmd = new MemberCommand.Find(criteria.runnerId());
 		String runnerNickname = memberService.getMember(memberFindCmd).getNickname().value();
 

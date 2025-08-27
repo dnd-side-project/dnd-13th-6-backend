@@ -96,4 +96,29 @@ class RunningFacadeTest {
 		assertThat(s3.values().get(0).message()).contains("닉넴1"); // 러너 닉네임 포함
 
 	}
+
+	@DisplayName("수신자가 0명(자기 혼자만 있는 크루)이면 푸시를 시도하지 않고 정상 응답한다")
+	@Test
+	void start_when_no_receivers_should_skip_push_and_return_ok() {
+		// given: m1만 포함된 크루(수신자 0명)
+		Member m1 = memberRepository.save(Member.register(ExternalAccount.of("provider1", "pid1"), "접시1"));
+		crewRepository.save(CrewMemberCount.of(m1.getId()));
+
+		Crew crew1 = crewService.create(new CrewCommand.Create(m1.getId(), "6조의 크루"));
+		assertThat(crew1).isNotNull();
+
+		// when
+		RunningResult.Start result = runningFacade.start(new RunningCriteria.Start(m1.getId()));
+
+		// then: 런 시작 결과는 정상
+		assertThat(result.runningId()).isPositive();
+		assertThat(result.startedAt()).isNotNull();
+		assertThat(result.status()).isNotNull();
+
+		// 그리고 어떤 멤버에게도 알림이 저장되지 않는다 - (수신자 자체가 없으므로)
+		NotificationInfo.Summaries s1 = notificationService.getRecentTopN(
+			new NotificationCommand.GetRecentTopN(m1.getId(), 10));
+		assertThat(s1.values()).isEmpty();
+	}
+
 }

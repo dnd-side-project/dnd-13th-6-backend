@@ -140,6 +140,11 @@ public class CrewResponse {
     ) {
     }
 
+    public record Related(
+            List<String> nicknames
+    ) {
+    }
+
     private CrewResponse() {
     }
 }

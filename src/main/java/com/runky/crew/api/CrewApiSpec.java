@@ -113,4 +113,12 @@ public interface CrewApiSpec {
 		@Schema(name = "크루 ID", description = "멤버를 추방할 크루 ID") Long crewId,
 		@Schema(name = "추방할 사용자 ID", description = "추방할 멤버의 ID") Long targetId
 	);
+
+    @Operation(
+            summary = "러닝중인 관련 크루원 조회",
+            description = "러닝중인 관련 크루원들을 조회합니다."
+    )
+    ApiResponse<CrewResponse.Related> getRunningRelatedMembers(
+            @Parameter(hidden = true) MemberPrincipal requester
+    );
 }

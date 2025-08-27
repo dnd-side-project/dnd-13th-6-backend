@@ -79,4 +79,9 @@ public record CrewResult(
             String nickname
     ) {
     }
+
+    public record RelatedRunningMember(
+            String nickname
+    ) {
+    }
 }

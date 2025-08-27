@@ -30,4 +30,5 @@ public interface CrewRepository {
 
 	List<Crew> findAll();
 
+    List<CrewMember> findRelatedCrewMembers(Long userId);
 }

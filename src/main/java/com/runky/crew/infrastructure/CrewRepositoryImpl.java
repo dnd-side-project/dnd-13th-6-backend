@@ -81,4 +81,9 @@ public class CrewRepositoryImpl implements CrewRepository {
 	public List<Crew> findAll() {
 		return crewJpaRepository.findAllCrewsJoinFetch();
 	}
+
+    @Override
+    public List<CrewMember> findRelatedCrewMembers(Long userId) {
+        return crewMemberJpaRepository.findRelatedCrewMembers(userId);
+    }
 }

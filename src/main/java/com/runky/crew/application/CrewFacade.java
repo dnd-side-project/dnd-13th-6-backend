@@ -1,6 +1,7 @@
 package com.runky.crew.application;
 
 import com.runky.crew.domain.Crew;
+import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewLeaderService;
 import com.runky.crew.domain.CrewMember;
 import com.runky.crew.domain.CrewService;
@@ -167,5 +168,22 @@ public class CrewFacade {
         Member member = memberService.getMember(new MemberCommand.Find(bannedMember.getMemberId()));
 
         return new CrewResult.Ban(bannedMember.getMemberId(), member.getNickname().value());
+    }
+
+    public List<CrewResult.RelatedRunningMember> getRelatedRunningMember(CrewCriteria.RelatedRunningMember criteria) {
+        List<CrewMember> members = crewService.findAllRelatedCrewMembers(new CrewCommand.Related(criteria.userId()));
+
+        List<String> nicknames = new ArrayList<>();
+        for (CrewMember crewMember : members) {
+            boolean isRunning = runningService.getRunnerStatus(crewMember.getMemberId());
+            if (isRunning) {
+                Member member = memberService.getMember(new MemberCommand.Find(crewMember.getMemberId()));
+                nicknames.add(member.getNickname().value());
+            }
+        }
+
+        return nicknames.stream()
+                .map(CrewResult.RelatedRunningMember::new)
+                .toList();
     }
 }

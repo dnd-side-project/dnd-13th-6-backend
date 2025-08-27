@@ -1,17 +1,10 @@
 package com.runky.goal.batch;
 
-import com.runky.goal.domain.GoalService;
-import com.runky.goal.domain.MemberGoalSnapshot;
-import com.runky.reward.domain.RewardService;
-import com.runky.running.domain.Running;
-import com.runky.running.domain.RunningInfo;
-import com.runky.running.domain.RunningInfo.TotalDistance;
-import jakarta.persistence.EntityManagerFactory;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -27,90 +20,100 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.runky.goal.domain.GoalService;
+import com.runky.goal.domain.MemberGoalSnapshot;
+import com.runky.reward.domain.RewardService;
+import com.runky.running.domain.Running;
+import com.runky.running.domain.RunningInfo;
+import com.runky.running.domain.RunningInfo.TotalDistance;
+
+import jakarta.persistence.EntityManagerFactory;
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @RequiredArgsConstructor
 public class WeeklyGoalAchieveJobConfig {
 
-    private final JobRepository jobRepository;
-    private final GoalService goalService;
-    private final RewardService rewardService;
+	private final JobRepository jobRepository;
+	private final GoalService goalService;
+	private final RewardService rewardService;
 
-    @Bean
-    public Job weeklyGoalAchieveJob(Step weeklyGoalAchieveStep) {
-        return new JobBuilder("weeklyGoalAchieveJob", jobRepository)
-                .start(weeklyGoalAchieveStep)
-                .build();
-    }
+	@Bean
+	public Job weeklyGoalAchieveJob(Step weeklyGoalAchieveStep) {
+		return new JobBuilder("weeklyGoalAchieveJob", jobRepository)
+			.start(weeklyGoalAchieveStep)
+			.build();
+	}
 
-    @Bean
-    @StepScope
-    public JpaPagingItemReader<RunningInfo.TotalDistance> weeklyDistanceReader(EntityManagerFactory emf,
-                                                                               @Value("#{jobParameters['snapshotDate']}") String dateString) {
-        LocalDate snapshotDate = LocalDate.parse(dateString);
-        return new JpaPagingItemReaderBuilder<RunningInfo.TotalDistance>()
-                .name("weeklyDistanceReader")
-                .entityManagerFactory(emf)
-                .queryString(
-                        "SELECT new com.runky.running.domain.RunningInfo$TotalDistance(r.runnerId, SUM(r.totalDistanceMeter)) "
-                                +
-                                "FROM Running r " +
-                                "WHERE r.status = :status " +
-                                "AND r.startedAt >= :from " +
-                                "AND r.endedAt <= :to " +
-                                "GROUP BY r.runnerId"
-                )
-                .parameterValues(Map.of(
-                        "status", Running.Status.FINISHED,
-                        "from", snapshotDate.minusDays(7).atStartOfDay(), // 전 주 월요일
-                        "to", snapshotDate.minusDays(1).atTime(LocalTime.MAX) // 전 주 일요일
-                ))
-                .build();
-    }
+	@Bean
+	@StepScope
+	public JpaPagingItemReader<RunningInfo.TotalDistance> weeklyDistanceReader(EntityManagerFactory emf,
+		@Value("#{jobParameters['snapshotDate']}") String dateString) {
+		LocalDate snapshotDate = LocalDate.parse(dateString);
+		return new JpaPagingItemReaderBuilder<RunningInfo.TotalDistance>()
+			.name("weeklyDistanceReader")
+			.entityManagerFactory(emf)
+			.queryString(
+				"SELECT new com.runky.running.domain.RunningInfo$TotalDistance(r.runnerId, SUM(r.totalDistanceMeter)) "
+					+
+					"FROM Running r " +
+					"WHERE r.status = :status " +
+					"AND r.startedAt >= :from " +
+					"AND r.endedAt <= :to " +
+					"GROUP BY r.runnerId"
+			)
+			.parameterValues(Map.of(
+				"status", Running.Status.ENDED,
+				"from", snapshotDate.minusDays(7).atStartOfDay(), // 전 주 월요일
+				"to", snapshotDate.minusDays(1).atTime(LocalTime.MAX) // 전 주 일요일
+			))
+			.build();
+	}
 
-    @Bean
-    @StepScope
-    public ItemProcessor<TotalDistance, Long> goalAchieveProcessor(
-            @Value("#{jobParameters['snapshotDate']}") String dateString) {
-        LocalDate snapshotDate = LocalDate.parse(dateString);
+	@Bean
+	@StepScope
+	public ItemProcessor<TotalDistance, Long> goalAchieveProcessor(
+		@Value("#{jobParameters['snapshotDate']}") String dateString) {
+		LocalDate snapshotDate = LocalDate.parse(dateString);
 
-        return totalDistance -> {
-            Optional<MemberGoalSnapshot> snapshot =
-                    goalService.findMemberGoalSnapshot(totalDistance.runnerId(), snapshotDate.minusWeeks(1));
-            if (snapshot.isEmpty()) {
-                return null;
-            }
+		return totalDistance -> {
+			Optional<MemberGoalSnapshot> snapshot =
+				goalService.findMemberGoalSnapshot(totalDistance.runnerId(), snapshotDate.minusWeeks(1));
+			if (snapshot.isEmpty()) {
+				return null;
+			}
 
-            // 목표 달성 여부 확인
-            if (snapshot.get().getGoal().value().doubleValue() <= totalDistance.totalDistance()) {
-                snapshot.get().achieve();
-                return totalDistance.runnerId();
-            }
+			// 목표 달성 여부 확인
+			if (snapshot.get().getGoal().value().doubleValue() <= totalDistance.totalDistance()) {
+				snapshot.get().achieve();
+				return totalDistance.runnerId();
+			}
 
-            // 목표 미달성 시, 클로버 증가 X
-            return null;
-        };
-    }
+			// 목표 미달성 시, 클로버 증가 X
+			return null;
+		};
+	}
 
-    @Bean
-    @StepScope
-    public ItemWriter<Long> goalAchieveWriter() {
-        return achievedMembers -> {
-            for (Long memberId : achievedMembers) {
-                rewardService.achieveMemberGoal(memberId);
-            }
-        };
-    }
+	@Bean
+	@StepScope
+	public ItemWriter<Long> goalAchieveWriter() {
+		return achievedMembers -> {
+			for (Long memberId : achievedMembers) {
+				rewardService.achieveMemberGoal(memberId);
+			}
+		};
+	}
 
-    @Bean
-    public Step weeklyGoalAchieveStep(JobRepository jobRepository, PlatformTransactionManager txManager,
-                                      JpaPagingItemReader<RunningInfo.TotalDistance> reader,
-                                      ItemProcessor<RunningInfo.TotalDistance, Long> processor,
-                                      ItemWriter<Long> writer) {
-        return new StepBuilder("weeklyGoalAchieveStep", jobRepository)
-                .<RunningInfo.TotalDistance, Long>chunk(100, txManager)
-                .reader(reader)
-                .processor(processor)
-                .writer(writer)
-                .build();
-    }
+	@Bean
+	public Step weeklyGoalAchieveStep(JobRepository jobRepository, PlatformTransactionManager txManager,
+		JpaPagingItemReader<RunningInfo.TotalDistance> reader,
+		ItemProcessor<RunningInfo.TotalDistance, Long> processor,
+		ItemWriter<Long> writer) {
+		return new StepBuilder("weeklyGoalAchieveStep", jobRepository)
+			.<RunningInfo.TotalDistance, Long>chunk(100, txManager)
+			.reader(reader)
+			.processor(processor)
+			.writer(writer)
+			.build();
+	}
 }

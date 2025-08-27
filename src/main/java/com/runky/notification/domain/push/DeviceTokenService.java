@@ -50,6 +50,9 @@ public class DeviceTokenService {
 
 	@Transactional(readOnly = true)
 	public DeviceTokenInfo.ActiveTokens getActiveTokens(PushCommand.DeviceToken.Gets command) {
+		if (command.memberIds().isEmpty()) {
+			throw new GlobalException(NotificationErrorCode.EMTPY_TOKEN_OWNER_IDS);
+		}
 		return new DeviceTokenInfo.ActiveTokens(deviceTokenRepository.findActiveTokensByMemberIds(command.memberIds()));
 	}
 

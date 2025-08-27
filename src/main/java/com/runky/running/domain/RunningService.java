@@ -21,8 +21,9 @@ public class RunningService {
 
 	@Transactional
 	public RunningInfo.Start start(RunningCommand.Start command) {
-		if (runningRepository.existsByRunnerIdAndEndedAtIsNull(command.runnerId())) {
-			throw new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING);
+		boolean runnerStatus = getRunnerStatus(command.runnerId());
+		if (runnerStatus == true) {
+			throw new GlobalException(RunningErrorCode.ALREADY_ACTIVE_RUNNING);
 		}
 
 		Running running = runningRepository.save(Running.start(command.runnerId(), LocalDateTime.now()));
@@ -34,22 +35,26 @@ public class RunningService {
 		Running running = runningRepository.findByIdAndRunnerId(command.runningId(), command.runnerId())
 			.orElseThrow(() -> new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING));
 
+		if (running.getStatus() == Running.Status.ENDED) {
+			throw new GlobalException(RunningErrorCode.ALREADY_ENDED_RUNNING);
+		}
+
 		if (!running.isActive()) {
 			throw new GlobalException(RunningErrorCode.NOT_ACTIVE_RUNNING);
+		}
+
+		if (trackRepository.existsByRunningId(command.runningId())) {
+			throw new GlobalException(RunningErrorCode.TRACK_ALREADY_EXISTS);
 		}
 
 		LocalDateTime now = LocalDateTime.now();
 		running.finish(command.totalDistanceMinutes(), command.durationSeconds(), command.avgSpeedMPS(), now);
 		runningRepository.save(running);
 
-		if (trackRepository.existsByRunningId(command.runningId())) {
-			throw new GlobalException(RunningErrorCode.TRACK_ALREADY_EXISTS);
-		}
-
 		RunningTrack runningTrack = new RunningTrack(
 			running,
-			command.format(),
 			command.points(),
+			command.format(),
 			command.pointCount()
 		);
 		trackRepository.save(runningTrack);

@@ -156,18 +156,16 @@ public class CrewFacade {
     public CrewResult.Delegate delegateLeader(CrewCriteria.Delegate criteria) {
         Crew crew = crewLeaderService.delegateLeader(criteria.toCommand());
 
-        // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
-        String leaderNickname = "Leader Nickname";
+        Member leader = memberService.getMember(new MemberCommand.Find(crew.getLeaderId()));
 
-        return new CrewResult.Delegate(crew.getLeaderId(), leaderNickname);
+        return new CrewResult.Delegate(crew.getLeaderId(), leader.getNickname().value());
     }
 
     public CrewResult.Ban banMember(CrewCriteria.Ban criteria) {
         CrewMember bannedMember = crewLeaderService.ban(criteria.toCommand());
 
-        // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
-        String bannedNickname = "Banned Nickname";
+        Member member = memberService.getMember(new MemberCommand.Find(bannedMember.getMemberId()));
 
-        return new CrewResult.Ban(bannedMember.getMemberId(), bannedNickname);
+        return new CrewResult.Ban(bannedMember.getMemberId(), member.getNickname().value());
     }
 }

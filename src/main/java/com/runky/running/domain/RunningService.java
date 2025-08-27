@@ -21,8 +21,9 @@ public class RunningService {
 
 	@Transactional
 	public RunningInfo.Start start(RunningCommand.Start command) {
-		if (runningRepository.existsByRunnerIdAndEndedAtIsNull(command.runnerId())) {
-			throw new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING);
+		boolean runnerStatus = getRunnerStatus(command.runnerId());
+		if (runnerStatus == true) {
+			throw new GlobalException(RunningErrorCode.ALREADY_ACTIVE_RUNNING);
 		}
 
 		Running running = runningRepository.save(Running.start(command.runnerId(), LocalDateTime.now()));

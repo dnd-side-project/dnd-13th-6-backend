@@ -1,15 +1,17 @@
 package com.runky.running.api;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.runky.running.application.RunningResult;
 
 public sealed interface RunningResponse {
 
-	record Start(Long runningId, Long runnerId, String status, String publishDestination, LocalDateTime startedAt)
+	record Start(Long runningId, Long runnerId, String status, String pub, String sub,
+				 LocalDateTime startedAt)
 		implements RunningResponse {
-		static Start from(String pub, RunningResult.Start result) {
-			return new Start(result.runningId(), result.runnerId(), result.status(), pub, result.startedAt());
+		static Start from(String pub, String sub, RunningResult.Start result) {
+			return new Start(result.runningId(), result.runnerId(), result.status(), pub, sub, result.startedAt());
 		}
 	}
 
@@ -24,6 +26,17 @@ public sealed interface RunningResponse {
 	record TodaySummary(Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMps) {
 		public static TodaySummary from(RunningResult.TodaySummary r) {
 			return new RunningResponse.TodaySummary(r.totalDistanceMeters(), r.durationSeconds(), r.avgSpeedMps());
+		}
+	}
+
+	record MyWeeklyTotalDistance(
+		double totalDistanceKm,
+		double totalDistanceMeter,
+		LocalDate weekStart,
+		LocalDate weekEnd
+	) {
+		public static MyWeeklyTotalDistance from(RunningResult.MyWeeklyTotalDistance r) {
+			return new MyWeeklyTotalDistance(r.totalDistanceKm(), r.totalDistanceMeter(), r.weekStart(), r.weekEnd());
 		}
 	}
 }

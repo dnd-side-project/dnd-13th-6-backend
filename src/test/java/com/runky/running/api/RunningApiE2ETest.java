@@ -91,7 +91,7 @@ class RunningApiE2ETest {
 			assertThat(body.runnerId()).isEqualTo(memberId);
 			assertThat(body.status()).isNotBlank();
 			assertThat(body.startedAt()).isNotNull();
-			assertThat(body.publishDestination())
+			assertThat(body.pub())
 				.isEqualTo("/app/runnings/" + body.runningId() + "/location");
 		}
 	}

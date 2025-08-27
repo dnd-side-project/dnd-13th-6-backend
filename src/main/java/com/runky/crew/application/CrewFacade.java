@@ -156,10 +156,9 @@ public class CrewFacade {
     public CrewResult.Delegate delegateLeader(CrewCriteria.Delegate criteria) {
         Crew crew = crewLeaderService.delegateLeader(criteria.toCommand());
 
-        // TODO 크루 리더의 닉네임을 가져오는 작업 추가 : UserService
-        String leaderNickname = "Leader Nickname";
+        Member leader = memberService.getMember(new MemberCommand.Find(crew.getLeaderId()));
 
-        return new CrewResult.Delegate(crew.getLeaderId(), leaderNickname);
+        return new CrewResult.Delegate(crew.getLeaderId(), leader.getNickname().value());
     }
 
     public CrewResult.Ban banMember(CrewCriteria.Ban criteria) {

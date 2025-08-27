@@ -1,6 +1,7 @@
 package com.runky.reward.infrastructure;
 
 import com.runky.reward.domain.Badge;
+import com.runky.reward.domain.Badge.BadgeType;
 import com.runky.reward.domain.BadgeRepository;
 import com.runky.reward.domain.MemberBadge;
 import java.util.List;
@@ -26,8 +27,18 @@ public class BadgeRepositoryImpl implements BadgeRepository {
     }
 
     @Override
+    public List<MemberBadge> save(List<MemberBadge> memberBadges) {
+        return memberBadgeJpaRepository.saveAll(memberBadges);
+    }
+
+    @Override
     public List<Badge> findBadgesOf(Long memberId) {
         return badgeJpaRepository.findBadgesOf(memberId);
+    }
+
+    @Override
+    public List<Badge> findByType(BadgeType badgeType) {
+        return badgeJpaRepository.findByType(badgeType);
     }
 
     @Override

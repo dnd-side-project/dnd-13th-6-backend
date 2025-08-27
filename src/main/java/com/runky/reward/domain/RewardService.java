@@ -49,6 +49,17 @@ public class RewardService {
     }
 
     @Transactional
+    public void init(RewardCommand.Init command) {
+        List<Badge> defaultBadges = badgeRepository.findByType(Badge.BadgeType.DEFAULT);
+        List<MemberBadge> memberBadges = defaultBadges.stream()
+                .map(badge -> badge.issue(command.memberId()))
+                .toList();
+        badgeRepository.save(memberBadges);
+        Clover clover = Clover.of(command.memberId());
+        cloverRepository.save(clover);
+    }
+
+    @Transactional
     public Clover achieveMemberGoal(Long memberId) {
         Clover clover = cloverRepository.findByUserIdWithLock(memberId)
                 .orElseThrow(() -> new GlobalException(RewardErrorCode.NOT_FOUND_CLOVER));

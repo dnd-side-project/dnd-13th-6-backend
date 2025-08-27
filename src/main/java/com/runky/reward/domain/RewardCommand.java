@@ -28,6 +28,11 @@ public class RewardCommand {
     ) {
     }
 
+    public record Init(
+            Long memberId
+    ) {
+    }
+
     private RewardCommand() {
     }
 }

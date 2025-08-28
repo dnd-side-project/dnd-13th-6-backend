@@ -40,6 +40,10 @@ jobs:
 
       # FCM
       FCM_PRIVATE_KEY: ${{ secrets.FCM_PRIVATE_KEY }}
+
+      # LOGIN
+      LOGIN_REDIRECT_NEW_USER: ${{ secrets.LOGIN_REDIRECT_NEW_USER }}
+      LOGIN_REDIRECT_ALREADY_EXISTING_USER: ${{ secrets.LOGIN_REDIRECT_ALREADY_EXISTING_USER }}
     
     steps:
       - name: 코드 가져오기

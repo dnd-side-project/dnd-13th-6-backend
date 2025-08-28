@@ -44,6 +44,10 @@ kakao:
 
 
 runky:
+  login:
+    redirect:
+      new-user: "https://localhost:3000/onboarding/terms"
+      already-existing-user: "https://localhost:3000/main"
   security:
     signup-token:
       ttlMinutes: 10
@@ -91,6 +95,10 @@ fcm:
   private-key: ${FCM_PRIVATE_KEY}
 
 runky:
+  login:
+    redirect:
+      new-user: ${LOGIN_REDIRECT_NEW_USER}
+      already-existing-user: ${LOGIN_REDIRECT_ALREADY_EXISTING_USER}
   security:
     signup-token:
       ttlMinutes: ${SIGNUP_TTL}

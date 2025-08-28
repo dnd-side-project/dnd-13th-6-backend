@@ -1,7 +1,5 @@
 package com.runky.auth.api;
 
-import static com.runky.auth.api.AuthConstants.*;
-
 import java.util.List;
 
 import org.springframework.http.ResponseCookie;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.runky.auth.application.AuthCriteria;
 import com.runky.auth.application.AuthFacade;
 import com.runky.auth.application.AuthResult;
+import com.runky.auth.config.props.LoginRedirectProperties;
 import com.runky.global.response.ApiResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController implements AuthApiSpec {
-
+	private final LoginRedirectProperties loginRedirectProperties;
 	private final AuthFacade authFacade;
 	private final TokenCookieProvider cookieProvider;
 	private final AuthResponseHelper responseHelper;
@@ -76,7 +75,7 @@ public class AuthController implements AuthApiSpec {
 				yield responseHelper.successWithCookiesAndRedirect(
 					ApiResponse.success(new AuthResponse.NewUser()),
 					List.of(st),
-					NEW_USER_REDIRECT
+					loginRedirectProperties.newUser()
 				);
 			}
 			case EXISTING_USER -> {
@@ -85,7 +84,7 @@ public class AuthController implements AuthApiSpec {
 				yield responseHelper.successWithCookiesAndRedirect(
 					ApiResponse.success(new AuthResponse.ExistingUser()),
 					List.of(at, rt),
-					ALREADY_EXISTING_USER
+					loginRedirectProperties.alreadyExistingUser()
 				);
 			}
 		};

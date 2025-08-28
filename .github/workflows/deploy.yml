@@ -63,6 +63,8 @@ jobs:
           echo "COOKIE_COMMON_HTTPONLY=${{ secrets.COOKIE_COMMON_HTTPONLY }}" >> ./docker/.env
           echo "COOKIE_COMMON_SECURE=${{ secrets.COOKIE_COMMON_SECURE }}" >> ./docker/.env
           echo "COOKIE_COMMON_SAMESITE=${{ secrets.COOKIE_COMMON_SAMESITE }}" >> ./docker/.env
+          echo "LOGIN_REDIRECT_NEW_USER=${{ secrets.LOGIN_REDIRECT_NEW_USER }}" >> ./docker/.env
+          echo "LOGIN_REDIRECT_ALREADY_EXISTING_USER=${{ secrets.LOGIN_REDIRECT_ALREADY_EXISTING_USER }}" >> ./docker/.env
 
       - name: Docker 이미지 빌드 및 푸시
         run: |

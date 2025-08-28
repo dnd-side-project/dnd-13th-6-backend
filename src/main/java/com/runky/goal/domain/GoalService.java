@@ -74,7 +74,10 @@ public class GoalService {
 
 		memberGoal.updateGoal(command.goal());
 
-		if (goalRepository.existsMemberGoalSnapShot(command.memberId())) {
+		// 스냅샷 존재 하지 않고, 현재 목표 값이 0인 경우
+		if (!goalRepository.existsMemberGoalSnapShot(command.memberId())
+			&& memberGoal.getGoal().value().intValue() == 0
+		) {
 			goalRepository.save(
 				new MemberGoalSnapshot(command.memberId(), memberGoal.getGoal(), false, LocalDate.now()));
 		}

@@ -49,7 +49,7 @@ public class MemberController implements MemberApiSpec {
 	) {
 		MemberResult.WithBadge result = memberFacade.changeBadge(
 			new MemberCriteria.ChangeBadge(requester.memberId(), request.badgeId()));
-		return ApiResponse.success(new MemberResponse.Badge(result.id(), result.badgeImageUrl()));
+		return ApiResponse.success(new MemberResponse.Badge(result.id(), result.badgeId(), result.badgeImageUrl()));
 	}
 
 	@Override
@@ -58,6 +58,6 @@ public class MemberController implements MemberApiSpec {
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable(value = "memberId") Long targetId) {
 		MemberResult.WithBadge result = memberFacade.getMember(new MemberCriteria.Get(targetId));
-		return ApiResponse.success(new MemberResponse.Badge(result.id(), result.badgeImageUrl()));
+		return ApiResponse.success(new MemberResponse.Badge(result.id(), result.badgeId(), result.badgeImageUrl()));
 	}
 }

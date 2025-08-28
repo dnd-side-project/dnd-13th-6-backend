@@ -2,25 +2,26 @@ package com.runky.member.api;
 
 public class MemberResponse {
 
-    public record Detail(
-            Long userId,
-            String nickname,
-            String badgeUrl
-    ) {
-    }
+	private MemberResponse() {
+	}
 
-    public record Nickname(
-            Long userId,
-            String nickname
-    ) {
-    }
+	public record Detail(
+		Long userId,
+		String nickname,
+		String badgeUrl
+	) {
+	}
 
-    public record Badge(
-            Long userId,
-            String badgeImageUrl
-    ) {
-    }
+	public record Nickname(
+		Long userId,
+		String nickname
+	) {
+	}
 
-    private MemberResponse() {
-    }
+	public record Badge(
+		Long userId,
+		Long badgeId,
+		String badgeImageUrl
+	) {
+	}
 }

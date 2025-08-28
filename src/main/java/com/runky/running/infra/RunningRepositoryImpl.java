@@ -58,6 +58,11 @@ public class RunningRepositoryImpl implements RunningRepository {
 	}
 
 	@Override
+	public Optional<Running> findByRunnerIdAndStatusAndEndedAtIsNull(final Long memberId, final Running.Status status) {
+		return jpaRepository.findByRunnerIdAndStatusAndEndedAtIsNull(memberId, status);
+	}
+
+	@Override
 	public Set<Long> findRunnerIdsByStatusAndEndedAtIsNull(final Collection<Long> runnerIds,
 		final Running.Status status) {
 		return jpaRepository.findRunnerIdsByStatusAndEndedAtIsNull(runnerIds, status);
@@ -71,9 +76,9 @@ public class RunningRepositoryImpl implements RunningRepository {
 		return jpaRepository.findFinishedByEndedAtBetween(runnerId, from, to);
 	}
 
-    @Override
-    public List<Running> findBetweenFromAndToByRunnerId(Long runnerId, LocalDateTime from, LocalDateTime to) {
-        return jpaRepository.findBetweenFromAndToByRunnerId(runnerId, from, to);
-    }
+	@Override
+	public List<Running> findBetweenFromAndToByRunnerId(Long runnerId, LocalDateTime from, LocalDateTime to) {
+		return jpaRepository.findBetweenFromAndToByRunnerId(runnerId, from, to);
+	}
 
 }

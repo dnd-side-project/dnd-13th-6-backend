@@ -27,7 +27,8 @@ public class MemberController implements MemberApiSpec {
 	@GetMapping("/me")
 	public ApiResponse<MemberResponse.Detail> getMyInfo(@AuthenticationPrincipal MemberPrincipal requester) {
 		MemberResult.WithBadge result = memberFacade.getMember(new MemberCriteria.Get(requester.memberId()));
-		return ApiResponse.success(new MemberResponse.Detail(result.id(), result.nickname(), result.badgeImageUrl()));
+		return ApiResponse.success(
+			new MemberResponse.Detail(result.id(), result.nickname(), result.badgeId(), result.badgeImageUrl()));
 	}
 
 	@Override

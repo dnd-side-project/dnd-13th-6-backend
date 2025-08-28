@@ -8,6 +8,7 @@ public class MemberResponse {
 	public record Detail(
 		Long userId,
 		String nickname,
+		Long badgeId,
 		String badgeUrl
 	) {
 	}

@@ -79,6 +79,32 @@ class CrewServiceIntegrationTest {
         }
     }
 
+    @Nested
+    @DisplayName("모든 관련 크루원 조회 시,")
+    class RelatedCrewMembers {
+
+        @Test
+        @DisplayName("내가 활동중인 크루의 모든 활동 멤버들을 조회한다.")
+        void getRelatedCrewMembers() {
+            Crew crew1 = Crew.of(new CrewCommand.Create(1L, "Crew 1"), new Code("ABC123"));
+            crew1.joinMember(2L);
+            crew1.joinMember(3L);
+            crew1.leaveMember(3L);
+            Crew crew2 = Crew.of(new CrewCommand.Create(1L, "Crew 2"), new Code("DEF456"));
+            crew2.joinMember(10L);
+            crew2.joinMember(11L);
+            crew2.joinMember(13L);
+            crew2.banMember(13L);
+            Crew saveCrew1 = crewRepository.save(crew1);
+            Crew saveCrew2 = crewRepository.save(crew2);
+
+            List<CrewMember> relatedMembers = crewService.findAllRelatedCrewMembers(new CrewCommand.Related(1L));
+
+            assertThat(relatedMembers).hasSize(3);
+            assertThat(relatedMembers).extracting("memberId").containsExactlyInAnyOrder(2L, 10L, 11L);
+        }
+    }
+
     @Test
     @DisplayName("사용자가 속한 크루를 조회한다.")
     void getCrewsOfUser() {

@@ -138,6 +138,11 @@ public class CrewCriteria {
         }
     }
 
+    public record RelatedRunningMember(
+            Long userId
+    ) {
+    }
+
     private CrewCriteria() {
     }
 }

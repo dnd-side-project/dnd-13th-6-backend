@@ -108,6 +108,21 @@ public class CrewService {
 	}
 
     @Transactional
+    public List<CrewMember> findAllRelatedCrewMembers(CrewCommand.Related command) {
+        List<CrewMember> relatedCrewMembers = crewRepository.findRelatedCrewMembers(command.userId());
+        return relatedCrewMembers.stream()
+                .filter(relatedCrewMember -> !relatedCrewMember.getMemberId().equals(command.userId()))
+                .collect(Collectors.toMap(
+                        CrewMember::getMemberId,
+                        m -> m,
+                        (m1, m2) -> m1
+                ))
+                .values()
+                .stream()
+                .toList();
+    }
+
+    @Transactional
     public void init(CrewCommand.Init command) {
         CrewMemberCount crewMemberCount = CrewMemberCount.of(command.memberId());
         crewRepository.save(crewMemberCount);

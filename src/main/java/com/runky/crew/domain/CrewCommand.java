@@ -66,6 +66,11 @@ public class CrewCommand {
     ) {
     }
 
+    public record Related(
+            Long userId
+    ) {
+    }
+
     public record Init(
             Long memberId
     ) {

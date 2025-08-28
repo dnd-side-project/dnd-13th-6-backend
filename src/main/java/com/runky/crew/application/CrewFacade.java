@@ -1,6 +1,19 @@
 package com.runky.crew.application;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.runky.crew.domain.Crew;
+import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewLeaderService;
 import com.runky.crew.domain.CrewMember;
 import com.runky.crew.domain.CrewService;
@@ -16,156 +29,163 @@ import com.runky.reward.domain.RewardService;
 import com.runky.running.domain.RunningCommand;
 import com.runky.running.domain.RunningInfo;
 import com.runky.running.domain.RunningService;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
 public class CrewFacade {
-    private final CrewService crewService;
-    private final MemberService memberService;
-    private final CrewLeaderService crewLeaderService;
-    private final RewardService rewardService;
-    private final RunningService runningService;
-    private final GoalService goalService;
+	private final CrewService crewService;
+	private final MemberService memberService;
+	private final CrewLeaderService crewLeaderService;
+	private final RewardService rewardService;
+	private final RunningService runningService;
+	private final GoalService goalService;
 
-    public CrewResult create(CrewCriteria.Create criteria) {
-        Crew crew = crewService.create(criteria.toCommand());
-        return CrewResult.from(crew);
-    }
+	public CrewResult create(CrewCriteria.Create criteria) {
+		Crew crew = crewService.create(criteria.toCommand());
+		return CrewResult.from(crew);
+	}
 
-    public CrewResult join(CrewCriteria.Join criteria) {
-        Crew crew = crewService.join(criteria.toCommand());
-        return CrewResult.from(crew);
-    }
+	public CrewResult join(CrewCriteria.Join criteria) {
+		Crew crew = crewService.join(criteria.toCommand());
+		return CrewResult.from(crew);
+	}
 
-    @Transactional(readOnly = true)
-    public List<CrewResult.Card> getCrews(Long userId) {
-        List<Crew> crews = crewService.getCrewsOfUser(userId);
+	@Transactional(readOnly = true)
+	public List<CrewResult.Card> getCrews(Long userId) {
+		List<Crew> crews = crewService.getCrewsOfUser(userId);
 
-        List<CrewResult.Card> cards = new ArrayList<>();
-        for (Crew crew : crews) {
-            Set<Long> crewMemberIds = crew.getActiveMembers().stream()
-                    .map(CrewMember::getMemberId)
-                    .collect(Collectors.toSet());
+		List<CrewResult.Card> cards = new ArrayList<>();
+		for (Crew crew : crews) {
+			Set<Long> crewMemberIds = crew.getActiveMembers().stream()
+				.map(CrewMember::getMemberId)
+				.collect(Collectors.toSet());
 
-            CrewGoalSnapshot snapshot = goalService.getCrewGoalSnapshot(
-                    new GoalCommand.GetCrewSnapshot(crew.getId(), LocalDate.now().minusWeeks(1)));
+			CrewGoalSnapshot snapshot = goalService.getCrewGoalSnapshot(
+				new GoalCommand.GetCrewSnapshot(crew.getId(), LocalDate.now().minusWeeks(1)));
 
-            List<Member> members = memberService.getMembers(new MemberCommand.GetMembers(crewMemberIds));
+			List<Member> members = memberService.getMembers(new MemberCommand.GetMembers(crewMemberIds));
 
-            List<String> imageUrls = members.stream()
-                    .map(Member::getBadgeId)
-                    .map(badgeId -> {
-                        Badge badge = rewardService.getBadge(new RewardCommand.Find(badgeId));
-                        return badge.getImageUrl();
-                    })
-                    .toList();
+			List<String> imageUrls = members.stream()
+				.map(Member::getBadgeId)
+				.map(badgeId -> {
+					Badge badge = rewardService.getBadge(new RewardCommand.Find(badgeId));
+					return badge.getImageUrl();
+				})
+				.toList();
 
-            boolean isRunning = crewMemberIds.stream()
-                    .anyMatch(runningService::getRunnerStatus);
+			boolean isRunning = crewMemberIds.stream()
+				.anyMatch(runningService::getRunnerStatus);
 
-            LocalDateTime now = LocalDateTime.now();
-            LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);
-            Double runningDistance = members.stream()
-                    .map(crewMember -> {
-                        RunningInfo.TotalDistance info = runningService.getTotalDistancesOf(
-                                new RunningCommand.WeekDistance(crewMember.getId(), start, now));
-                        return info.totalDistance();
-                    }).reduce(0.0, Double::sum);
+			LocalDateTime now = LocalDateTime.now();
+			LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);
+			Double runningDistance = members.stream()
+				.map(crewMember -> {
+					RunningInfo.TotalDistance info = runningService.getTotalDistancesOf(
+						new RunningCommand.WeekDistance(crewMember.getId(), start, now));
+					return info.totalDistance();
+				}).reduce(0.0, Double::sum);
 
-            cards.add(new CrewResult.Card(crew.getId(), crew.getName(), crew.getActiveMemberCount(),
-                    crew.getLeaderId().equals(userId), imageUrls, snapshot.getGoal().value(), runningDistance,
-                    isRunning));
-        }
+			cards.add(new CrewResult.Card(crew.getId(), crew.getName(), crew.getActiveMemberCount(),
+				crew.getLeaderId().equals(userId), imageUrls, snapshot.getGoal().value(), runningDistance,
+				isRunning));
+		}
 
-        return cards;
-    }
+		return cards;
+	}
 
-    public CrewResult.Detail getCrew(CrewCriteria.Detail criteria) {
-        Crew crew = crewService.getCrew(criteria.toCrewCommand());
+	public CrewResult.Detail getCrew(CrewCriteria.Detail criteria) {
+		Crew crew = crewService.getCrew(criteria.toCrewCommand());
 
-        Member leader = memberService.getMember(new MemberCommand.Find(crew.getLeaderId()));
+		Member leader = memberService.getMember(new MemberCommand.Find(crew.getLeaderId()));
 
-        CrewGoalSnapshot snapshot = goalService.getCrewGoalSnapshot(
-                new GoalCommand.GetCrewSnapshot(crew.getId(), LocalDate.now().minusWeeks(1)));
+		CrewGoalSnapshot snapshot = goalService.getCrewGoalSnapshot(
+			new GoalCommand.GetCrewSnapshot(crew.getId(), LocalDate.now().minusWeeks(1)));
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);
-        Double runningDistance = crew.getActiveMembers().stream()
-                .map(crewMember -> {
-                    RunningInfo.TotalDistance info = runningService.getTotalDistancesOf(
-                            new RunningCommand.WeekDistance(crewMember.getId(), start, now));
-                    return info.totalDistance();
-                }).reduce(0.0, Double::sum);
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);
+		Double runningDistance = crew.getActiveMembers().stream()
+			.map(crewMember -> {
+				RunningInfo.TotalDistance info = runningService.getTotalDistancesOf(
+					new RunningCommand.WeekDistance(crewMember.getId(), start, now));
+				return info.totalDistance();
+			}).reduce(0.0, Double::sum);
 
-        return new CrewResult.Detail(crew.getId(), crew.getName(), leader.getNickname().value(), crew.getNotice(),
-                crew.getActiveMemberCount(), snapshot.getGoal().value(), runningDistance, crew.getCode().value());
-    }
+		return new CrewResult.Detail(crew.getId(), crew.getName(), leader.getNickname().value(), crew.getNotice(),
+			crew.getActiveMemberCount(), snapshot.getGoal().value(), runningDistance, crew.getCode().value());
+	}
 
-    public List<CrewResult.CrewMember> getCrewMembers(CrewCriteria.Members criteria) {
-        List<CrewMember> members = crewService.getActiveCrewMembers(criteria.toCommand());
+	public List<CrewResult.CrewMember> getCrewMembers(CrewCriteria.Members criteria) {
+		List<CrewMember> members = crewService.getActiveCrewMembers(criteria.toCommand());
 
-        return members.stream()
-                .map(crewMember -> {
-                    Member member = memberService.getMember(new MemberCommand.Find(crewMember.getMemberId()));
-                    Badge badge = rewardService.getBadge(new RewardCommand.Find(member.getBadgeId()));
-                    boolean isRunning = runningService.getRunnerStatus(member.getId());
+		return members.stream()
+			.map(crewMember -> {
+				Member member = memberService.getMember(new MemberCommand.Find(crewMember.getMemberId()));
+				Badge badge = rewardService.getBadge(new RewardCommand.Find(member.getBadgeId()));
+				RunningInfo.RunnerStatusAndSub runningStatus = runningService.getRunnerStatusAndSub(member.getId());
+				LocalDateTime now = LocalDateTime.now();
+				LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);
 
-                    LocalDateTime now = LocalDateTime.now();
-                    LocalDateTime start = LocalDateTime.of(now.toLocalDate().with(DayOfWeek.MONDAY), LocalTime.MIN);
+				RunningInfo.TotalDistance info = runningService.getTotalDistancesOf(
+					new RunningCommand.WeekDistance(member.getId(), start, now));
 
-                    RunningInfo.TotalDistance info = runningService.getTotalDistancesOf(
-                            new RunningCommand.WeekDistance(member.getId(), start, now));
+				return new CrewResult.CrewMember(member.getId(), member.getNickname().value(), badge.getImageUrl(),
+					info.totalDistance(), runningStatus.isRunning(), runningStatus.sub());
+			})
+			.toList();
+	}
 
-                    return new CrewResult.CrewMember(member.getId(), member.getNickname().value(), badge.getImageUrl(),
-                            info.totalDistance(), isRunning);
-                })
-                .toList();
-    }
+	public CrewResult.Leave leaveCrew(CrewCriteria.Leave criteria) {
+		Crew crew = crewService.leave(criteria.toCommand());
+		return new CrewResult.Leave(crew.getId(), crew.getName());
+	}
 
-    public CrewResult.Leave leaveCrew(CrewCriteria.Leave criteria) {
-        Crew crew = crewService.leave(criteria.toCommand());
-        return new CrewResult.Leave(crew.getId(), crew.getName());
-    }
+	public CrewResult updateNotice(CrewCriteria.UpdateNotice criteria) {
+		Crew crew = crewLeaderService.updateNotice(criteria.toCommand());
+		return CrewResult.from(crew);
+	}
 
-    public CrewResult updateNotice(CrewCriteria.UpdateNotice criteria) {
-        Crew crew = crewLeaderService.updateNotice(criteria.toCommand());
-        return CrewResult.from(crew);
-    }
+	public CrewResult updateName(CrewCriteria.UpdateName criteria) {
+		Crew crew = crewLeaderService.updateName(criteria.toCommand());
+		return CrewResult.from(crew);
+	}
 
-    public CrewResult updateName(CrewCriteria.UpdateName criteria) {
-        Crew crew = crewLeaderService.updateName(criteria.toCommand());
-        return CrewResult.from(crew);
-    }
+	public CrewResult disband(CrewCriteria.Disband criteria) {
+		Crew crew = crewLeaderService.disband(criteria.toCommand());
+		return CrewResult.from(crew);
+	}
 
-    public CrewResult disband(CrewCriteria.Disband criteria) {
-        Crew crew = crewLeaderService.disband(criteria.toCommand());
-        return CrewResult.from(crew);
-    }
+	public CrewResult.Delegate delegateLeader(CrewCriteria.Delegate criteria) {
+		Crew crew = crewLeaderService.delegateLeader(criteria.toCommand());
 
-    public CrewResult.Delegate delegateLeader(CrewCriteria.Delegate criteria) {
-        Crew crew = crewLeaderService.delegateLeader(criteria.toCommand());
+		Member leader = memberService.getMember(new MemberCommand.Find(crew.getLeaderId()));
 
-        Member leader = memberService.getMember(new MemberCommand.Find(crew.getLeaderId()));
+		return new CrewResult.Delegate(crew.getLeaderId(), leader.getNickname().value());
+	}
 
-        return new CrewResult.Delegate(crew.getLeaderId(), leader.getNickname().value());
-    }
+	public CrewResult.Ban banMember(CrewCriteria.Ban criteria) {
+		CrewMember bannedMember = crewLeaderService.ban(criteria.toCommand());
 
-    public CrewResult.Ban banMember(CrewCriteria.Ban criteria) {
-        CrewMember bannedMember = crewLeaderService.ban(criteria.toCommand());
+		Member member = memberService.getMember(new MemberCommand.Find(bannedMember.getMemberId()));
 
-        Member member = memberService.getMember(new MemberCommand.Find(bannedMember.getMemberId()));
+		return new CrewResult.Ban(bannedMember.getMemberId(), member.getNickname().value());
+	}
 
-        return new CrewResult.Ban(bannedMember.getMemberId(), member.getNickname().value());
-    }
+	public List<CrewResult.RelatedRunningMember> getRelatedRunningMember(CrewCriteria.RelatedRunningMember criteria) {
+		List<CrewMember> members = crewService.findAllRelatedCrewMembers(new CrewCommand.Related(criteria.userId()));
+
+		List<String> nicknames = new ArrayList<>();
+		for (CrewMember crewMember : members) {
+			boolean isRunning = runningService.getRunnerStatus(crewMember.getMemberId());
+			if (isRunning) {
+				Member member = memberService.getMember(new MemberCommand.Find(crewMember.getMemberId()));
+				nicknames.add(member.getNickname().value());
+			}
+		}
+
+		return nicknames.stream()
+			.map(CrewResult.RelatedRunningMember::new)
+			.toList();
+	}
 }

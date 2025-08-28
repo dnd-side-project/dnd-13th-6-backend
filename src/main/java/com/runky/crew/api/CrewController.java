@@ -145,4 +145,17 @@ public class CrewController implements CrewApiSpec {
 		CrewResult.Ban result = crewFacade.banMember(new CrewCriteria.Ban(crewId, requester.memberId(), targetId));
 		return ApiResponse.success(new CrewResponse.Ban(result.targetId(), result.nickname()));
 	}
+
+    @Override
+    @GetMapping("/members/running")
+    public ApiResponse<CrewResponse.Related> getRunningRelatedMembers(
+            @AuthenticationPrincipal MemberPrincipal requester) {
+        List<CrewResult.RelatedRunningMember> results =
+                crewFacade.getRelatedRunningMember(new CrewCriteria.RelatedRunningMember(requester.memberId()));
+        List<String> nicknames = results.stream()
+                .map(CrewResult.RelatedRunningMember::nickname)
+                .toList();
+
+        return ApiResponse.success(new CrewResponse.Related(nicknames));
+    }
 }

@@ -160,7 +160,7 @@ public class RunningService {
 
 		List<Running> runs = runningRepository.findFinishedOnDate(runnerId, now);
 		if (runs.isEmpty()) {
-			throw new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING);
+			return new RunningInfo.TodaySummary(0.0, 0L, 0.0);
 		}
 
 		double totalDistance = runs.stream()

@@ -72,14 +72,12 @@ public class GoalService {
 		MemberGoal memberGoal = goalRepository.findMemberGoalByMemberId(command.memberId())
 			.orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
 
+		boolean firstSnapShot = !goalRepository.existsMemberGoalSnapShot(command.memberId());
+
 		memberGoal.updateGoal(command.goal());
 
-		// 스냅샷 존재 하지 않고, 현재 목표 값이 0인 경우
-		if (!goalRepository.existsMemberGoalSnapShot(command.memberId())
-			&& memberGoal.getGoal().value().intValue() == 0
-		) {
-			goalRepository.save(
-				new MemberGoalSnapshot(command.memberId(), memberGoal.getGoal(), false, LocalDate.now()));
+		if (firstSnapShot) {
+			goalRepository.save(memberGoal.createSnapshot(LocalDate.now()));
 		}
 		return memberGoal;
 	}

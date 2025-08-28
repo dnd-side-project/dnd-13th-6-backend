@@ -6,27 +6,30 @@ import java.util.Set;
 
 public interface GoalRepository {
 
-    MemberGoal save(MemberGoal memberGoal);
+	MemberGoal save(MemberGoal memberGoal);
 
-    MemberGoalSnapshot save(MemberGoalSnapshot memberGoalSnapshot);
+	MemberGoalSnapshot save(MemberGoalSnapshot memberGoalSnapshot);
 
-    CrewGoalSnapshot save(CrewGoalSnapshot crewGoalSnapshot);
+	CrewGoalSnapshot save(CrewGoalSnapshot crewGoalSnapshot);
 
-    void saveAll(List<MemberGoalSnapshot> snapshots);
+	void saveAll(List<MemberGoalSnapshot> snapshots);
 
-    void saveAllCrewGoalSnapshots(List<CrewGoalSnapshot> snapshots);
+	void saveAllCrewGoalSnapshots(List<CrewGoalSnapshot> snapshots);
 
-    List<MemberGoal> findAllMemberGoals();
+	List<MemberGoal> findAllMemberGoals();
 
-    Optional<CrewGoalSnapshot> findCrewGoalSnapshotOfWeek(Long crewId, WeekUnit weekUnit);
+	Optional<CrewGoalSnapshot> findCrewGoalSnapshotOfWeek(Long crewId, WeekUnit weekUnit);
 
-    Optional<CrewGoalSnapshot> findCrewGoalSnapshot(Long crewId, WeekUnit weekUnit);
+	Optional<CrewGoalSnapshot> findCrewGoalSnapshot(Long crewId, WeekUnit weekUnit);
 
-    Optional<MemberGoalSnapshot> findMemberGoalSnapshotOfWeek(Long memberId, WeekUnit weekUnit);
+	Optional<MemberGoalSnapshot> findMemberGoalSnapshotOfWeek(Long memberId, WeekUnit weekUnit);
 
-    List<MemberGoalSnapshot> findLatestSnapshotsOfWeek(Set<Long> memberIds, WeekUnit weekUnit);
+	List<MemberGoalSnapshot> findLatestSnapshotsOfWeek(Set<Long> memberIds, WeekUnit weekUnit);
 
-    Optional<MemberGoal> findMemberGoalByMemberId(Long memberId);
+	Optional<MemberGoal> findMemberGoalByMemberId(Long memberId);
 
-    List<CrewGoalSnapshot> findAllCrewGoalSnapshots(Set<Long> crewId, WeekUnit weekUnit);
+	List<CrewGoalSnapshot> findAllCrewGoalSnapshots(Set<Long> crewId, WeekUnit weekUnit);
+
+	boolean existsMemberGoalSnapShot(Long memberId);
+
 }

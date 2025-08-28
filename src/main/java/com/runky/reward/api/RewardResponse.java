@@ -4,28 +4,29 @@ import java.util.List;
 
 public class RewardResponse {
 
-    public record Images(
-            List<Image> badges
-    ) {
-    }
+	private RewardResponse() {
+	}
 
-    public record Image(
-            String badge
-    ) {
-    }
+	public record Images(
+		List<Image> badges
+	) {
+	}
 
-    public record Gotcha(
-            Long id,
-            String imageUrl,
-            String name
-    ) {
-    }
+	public record Image(
+		Long badgeId,
+		String badge
+	) {
+	}
 
-    public record Clover(
-            Long count
-    ) {
-    }
+	public record Gotcha(
+		Long id,
+		String imageUrl,
+		String name
+	) {
+	}
 
-    private RewardResponse() {
-    }
+	public record Clover(
+		Long count
+	) {
+	}
 }

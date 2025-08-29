@@ -49,7 +49,7 @@ public class TokenCookieProvider {
 			.httpOnly(cookieProps.common().httpOnly())
 			.secure(cookieProps.common().secure())
 			.path(cookieProps.common().path())
-			//			.domain(cookieProps.common().domain())
+                .domain(cookieProps.common().domain())
 			.sameSite(cookieProps.common().sameSite());
 	}
 

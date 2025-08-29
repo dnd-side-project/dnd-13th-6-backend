@@ -50,8 +50,8 @@ datasource:
   mysql-jpa:
     main:
       jdbc-url: jdbc:mysql://localhost:3306/runky
-      username: root
-      password:
+      username: application
+      password: application
 
 
 ---

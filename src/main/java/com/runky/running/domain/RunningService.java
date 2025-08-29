@@ -27,6 +27,18 @@ public class RunningService {
 	private final RunningRepository runningRepository;
 	private final RunningTrackRepository trackRepository;
 
+	@Transactional(readOnly = true)
+	public RunningInfo.RunResult getRunResult(RunningCommand.RunResult command) {
+		Running running = runningRepository.findByIdAndRunnerId(command.runningId(), command.runnerId())
+			.orElseThrow(() -> new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING));
+
+		RunningTrack runningTrack = trackRepository.findByRunning(running)
+			.orElseThrow(() -> new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING_TRACK));
+
+		return RunningInfo.RunResult.from(running, runningTrack);
+
+	}
+
 	@Transactional
 	public RunningInfo.Start start(RunningCommand.Start command) {
 		boolean runnerStatus = getRunnerStatus(command.runnerId());

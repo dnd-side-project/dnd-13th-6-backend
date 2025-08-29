@@ -35,7 +35,22 @@ public sealed interface RunningInfo {
 	record TodaySummary(Double totalDistanceMeters, Long durationSeconds, Double avgSpeedMps) {
 	}
 
-	public record MyWeek(Long runnerId, Double totalMeters, LocalDate weekStart, LocalDate weekEnd) {
+	record MyWeek(Long runnerId, Double totalMeters, LocalDate weekStart, LocalDate weekEnd) {
 	}
 
+	record RunResult(
+		Long runningId, Long runnerId,
+		Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMps,
+		LocalDateTime startedAt, LocalDateTime endedAt,
+		String format, String points
+	) implements RunningInfo {
+		static RunResult from(final Running running, final RunningTrack runningTrack) {
+			return new RunResult(
+				running.getId(), running.getRunnerId(),
+				running.getTotalDistanceMeter(), running.getDurationSeconds(), running.getAvgSpeedMPS(),
+				running.getStartedAt(), running.getEndedAt(),
+				runningTrack.getFormat(), runningTrack.getPoints()
+			);
+		}
+	}
 }

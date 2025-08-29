@@ -31,4 +31,7 @@ public sealed interface RunningCommand {
 		Long runnerId
 	) implements RunningCommand {
 	}
+
+	record RunResult(Long runnerId, Long runningId) {
+	}
 }

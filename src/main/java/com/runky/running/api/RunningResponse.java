@@ -39,4 +39,21 @@ public sealed interface RunningResponse {
 			return new MyWeeklyTotalDistance(r.totalDistanceKm(), r.totalDistanceMeter(), r.weekStart(), r.weekEnd());
 		}
 	}
+
+	record RunResult(
+		Long runningId, Long runnerId,
+		Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMps,
+		LocalDateTime startedAt, LocalDateTime endedAt,
+		String format, String points
+	) {
+		public static RunResult from(RunningResult.RunResult r) {
+			return new RunResult(
+				r.runningId(), r.runnerId(),
+				r.totalDistanceMeter(), r.durationSeconds(), r.avgSpeedMps(),
+				r.startedAt(), r.endedAt(),
+				r.format(), r.points()
+			);
+		}
+
+	}
 }

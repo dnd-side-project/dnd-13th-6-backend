@@ -113,7 +113,8 @@ public class CrewFacade {
 			}).reduce(0.0, Double::sum);
 
 		return new CrewResult.Detail(crew.getId(), crew.getName(), leader.getNickname().value(), crew.getNotice(),
-			crew.getActiveMemberCount(), snapshot.getGoal().value(), runningDistance, crew.getCode().value());
+			crew.getActiveMemberCount(), snapshot.getGoal().value(), runningDistance, crew.getCode().value(),
+                leader.getId().equals(criteria.userId()));
 	}
 
 	public List<CrewResult.CrewMember> getCrewMembers(CrewCriteria.Members criteria) {

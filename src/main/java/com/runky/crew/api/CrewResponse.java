@@ -70,7 +70,8 @@ public class CrewResponse {
 		Long memberCount,
 		BigDecimal goal,
 		Double runningDistance,
-		String code
+		String code,
+        boolean isLeader
 	) {
 		public static Detail from(CrewResult.Detail detail) {
 			return new Detail(
@@ -81,7 +82,8 @@ public class CrewResponse {
 				detail.memberCount(),
 				detail.goal(),
 				detail.runningDistance(),
-				detail.code()
+				detail.code(),
+                detail.isLeader()
 			);
 		}
 	}

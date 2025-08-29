@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <springProfile name="local,test">
+    <springProfile name="test">
         <!-- 콘솔 출력용 Appender -->
         <include resource="org/springframework/boot/logging/logback/defaults.xml" />
         <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
@@ -13,8 +13,8 @@
         </root>
     </springProfile>
 
-    <springProfile name="prod">
-        <springProperty name="LOG_PATH" source="LOG_PATH" defaultValue="/home/logs"/>
+    <springProfile name="local">
+        <springProperty name="LOG_PATH" source="LOG_PATH" defaultValue="~/logs"/>
 
         <include resource="org/springframework/boot/logging/logback/defaults.xml" />
         <include resource="org/springframework/boot/logging/logback/console-appender.xml" />

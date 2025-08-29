@@ -17,6 +17,7 @@ public enum RunningErrorCode implements ErrorCode {
 	ALREADY_ENDED_RUNNING(HttpStatus.CONFLICT, "R104", "이미 종료된 런닝입니다."),
 
 	/* R2xx: Running Track 저장/포맷 */
+	NOT_FOUND_RUNNING_TRACK(HttpStatus.NOT_FOUND, "R205", "해당 런닝의 런닝 트랙이 저장되지 않았습니다."),
 	TRACK_ALREADY_EXISTS(HttpStatus.CONFLICT, "R201", "이미 트랙이 저장되어 있습니다."),
 	INVALID_TRACK_FORMAT(HttpStatus.BAD_REQUEST, "R202", "지원하지 않는 트랙 포맷입니다."),
 	EMPTY_TRACK_POINTS(HttpStatus.BAD_REQUEST, "R203", "트랙 좌표가 비어있습니다."),

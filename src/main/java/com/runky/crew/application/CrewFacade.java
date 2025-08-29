@@ -176,17 +176,15 @@ public class CrewFacade {
 	public List<CrewResult.RelatedRunningMember> getRelatedRunningMember(CrewCriteria.RelatedRunningMember criteria) {
 		List<CrewMember> members = crewService.findAllRelatedCrewMembers(new CrewCommand.Related(criteria.userId()));
 
-		List<String> nicknames = new ArrayList<>();
+		List<CrewResult.RelatedRunningMember> results = new ArrayList<>();
 		for (CrewMember crewMember : members) {
 			boolean isRunning = runningService.getRunnerStatus(crewMember.getMemberId());
 			if (isRunning) {
 				Member member = memberService.getMember(new MemberCommand.Find(crewMember.getMemberId()));
-				nicknames.add(member.getNickname().value());
+                Badge badge = rewardService.getBadge(new RewardCommand.Find(member.getBadgeId()));
+                results.add(new CrewResult.RelatedRunningMember(member.getNickname().value(), badge.getImageUrl()));
 			}
 		}
-
-		return nicknames.stream()
-			.map(CrewResult.RelatedRunningMember::new)
-			.toList();
+        return results;
 	}
 }

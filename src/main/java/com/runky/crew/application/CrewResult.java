@@ -1,6 +1,8 @@
 package com.runky.crew.application;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import com.runky.crew.domain.Crew;
@@ -45,7 +47,8 @@ public record CrewResult(
 		BigDecimal goal,
 		Double runningDistance,
 		String code,
-        boolean isLeader
+        boolean isLeader,
+        LocalDate createdAt
 	) {
 	}
 

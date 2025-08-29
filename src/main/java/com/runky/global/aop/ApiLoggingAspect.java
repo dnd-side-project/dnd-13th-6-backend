@@ -2,6 +2,7 @@ package com.runky.global.aop;
 
 import com.runky.global.security.auth.MemberPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class ApiLoggingAspect {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = (principal instanceof MemberPrincipal memberPrincipal) ? memberPrincipal.memberId() : -1L;
 
-        log.info("Request : {}, (userId={}) {}\n{}", request.getMethod(), userId, request.getRequestURI(),
+        log.info("time:{} / Request : {}, (userId={}) {}\n{}", ZonedDateTime.now(), request.getMethod(), userId, request.getRequestURI(),
                 params(joinPoint));
     }
 

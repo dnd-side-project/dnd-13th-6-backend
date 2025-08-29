@@ -30,6 +30,29 @@ class CrewServiceIntegrationTest {
     }
 
     @Nested
+    @DisplayName("크루 목록 조회 시,")
+    class GetCrews {
+        @Test
+        @DisplayName("떠난 크루는 포함되지 않는다.")
+        void notIncludeLeftCrew() {
+            Crew crew1 = Crew.of(new CrewCommand.Create(1L, "Crew 1"), new Code("ABC123"));
+            crew1.joinMember(2L);
+            crew1.joinMember(3L);
+            crewRepository.save(crew1);
+            Crew crew2 = Crew.of(new CrewCommand.Create(1L, "Crew 2"), new Code("DEF456"));
+            crew2.joinMember(2L);
+            crew2.joinMember(3L);
+            crew2.leaveMember(3L);
+            crewRepository.save(crew2);
+
+            List<Crew> crews = crewService.getCrewsOfUser(3L);
+
+            assertThat(crews).hasSize(1);
+            assertThat(crews).extracting("name").containsExactly("Crew 1");
+        }
+    }
+
+    @Nested
     @DisplayName("크루 생성 시,")
     class Create {
         @Test

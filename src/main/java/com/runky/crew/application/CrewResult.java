@@ -84,7 +84,8 @@ public record CrewResult(
 	}
 
 	public record RelatedRunningMember(
-		String nickname
+		String nickname,
+        String badgeImageUrl
 	) {
 	}
 }

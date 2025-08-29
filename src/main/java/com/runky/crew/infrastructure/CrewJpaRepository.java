@@ -21,7 +21,7 @@ public interface CrewJpaRepository extends JpaRepository<Crew, Long> {
         SELECT c2.id
         FROM Crew c2
         JOIN c2.members m2
-        WHERE m2.memberId = :memberId
+        WHERE m2.memberId = :memberId AND m2.role IN ('MEMBER', 'LEADER')
     )
 """)
 	List<Crew> findCrewsByMemberId(Long memberId);

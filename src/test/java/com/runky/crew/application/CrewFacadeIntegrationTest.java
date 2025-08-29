@@ -1,5 +1,6 @@
 package com.runky.crew.application;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.runky.crew.domain.Code;
@@ -187,6 +188,7 @@ class CrewFacadeIntegrationTest {
             assertThat(result.runningDistance()).isEqualTo(10000.0);
             assertThat(result.name()).isEqualTo("crew 1");
             assertThat(result.leaderNickname()).isEqualTo("name1");
+            assertThat(result.isLeader()).isTrue();
         }
     }
 

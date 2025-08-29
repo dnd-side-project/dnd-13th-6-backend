@@ -44,7 +44,8 @@ public record CrewResult(
 		Long memberCount,
 		BigDecimal goal,
 		Double runningDistance,
-		String code
+		String code,
+        boolean isLeader
 	) {
 	}
 

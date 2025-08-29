@@ -20,7 +20,7 @@ public enum NotificationTemplate {
 	// 개인 목표
 	PERSONAL_GOAL_ACHIEVED(
 		"개인 목표 달성 성공",
-		"이번 주 ${KM} 목표를 달성 했어요! 행운이 도착했어요.✨",
+		"이번 주 ${KM}km 목표를 달성 했어요! 행운이 도착했어요.✨",
 		EnumSet.of(VarKey.KM)
 	),
 	PERSONAL_GOAL_FAILED(
@@ -44,7 +44,7 @@ public enum NotificationTemplate {
 	// 크루 해체
 	CREW_DISBANDED(
 		"크루",
-		"${CREW_NAME이 크루 리더의 결정으로 해체되었어요.",
+		"${CREW_NAME}이 크루 리더의 결정으로 해체되었어요.",
 		EnumSet.of(VarKey.CREW_NAME)
 	),
 

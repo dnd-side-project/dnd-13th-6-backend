@@ -8,7 +8,7 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 100
-        timezone.default_storage: NORMALIZE_UTC
+        timezone.default_storage: NORMALIZE
         jdbc.time_zone: Asia/Seoul
 
   batch:

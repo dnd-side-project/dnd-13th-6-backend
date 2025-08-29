@@ -5,6 +5,7 @@ import com.runky.global.security.auth.MemberPrincipal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -29,6 +30,30 @@ public interface RunningApiSpec {
 	)
 	ApiResponse<RunningResponse.TodaySummary> getToday(
 		@Parameter(hidden = true) MemberPrincipal requester
+	);
+
+	@Operation(
+		summary = "내 주간 누적 거리 조회",
+		description = "요청자 기준 KST(UTC+9) 이번 주(월~일)의 **완료된** 모든 런닝 기록 총합 거리를 반환합니다."
+	)
+	ApiResponse<RunningResponse.MyWeeklyTotalDistance> getMyWeeklyTotalDistance(
+		@Parameter(hidden = true) MemberPrincipal requester
+	);
+
+	@Operation(
+		summary = "런닝 결과 단건 조회",
+		description = "특정 런닝 ID에 대한 최종 기록(일반적으로 종료된 세션 기준)을 조회합니다."
+	)
+	ApiResponse<RunningResponse.RunResult> getRunResult(
+		@Parameter(hidden = true) MemberPrincipal requester,
+		@Parameter(
+			name = "runningId",
+			in = ParameterIn.PATH,
+			required = true,
+			description = "조회할 런닝 ID",
+			schema = @Schema(type = "integer", format = "int64", example = "123")
+		)
+		Long runningId
 	);
 }
 

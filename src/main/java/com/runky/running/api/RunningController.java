@@ -70,4 +70,13 @@ public class RunningController implements RunningApiSpec {
 			new RunningCriteria.MyWeeklyTotalDistance(requester.memberId()));
 		return ApiResponse.success(RunningResponse.MyWeeklyTotalDistance.from(result));
 	}
+
+	@GetMapping("/{runningId}")
+	public ApiResponse<RunningResponse.RunResult> getRunResult(
+		@AuthenticationPrincipal MemberPrincipal requester,
+		@PathVariable("runningId") Long runningId
+	) {
+		var result = runningFacade.getRunResult(new RunningCriteria.RunResult(requester.memberId(), runningId));
+		return ApiResponse.success(RunningResponse.RunResult.from(result));
+	}
 }

@@ -71,4 +71,11 @@ public class RunningFacade {
 		);
 		return RunningResult.MyWeeklyTotalDistance.from(info);
 	}
+
+	@Transactional(readOnly = true)
+	public RunningResult.RunResult getRunResult(final RunningCriteria.RunResult criteria) {
+		var info = runningService.getRunResult(
+			new RunningCommand.RunResult(criteria.runningId(), criteria.runningId()));
+		return RunningResult.RunResult.from(info);
+	}
 }

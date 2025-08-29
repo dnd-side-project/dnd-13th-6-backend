@@ -37,4 +37,7 @@ public sealed interface RunningCriteria {
 
 	record MyWeeklyTotalDistance(Long runnerId) implements RunningCriteria {
 	}
+
+	record RunResult(Long runnerId, Long runningId) {
+	}
 }

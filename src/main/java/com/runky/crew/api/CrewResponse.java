@@ -149,7 +149,12 @@ public class CrewResponse {
 	}
 
 	public record Related(
-		List<String> nicknames
+		List<RunningMember> runningMembers
 	) {
+        public record RunningMember(
+                String nickname,
+                String badgeImageUrl
+        ) {
+        }
 	}
 }

@@ -1,5 +1,6 @@
 package com.runky.crew.api;
 
+import com.runky.crew.api.CrewResponse.Related.RunningMember;
 import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -152,10 +153,11 @@ public class CrewController implements CrewApiSpec {
             @AuthenticationPrincipal MemberPrincipal requester) {
         List<CrewResult.RelatedRunningMember> results =
                 crewFacade.getRelatedRunningMember(new CrewCriteria.RelatedRunningMember(requester.memberId()));
-        List<String> nicknames = results.stream()
-                .map(CrewResult.RelatedRunningMember::nickname)
+
+        List<RunningMember> runningMembers = results.stream()
+                .map(result -> new CrewResponse.Related.RunningMember(result.nickname(), result.badgeImageUrl()))
                 .toList();
 
-        return ApiResponse.success(new CrewResponse.Related(nicknames));
+        return ApiResponse.success(new CrewResponse.Related(runningMembers));
     }
 }

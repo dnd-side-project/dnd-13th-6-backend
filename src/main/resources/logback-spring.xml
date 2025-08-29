@@ -14,7 +14,7 @@
     </springProfile>
 
     <springProfile name="prod">
-        <springProperty name="LOG_PATH" source="LOG_PATH" defaultValue="logs"/>
+        <springProperty name="LOG_PATH" source="LOG_PATH" defaultValue="/home/logs"/>
 
         <include resource="org/springframework/boot/logging/logback/defaults.xml" />
         <include resource="org/springframework/boot/logging/logback/console-appender.xml" />

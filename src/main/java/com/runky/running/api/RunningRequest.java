@@ -8,7 +8,7 @@ public sealed interface RunningRequest {
 		Summary summary,
 		Track track
 	) implements RunningRequest {
-		RunningCriteria.End toCriteria(Long runningId, Long runnerId) {
+		public RunningCriteria.End toCriteria(Long runningId, Long runnerId) {
 			return new RunningCriteria.End(
 				runningId,
 				runnerId,

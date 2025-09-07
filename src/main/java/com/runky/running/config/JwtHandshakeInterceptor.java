@@ -29,6 +29,9 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
 	public static final String WS_AUTH_ATTR = "WS_AUTHENTICATION";
 	private static final String ACCESS_TOKEN_COOKIE = "accessToken";
+	private static final String HDR_AUTHORIZATION = "Authorization";
+	private static final String HDR_X_ACCESS_TOKEN = "X-Access-Token";
+	private static final String BEARER_PREFIX = "Bearer ";
 
 	private final TokenDecoder tokenDecoder;
 
@@ -37,7 +40,12 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 		@NonNull WebSocketHandler wsHandler, @NonNull Map<String, Object> attributes) {
 		if (request instanceof ServletServerHttpRequest servlet) {
 			HttpServletRequest req = servlet.getServletRequest();
+
 			String token = resolveFromCookie(req.getCookies());
+
+			if (!StringUtils.hasText(token))
+				token = resolveFromHeader(req);
+
 			if (StringUtils.hasText(token)) {
 				AccessTokenClaims claims = tokenDecoder.decodeAccess(token);
 				MemberPrincipal principal = new MemberPrincipal(claims.memberId(), claims.role());
@@ -61,5 +69,14 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 			.map(Cookie::getValue)
 			.findFirst()
 			.orElse(null);
+	}
+
+	private String resolveFromHeader(HttpServletRequest req) {
+		String a = req.getHeader(HDR_AUTHORIZATION);
+		if (StringUtils.hasText(a) && a.startsWith(BEARER_PREFIX)) {
+			return a.substring(BEARER_PREFIX.length()).trim();
+		}
+		String x = req.getHeader(HDR_X_ACCESS_TOKEN);
+		return StringUtils.hasText(x) ? x.trim() : null;
 	}
 }

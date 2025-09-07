@@ -1,7 +1,23 @@
 package com.runky.goal.api;
 
+import static org.assertj.core.api.Assertions.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 
 import com.runky.crew.domain.Code;
 import com.runky.crew.domain.Crew;
@@ -16,207 +32,192 @@ import com.runky.goal.domain.MemberGoalSnapshot;
 import com.runky.goal.domain.WeekUnit;
 import com.runky.utils.DatabaseCleanUp;
 import com.runky.utils.TestTokenIssuer;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GoalApiE2ETest {
 
-    @Autowired
-    private TestRestTemplate testRestTemplate;
-    @Autowired
-    private DatabaseCleanUp databaseCleanUp;
-    @Autowired
-    private GoalRepository goalRepository;
-    @Autowired
-    private CrewRepository crewRepository;
-    @Autowired
-    private TestTokenIssuer tokenIssuer;
+	@Autowired
+	private TestRestTemplate testRestTemplate;
+	@Autowired
+	private DatabaseCleanUp databaseCleanUp;
+	@Autowired
+	private GoalRepository goalRepository;
+	@Autowired
+	private CrewRepository crewRepository;
+	@Autowired
+	private TestTokenIssuer tokenIssuer;
 
-    @AfterEach
-    void tearDown() {
-        databaseCleanUp.truncateAllTables();
-    }
+	@AfterEach
+	void tearDown() {
+		databaseCleanUp.truncateAllTables();
+	}
 
-    @Nested
-    @DisplayName("PATCH /api/goals/me")
-    class Update {
-        private final String BASE_URL = "/api/goals/me";
+	@Nested
+	@DisplayName("PATCH /api/goals/me")
+	class Update {
+		private final String BASE_URL = "/api/goals/me";
 
-        @Test
-        @DisplayName("유저의 이번주 목표를 수정한다.")
-        void updateGoal() {
-            goalRepository.save(MemberGoal.from(1L));
+		@Test
+		@DisplayName("유저의 이번주 목표를 수정한다.")
+		void updateGoal() {
+			goalRepository.save(MemberGoal.from(1L));
 
-            ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
-            };
-            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
-            GoalRequest.Goal request = new GoalRequest.Goal(BigDecimal.TEN);
+			ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
+			};
+			HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
+			GoalRequest.Goal request = new GoalRequest.Goal(BigDecimal.TEN);
 
-            ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
-                    HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders), responseType);
+			ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
+				HttpMethod.PATCH, new HttpEntity<>(request, httpHeaders), responseType);
 
-            MemberGoal memberGoal = goalRepository.findMemberGoalByMemberId(1L).orElseThrow();
-            assertThat(response.getBody().getResult().goal()).isEqualTo(new BigDecimal("10.00"));
-            assertThat(memberGoal.getGoal().value()).isEqualTo(new BigDecimal("10.00"));
-        }
-    }
+			MemberGoal memberGoal = goalRepository.findMemberGoalByMemberId(1L).orElseThrow();
+			assertThat(response.getBody().getResult().goal()).isEqualTo(new BigDecimal("10.00"));
+			assertThat(memberGoal.getGoal().value()).isEqualTo(new BigDecimal("10.00"));
+		}
+	}
 
-    @Nested
-    @DisplayName("GET /api/goals/me")
-    class Get {
-        private final String BASE_URL = "/api/goals/me";
+	@Nested
+	@DisplayName("GET /api/goals/me")
+	class Get {
+		private final String BASE_URL = "/api/goals/me";
 
-        @Test
-        @DisplayName("유저의 이번주 목표를 조회한다.")
-        void getGoal() {
-            MemberGoalSnapshot snapshot = goalRepository.save(
-                    new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), false, LocalDate.of(2025, 8, 26)));
+		@Test
+		@DisplayName("유저의 이번주 목표를 조회한다.")
+		void getGoal() {
+			LocalDate todayKst = LocalDate.now(java.time.ZoneId.of("Asia/Seoul"));
+			MemberGoalSnapshot snapshot = goalRepository.save(
+				new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), false, todayKst));
+			ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
+			};
+			HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
+			ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
-            ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
-            };
-            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
-            ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
-                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+			assertThat(response.getBody().getResult().goal()).isEqualTo(snapshot.getGoal().value());
+		}
+	}
 
-            assertThat(response.getBody().getResult().goal()).isEqualTo(snapshot.getGoal().value());
-        }
-    }
+	@Nested
+	@DisplayName("GET /api/goals/crews/{crewId}")
+	class GetCrewGoal {
+		private final String BASE_URL = "/api/goals/crews/{crewId}";
 
-    @Nested
-    @DisplayName("GET /api/goals/crews/{crewId}")
-    class GetCrewGoal {
-        private final String BASE_URL = "/api/goals/crews/{crewId}";
+		@Test
+		@DisplayName("크루의 이번주 목표를 조회한다.")
+		void getCrewGoal() {
+			LocalDate todayKst = LocalDate.now(java.time.ZoneId.of("Asia/Seoul"));
+			MemberGoalSnapshot memberGoalSnapshot =
+				new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), false, todayKst);
+			CrewGoalSnapshot crewGoalSnapshot =
+				goalRepository.save(CrewGoalSnapshot.of(List.of(memberGoalSnapshot), 1L, todayKst));
+			ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
+			};
+			HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
 
-        @Test
-        @DisplayName("크루의 이번주 목표를 조회한다.")
-        void getCrewGoal() {
-            MemberGoalSnapshot memberGoalSnapshot = new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), false,
-                    LocalDate.of(2025, 8, 26));
-            CrewGoalSnapshot crewGoalSnapshot = goalRepository.save(CrewGoalSnapshot.of(
-                    List.of(memberGoalSnapshot), 1L, LocalDate.of(2025, 8, 26)));
+			ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType, 1L);
 
-            ParameterizedTypeReference<ApiResponse<GoalResponse.Goal>> responseType = new ParameterizedTypeReference<>() {
-            };
-            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
+			assertThat(response.getBody().getResult().goal()).isEqualTo(crewGoalSnapshot.getGoal().value());
+		}
+	}
 
-            ResponseEntity<ApiResponse<GoalResponse.Goal>> response = testRestTemplate.exchange(BASE_URL,
-                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType, 1L);
+	@Nested
+	@DisplayName("GET /api/goals/me/last/achieve")
+	class GetAchieve {
+		private final String BASE_URL = "/api/goals/me/last/achieve";
 
-            assertThat(response.getBody().getResult().goal()).isEqualTo(crewGoalSnapshot.getGoal().value());
-        }
-    }
+		@Test
+		@DisplayName("유저의 이번주 목표 달성 여부를 조회한다.")
+		void getAchieve() {
+			goalRepository.save(
+				new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), true, LocalDate.now().minusWeeks(1)));
 
-    @Nested
-    @DisplayName("GET /api/goals/me/last/achieve")
-    class GetAchieve {
-        private final String BASE_URL = "/api/goals/me/last/achieve";
+			ParameterizedTypeReference<ApiResponse<GoalResponse.Achieve>> responseType = new ParameterizedTypeReference<>() {
+			};
 
-        @Test
-        @DisplayName("유저의 이번주 목표 달성 여부를 조회한다.")
-        void getAchieve() {
-            goalRepository.save(
-                    new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), true, LocalDate.now().minusWeeks(1)));
+			HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
+			ResponseEntity<ApiResponse<GoalResponse.Achieve>> response = testRestTemplate.exchange(BASE_URL,
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
-            ParameterizedTypeReference<ApiResponse<GoalResponse.Achieve>> responseType = new ParameterizedTypeReference<>() {
-            };
+			assertThat(response.getBody().getResult().achieved()).isTrue();
+		}
+	}
 
-            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
-            ResponseEntity<ApiResponse<GoalResponse.Achieve>> response = testRestTemplate.exchange(BASE_URL,
-                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+	@Nested
+	@DisplayName("GET /api/goals/crews/{crewId}/last/achieve")
+	class GetCrewAchieve {
+		private final String BASE_URL = "/api/goals/crews/{crewId}/last/achieve";
 
-            assertThat(response.getBody().getResult().achieved()).isTrue();
-        }
-    }
+		@Test
+		@DisplayName("크루의 이번주 목표 달성 여부를 조회한다.")
+		void getCrewAchieve() {
+			CrewGoalSnapshot crewGoalSnapshot = new CrewGoalSnapshot(1L, new Goal(BigDecimal.TEN), true,
+				WeekUnit.from(LocalDate.now().minusWeeks(1)));
+			goalRepository.save(crewGoalSnapshot);
 
-    @Nested
-    @DisplayName("GET /api/goals/crews/{crewId}/last/achieve")
-    class GetCrewAchieve {
-        private final String BASE_URL = "/api/goals/crews/{crewId}/last/achieve";
+			ParameterizedTypeReference<ApiResponse<GoalResponse.Achieve>> responseType = new ParameterizedTypeReference<>() {
+			};
+			HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
+			String url = "/api/goals/crews/1/last/achieve";
 
-        @Test
-        @DisplayName("크루의 이번주 목표 달성 여부를 조회한다.")
-        void getCrewAchieve() {
-            CrewGoalSnapshot crewGoalSnapshot = new CrewGoalSnapshot(1L, new Goal(BigDecimal.TEN), true,
-                    WeekUnit.from(LocalDate.now().minusWeeks(1)));
-            goalRepository.save(crewGoalSnapshot);
+			ResponseEntity<ApiResponse<GoalResponse.Achieve>> response = testRestTemplate.exchange(url,
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType, 1L);
 
-            ParameterizedTypeReference<ApiResponse<GoalResponse.Achieve>> responseType = new ParameterizedTypeReference<>() {
-            };
-            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
-            String url = "/api/goals/crews/1/last/achieve";
+			assertThat(response.getBody().getResult().achieved()).isTrue();
+		}
+	}
 
-            ResponseEntity<ApiResponse<GoalResponse.Achieve>> response = testRestTemplate.exchange(url,
-                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType, 1L);
+	@Nested
+	@DisplayName("GET /api/goals/me/last/clovers")
+	class GetMemberGoalClovers {
+		private final String BASE_URL = "/api/goals/me/last/clovers";
 
-            assertThat(response.getBody().getResult().achieved()).isTrue();
-        }
-    }
+		@Test
+		@DisplayName("유저의 지난주 클로버 개수를 조회한다.")
+		void getMemberGoalClovers() {
+			MemberGoalSnapshot memberGoalSnapshot = new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), true,
+				LocalDate.now().minusWeeks(1));
+			goalRepository.save(memberGoalSnapshot);
 
-    @Nested
-    @DisplayName("GET /api/goals/me/last/clovers")
-    class GetMemberGoalClovers {
-        private final String BASE_URL = "/api/goals/me/last/clovers";
+			ParameterizedTypeReference<ApiResponse<GoalResponse.Clover>> responseType = new ParameterizedTypeReference<>() {
+			};
 
-        @Test
-        @DisplayName("유저의 지난주 클로버 개수를 조회한다.")
-        void getMemberGoalClovers() {
-            MemberGoalSnapshot memberGoalSnapshot = new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), true,
-                    LocalDate.now().minusWeeks(1));
-            goalRepository.save(memberGoalSnapshot);
+			HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
+			ResponseEntity<ApiResponse<GoalResponse.Clover>> response = testRestTemplate.exchange(BASE_URL,
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
-            ParameterizedTypeReference<ApiResponse<GoalResponse.Clover>> responseType = new ParameterizedTypeReference<>() {
-            };
+			assertThat(response.getBody().getResult().count()).isEqualTo(1);
+		}
+	}
 
-            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
-            ResponseEntity<ApiResponse<GoalResponse.Clover>> response = testRestTemplate.exchange(BASE_URL,
-                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
+	@Nested
+	@DisplayName("GET /api/goals/crews/last/clovers")
+	class GetCrewGoalClovers {
+		private final String BASE_URL = "/api/goals/crews/last/clovers";
 
-            assertThat(response.getBody().getResult().count()).isEqualTo(1);
-        }
-    }
+		@Test
+		@DisplayName("크루의 지난주 클로버 개수를 조회한다.")
+		void getCrewGoalClovers() {
+			Crew crew1 = crewRepository.save(Crew.of(new CrewCommand.Create(1L, "name1"), new Code("abc123")));
+			Crew crew2 = crewRepository.save(Crew.of(new CrewCommand.Create(1L, "name2"), new Code("abc123")));
+			Crew crew3 = crewRepository.save(Crew.of(new CrewCommand.Create(1L, "name3"), new Code("abc123")));
+			CrewGoalSnapshot snapshot1 = CrewGoalSnapshot.empty(crew1.getId(), LocalDate.now().minusWeeks(1));
+			snapshot1.achieve();
+			goalRepository.save(snapshot1);
+			CrewGoalSnapshot snapshot2 = CrewGoalSnapshot.empty(crew2.getId(), LocalDate.now().minusWeeks(1));
+			snapshot2.achieve();
+			goalRepository.save(snapshot2);
+			CrewGoalSnapshot snapshot3 = CrewGoalSnapshot.empty(crew3.getId(), LocalDate.now().minusWeeks(1));
+			goalRepository.save(snapshot3);
 
-    @Nested
-    @DisplayName("GET /api/goals/crews/last/clovers")
-    class GetCrewGoalClovers {
-        private final String BASE_URL = "/api/goals/crews/last/clovers";
+			ParameterizedTypeReference<ApiResponse<GoalResponse.Clover>> responseType = new ParameterizedTypeReference<>() {
+			};
 
-        @Test
-        @DisplayName("크루의 지난주 클로버 개수를 조회한다.")
-        void getCrewGoalClovers() {
-            Crew crew1 = crewRepository.save(Crew.of(new CrewCommand.Create(1L, "name1"), new Code("abc123")));
-            Crew crew2 = crewRepository.save(Crew.of(new CrewCommand.Create(1L, "name2"), new Code("abc123")));
-            Crew crew3 = crewRepository.save(Crew.of(new CrewCommand.Create(1L, "name3"), new Code("abc123")));
-            CrewGoalSnapshot snapshot1 = CrewGoalSnapshot.empty(crew1.getId(), LocalDate.now().minusWeeks(1));
-            snapshot1.achieve();
-            goalRepository.save(snapshot1);
-            CrewGoalSnapshot snapshot2 = CrewGoalSnapshot.empty(crew2.getId(), LocalDate.now().minusWeeks(1));
-            snapshot2.achieve();
-            goalRepository.save(snapshot2);
-            CrewGoalSnapshot snapshot3 = CrewGoalSnapshot.empty(crew3.getId(), LocalDate.now().minusWeeks(1));
-            goalRepository.save(snapshot3);
+			HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
+			ResponseEntity<ApiResponse<GoalResponse.Clover>> response = testRestTemplate.exchange(BASE_URL,
+				HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
-            ParameterizedTypeReference<ApiResponse<GoalResponse.Clover>> responseType = new ParameterizedTypeReference<>() {
-            };
-
-            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
-            ResponseEntity<ApiResponse<GoalResponse.Clover>> response = testRestTemplate.exchange(BASE_URL,
-                    HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
-
-            assertThat(response.getBody().getResult().count()).isEqualTo(6);
-        }
-    }
+			assertThat(response.getBody().getResult().count()).isEqualTo(6);
+		}
+	}
 }

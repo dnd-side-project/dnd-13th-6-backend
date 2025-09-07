@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.runky.auth.api.AuthRequest;
 import com.runky.auth.application.AuthCriteria;
 import com.runky.auth.application.AuthFacade;
-import com.runky.auth.config.props.LoginRedirectProperties;
 import com.runky.global.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/dev/api/auth")
 @RequiredArgsConstructor
 public class DevAuthController {
-	private final LoginRedirectProperties loginRedirectProperties;
 	private final AuthFacade authFacade;
 	private final DevAuthResponseHelper responseHelper;
 
@@ -39,12 +37,12 @@ public class DevAuthController {
 		return switch (result.authStatus()) {
 			case NEW_USER -> responseHelper.redirectWithFragment(
 				ApiResponse.success(new DevAuthResponse.NewUser(result.signupToken())),
-				loginRedirectProperties.newUser(),
+				"https://localhost:3000/onboarding/terms",
 				Map.of("next", "COMPLETE_SIGNUP", "signupToken", result.signupToken())
 			);
 			case EXISTING_USER -> responseHelper.redirectWithFragment(
 				ApiResponse.success(new DevAuthResponse.ExistingUser(result.accessToken(), result.refreshToken())),
-				loginRedirectProperties.alreadyExistingUser(),
+				"https://localhost:3000/main",
 				Map.of("accessToken", result.accessToken(), "refreshToken", result.refreshToken())
 			);
 		};

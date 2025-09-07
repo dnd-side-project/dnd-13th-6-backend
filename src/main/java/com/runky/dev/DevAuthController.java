@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.runky.auth.api.AuthRequest;
 import com.runky.auth.application.AuthCriteria;
-import com.runky.auth.application.AuthFacade;
 import com.runky.global.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/dev/api/auth")
 @RequiredArgsConstructor
 public class DevAuthController {
-	private final AuthFacade authFacade;
+	private final DevAuthFacade authFacade;
 	private final DevAuthResponseHelper responseHelper;
 
 	/**

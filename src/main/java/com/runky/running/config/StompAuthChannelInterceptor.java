@@ -2,6 +2,7 @@ package com.runky.running.config;
 
 import static com.runky.running.config.JwtHandshakeInterceptor.*;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -32,10 +33,10 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class StompAuthChannelInterceptor implements ChannelInterceptor {
+	private static final Pattern RUNNING_ID_PATTERN = Pattern.compile("/topic/runnings/(\\d+)$");
 
 	private static final Logger log = LoggerFactory.getLogger(StompAuthChannelInterceptor.class);
 
-	// JwtCookieAuthFilter와 동일한 헤더 명세
 	private static final String HDR_AUTHORIZATION = "Authorization";
 	private static final String HDR_X_ACCESS_TOKEN = "X-Access-Token";
 	private static final String BEARER_PREFIX = "Bearer ";
@@ -46,17 +47,15 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
 	public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
 		StompHeaderAccessor acc = StompHeaderAccessor.wrap(message);
 
+		// CONNECT
 		if (StompCommand.CONNECT.equals(acc.getCommand())) {
-			// A) STOMP CONNECT 헤더에서 우선 시도
 			String token = resolveFromStompHeaders(acc);
-
 			if (StringUtils.hasText(token)) {
 				acc.setUser(buildAuthentication(token));
-				// 보안상 토큰 헤더 제거(옵션)
 				removeHeader(acc, HDR_AUTHORIZATION);
 				removeHeader(acc, HDR_X_ACCESS_TOKEN);
+				log.info("[WS][CONNECT] sessionId={}, memberId={}", acc.getSessionId(), resolveMemberId(acc.getUser()));
 			} else {
-				// B) 헤더에 없으면 핸드셰이크 폴백(쿠키 기반)
 				Map<String, Object> attrs = acc.getSessionAttributes();
 				if (attrs != null) {
 					Object auth = attrs.get(WS_AUTH_ATTR);
@@ -67,24 +66,33 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
 				if (acc.getUser() == null) {
 					throw new MessagingException("Missing authentication for STOMP CONNECT");
 				}
+				log.info("[WS][CONNECT][FALLBACK] sessionId={}, memberId={}", acc.getSessionId(),
+					resolveMemberId(acc.getUser()));
 			}
 		}
 
-		// 인증 강제: SUBSCRIBE / SEND
+		// 인증 강제
 		if ((StompCommand.SUBSCRIBE.equals(acc.getCommand()) || StompCommand.SEND.equals(acc.getCommand()))
 			&& acc.getUser() == null) {
 			throw new MessagingException("Unauthenticated STOMP session");
 		}
 
-		// ✅ 구독 로그: 누가(memberId) 어떤 방(runningId) 구독했는지
+		// SUBSCRIBE 로깅
 		if (StompCommand.SUBSCRIBE.equals(acc.getCommand())) {
 			String dest = acc.getDestination();      // 예: /topic/runnings/42
-			String sessionId = acc.getSessionId();
 			Long runningId = extractRunningId(dest);
 			Long memberId = resolveMemberId(acc.getUser());
+			log.info("[WS][SUBSCRIBE] dest={}, runningId={}, memberId={}, sessionId={}, subscriptionId={}",
+				dest, runningId, memberId, acc.getSessionId(), acc.getSubscriptionId());
+		}
 
-			log.info("[WS][SUBSCRIBE] dest={}, runningId={}, memberId={}, sessionId={}",
-				dest, runningId, memberId, sessionId);
+		// SEND 로깅 (클라이언트 → 서버, 컨트롤러 진입 전의 원문 바디)
+		if (StompCommand.SEND.equals(acc.getCommand())) {
+			String dest = acc.getDestination();      // 예: /app/runnings/42/location
+			Long memberId = resolveMemberId(acc.getUser());
+			String body = payloadAsString(message.getPayload());
+			log.info("[WS][SEND] dest={}, memberId={}, sessionId={}, body={}",
+				dest, memberId, acc.getSessionId(), abbreviate(body));
 		}
 
 		return message;
@@ -105,7 +113,6 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
 	}
 
 	private String resolveFromStompHeaders(StompHeaderAccessor acc) {
-		// Authorization: Bearer <token> -> X-Access-Token: <token>
 		String authz = acc.getFirstNativeHeader(HDR_AUTHORIZATION);
 		if (StringUtils.hasText(authz) && authz.startsWith(BEARER_PREFIX)) {
 			return authz.substring(BEARER_PREFIX.length()).trim();
@@ -121,24 +128,30 @@ public class StompAuthChannelInterceptor implements ChannelInterceptor {
 	}
 
 	private Long resolveMemberId(Principal principal) {
-		if (principal == null)
-			return null;
-
-		// StompAuthChannelInterceptor에서 setUser(auth) 했으므로 보통 Authentication이 들어옵니다.
-		if (principal instanceof Authentication auth) {
-			Object p = auth.getPrincipal();
-			if (p instanceof MemberPrincipal mp) {
-				return mp.memberId();
-			}
-		}
+		if (principal instanceof Authentication auth && auth.getPrincipal() instanceof MemberPrincipal mp)
+			return mp.memberId();
 		return null;
 	}
 
 	private Long extractRunningId(String destination) {
-		if (destination == null)
+		if (destination == null) {
 			return null;
-		// /topic/runnings/{runningId} 형식만 매칭
-		Matcher m = Pattern.compile("^/topic/runnings/(\\d+)$").matcher(destination);
-		return m.find() ? Long.valueOf(m.group(1)) : null;
+		}
+		Matcher matcher = RUNNING_ID_PATTERN.matcher(destination);
+
+		return matcher.find() ? Long.valueOf(matcher.group(1)) : null;
+	}
+
+	private String payloadAsString(Object payload) {
+		if (payload instanceof byte[] b)
+			return new String(b, StandardCharsets.UTF_8);
+		return String.valueOf(payload);
+	}
+
+	private String abbreviate(String s) {
+		if (s == null)
+			return null;
+		int limit = 1000;
+		return s.length() > limit ? s.substring(0, limit) + "...(truncated)" : s;
 	}
 }

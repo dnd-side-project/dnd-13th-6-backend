@@ -22,7 +22,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Component
 public class ApiLoggingAspect {
 
-    @Pointcut("execution(public * com.runky.*.api.*Controller.*(..))")
+    @Pointcut("execution(public * com.runky.*.api.*Controller.*(..)) "
+            + "&& !execution(* com.runky.*.api.RunningLocationWsController.*(..))")
     public void controllerPointcut() {
     }
 

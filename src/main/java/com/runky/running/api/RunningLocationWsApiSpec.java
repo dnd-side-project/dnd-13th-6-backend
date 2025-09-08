@@ -27,7 +27,7 @@ public interface RunningLocationWsApiSpec {
 			content = @Content(mediaType = "application/json",
 				schema = @Schema(implementation = RunningLocationWsController.RoomEvent.class)))
 	})
-	RunningLocationWsController.RoomEvent publish(
+	void publish(
 
 		@Parameter(hidden = true)
 		MemberPrincipal requester,

@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
 	private final StompAuthChannelInterceptor stompAuthChannelInterceptor;
+	private final StompOutboundLoggingInterceptor stompOutboundLoggingInterceptor;
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -39,6 +40,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	@Override
 	public void configureClientInboundChannel(ChannelRegistration registration) {
 		// 인터셉터 등록
-		registration.interceptors(stompAuthChannelInterceptor);
+		registration.interceptors(stompAuthChannelInterceptor); // Inbound 인증+로깅
+	}
+
+	@Override
+	public void configureClientOutboundChannel(ChannelRegistration registration) {
+		registration.interceptors(stompOutboundLoggingInterceptor); // Outbound 로깅
 	}
 }

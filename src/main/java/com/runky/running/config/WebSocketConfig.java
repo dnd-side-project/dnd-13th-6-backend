@@ -16,6 +16,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	private final JwtChannelInterceptor jwtChannelInterceptor;
 	private final StompInboundSendLogger stompInboundSendLogger;
 	private final StompOutboundMessageLogger stompOutboundMessageLogger;
+	private final CookieAuthHandshakeInterceptor cookieAuthHandshakeInterceptor;
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -29,6 +30,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry
 			.addEndpoint("/ws")
+			.addInterceptors(cookieAuthHandshakeInterceptor)
 			.setAllowedOriginPatterns(
 				"https://*.runky.store", "http://*.runky.store",
 				"https://localhost:*", "http://localhost:*",

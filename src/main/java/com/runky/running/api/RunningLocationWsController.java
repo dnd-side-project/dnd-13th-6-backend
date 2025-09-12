@@ -1,14 +1,20 @@
+// src/main/java/com/runky/running/api/RunningLocationWsController.java
 package com.runky.running.api;
+
+import static com.runky.running.api.RunningSocketConstants.*;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
-import com.runky.global.security.auth.MemberPrincipal;
-
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,25 +27,28 @@ public class RunningLocationWsController implements RunningLocationWsApiSpec {
 
 	@MessageMapping("/runnings/{runningId}/location")
 	public void publish(
-		@AuthenticationPrincipal MemberPrincipal requester,
 		@DestinationVariable Long runningId,
-		@Payload LocationMessage payload
+		@Valid @Payload LocationMessage payload,
+		SimpMessageHeaderAccessor accessor
 	) {
-		Long memberId = requester != null ? requester.memberId() : null;
-
-		log.info("[WS][@MessageMapping][IN] runningId={}, memberId={}, payload={}", runningId, memberId, payload);
-
-		RoomEvent event = new RoomEvent("LOCATION", memberId, payload.x(), payload.y(), payload.timestamp());
+		Long runnerId = (Long)accessor.getSessionAttributes().get(ATTR_MEMBER_ID);
+		RoomEvent event = new RoomEvent("LOCATION", runnerId, payload.x(), payload.y(), payload.timestamp());
 		String dest = "/topic/runnings/" + runningId;
 
 		messagingTemplate.convertAndSend(dest, event);
-
-		log.info("[WS][@MessageMapping][OUT] dest={}, event={}", dest, event);
 	}
 
-	public record LocationMessage(double x, double y, long timestamp) {
+	public record LocationMessage(
+		@NotNull @DecimalMin(value = "-180", inclusive = true) @DecimalMax(value = "180", inclusive = true)
+		Double x,
+		@NotNull @DecimalMin(value = "-90", inclusive = true) @DecimalMax(value = "90", inclusive = true)
+		Double y,
+		@NotNull @PositiveOrZero
+		long timestamp
+	) {
 	}
 
 	public record RoomEvent(String type, Long runnerId, Double x, Double y, long timestamp) {
 	}
+
 }

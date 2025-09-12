@@ -37,12 +37,16 @@ public class SecurityConfig {
 		return http
 			.csrf(AbstractHttpConfigurer::disable)
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+			.sessionManagement(session -> session.sessionCreationPolicy(
+				SessionCreationPolicy.IF_REQUIRED))
 			.exceptionHandling(exception -> exception
 				.authenticationEntryPoint(jwtAuthenticationEntryPoint))
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/auth/**")
 				.permitAll()
 				.requestMatchers("swagger-ui/**", "swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**")
+				.permitAll()
+				.requestMatchers("/ws/**")
 				.permitAll()
 				.requestMatchers("/health")
 				.permitAll()

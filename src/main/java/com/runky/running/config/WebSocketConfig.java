@@ -13,14 +13,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-	private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
-	private final StompAuthChannelInterceptor stompAuthChannelInterceptor;
-	private final StompOutboundLoggingInterceptor stompOutboundLoggingInterceptor;
+	private final JwtChannelInterceptor jwtChannelInterceptor;
+	private final StompInboundSendLogger stompInboundSendLogger;
+	private final StompOutboundMessageLogger stompOutboundMessageLogger;
+	private final CookieAuthHandshakeInterceptor cookieAuthHandshakeInterceptor;
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		registry.setApplicationDestinationPrefixes("/app"); // 클라이언트가 메시지를 보낼 때 접두사
-		registry.enableSimpleBroker("/topic", "/queue"); // 클라이언트가 구독할 주소
+		registry.setApplicationDestinationPrefixes("/app");
+		registry.enableSimpleBroker("/topic", "/queue");
 		registry.setUserDestinationPrefix("/user");
 
 	}
@@ -29,22 +30,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry
 			.addEndpoint("/ws")
-			.addInterceptors(jwtHandshakeInterceptor)
+			.addInterceptors(cookieAuthHandshakeInterceptor)
 			.setAllowedOriginPatterns(
-				"https://web.runky.store", "http://web.runky.store",
-				"https://localhost:3000", "http://localhost:3000"
-			)
-			.withSockJS();
+				"https://*.runky.store", "http://*.runky.store",
+				"https://localhost:*", "http://localhost:*",
+				"null"
+			);
 	}
 
 	@Override
-	public void configureClientInboundChannel(ChannelRegistration registration) {
-		// 인터셉터 등록
-		registration.interceptors(stompAuthChannelInterceptor); // Inbound 인증+로깅
+	public void configureClientInboundChannel(ChannelRegistration reg) {
+		reg.interceptors(jwtChannelInterceptor, stompInboundSendLogger);
 	}
 
 	@Override
-	public void configureClientOutboundChannel(ChannelRegistration registration) {
-		registration.interceptors(stompOutboundLoggingInterceptor); // Outbound 로깅
+	public void configureClientOutboundChannel(ChannelRegistration reg) {
+		reg.interceptors(stompOutboundMessageLogger);
 	}
+
 }

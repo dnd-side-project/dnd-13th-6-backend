@@ -1,6 +1,6 @@
 package com.runky.running.api;
 
-import com.runky.global.security.auth.MemberPrincipal;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,13 +29,11 @@ public interface RunningLocationWsApiSpec {
 	})
 	void publish(
 
-		@Parameter(hidden = true)
-		MemberPrincipal requester,
-
 		@Parameter(name = "runningId", description = "참여 중인 런닝방 ID",
 			in = ParameterIn.PATH, required = true, example = "1")
 		Long runningId,
-		RunningLocationWsController.LocationMessage payload
+		RunningLocationWsController.LocationMessage payload,
+		SimpMessageHeaderAccessor accessor
 	);
 
 }

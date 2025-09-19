@@ -1,4 +1,4 @@
-package com.runky.running.infra;
+package com.runky.running.infra.jpa;
 
 import java.util.Optional;
 

@@ -1,4 +1,4 @@
-package com.runky.running.config;
+package com.runky.running.infra.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -7,6 +7,11 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import com.runky.running.infra.websocket.handshake.CookieAuthHandshakeInterceptor;
+import com.runky.running.infra.websocket.inbound.InboundChannelLogger;
+import com.runky.running.infra.websocket.inbound.JwtChannelInterceptor;
+import com.runky.running.infra.websocket.outbound.OutboundChannelLogger;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -14,8 +19,8 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	private final JwtChannelInterceptor jwtChannelInterceptor;
-	private final StompInboundSendLogger stompInboundSendLogger;
-	private final StompOutboundMessageLogger stompOutboundMessageLogger;
+	private final InboundChannelLogger inboundChannelLogger;
+	private final OutboundChannelLogger outboundChannelLogger;
 	private final CookieAuthHandshakeInterceptor cookieAuthHandshakeInterceptor;
 
 	@Override
@@ -40,12 +45,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureClientInboundChannel(ChannelRegistration reg) {
-		reg.interceptors(jwtChannelInterceptor, stompInboundSendLogger);
+		reg.interceptors(jwtChannelInterceptor, inboundChannelLogger);
 	}
 
 	@Override
 	public void configureClientOutboundChannel(ChannelRegistration reg) {
-		reg.interceptors(stompOutboundMessageLogger);
+		reg.interceptors(outboundChannelLogger);
 	}
 
 }

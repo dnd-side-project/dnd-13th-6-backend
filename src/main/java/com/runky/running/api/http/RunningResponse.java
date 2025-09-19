@@ -1,4 +1,4 @@
-package com.runky.running.api;
+package com.runky.running.api.http;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

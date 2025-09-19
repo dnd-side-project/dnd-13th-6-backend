@@ -14,6 +14,8 @@ public enum AuthErrorCode implements ErrorCode {
 	EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "A102", "만료된 토큰입니다."),
 	TOKEN_MISMATCH(HttpStatus.UNAUTHORIZED, "A103", "토큰 정보가 일치하지 않습니다."),
 	TOKEN_REQUIRED(HttpStatus.BAD_REQUEST, "A104", "토큰이 필요합니다."),
+	NULL_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "A105", "인증이 필요합니다"),
+	UN_SUPPORT_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "A106", "지원하지 않는 인증 타입입니다"),
 	SIGNUP_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "A201", "회원가입 토큰이 만료되었습니다. 다시 로그인해주세요."),
 	SIGNUP_TOKEN_ID_BLANK(HttpStatus.INTERNAL_SERVER_ERROR, "A202", "회원가입 토큰의 ID가 비어있습니다."),
 	SIGNUP_TOKEN_TTL_BLANK(HttpStatus.INTERNAL_SERVER_ERROR, "A203", "회원가입 토큰의 ttl이 비어있습니다."),

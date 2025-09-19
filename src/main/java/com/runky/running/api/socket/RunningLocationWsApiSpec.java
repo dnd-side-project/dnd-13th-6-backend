@@ -1,4 +1,4 @@
-package com.runky.running.api;
+package com.runky.running.api.socket;
 
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 

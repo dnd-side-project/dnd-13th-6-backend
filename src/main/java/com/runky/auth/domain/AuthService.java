@@ -28,6 +28,12 @@ public class AuthService {
 		if (auth == null) {
 			throw new GlobalException(AuthErrorCode.NULL_AUTHENTICATION);
 		}
-		return (MemberPrincipal)auth.getPrincipal();
+
+		Object principal = auth.getPrincipal();
+
+		if (!(principal instanceof MemberPrincipal)) {
+			throw new GlobalException(AuthErrorCode.UN_SUPPORT_AUTHENTICATION);
+		}
+		return (MemberPrincipal)principal;
 	}
 }

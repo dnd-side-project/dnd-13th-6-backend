@@ -1,14 +1,14 @@
 // src/main/java/com/runky/running/api/RunningLocationWsController.java
 package com.runky.running.api;
 
-import static com.runky.running.api.RunningSocketConstants.*;
-
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+
+import com.runky.global.security.auth.MemberPrincipal;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
@@ -31,10 +31,11 @@ public class RunningLocationWsController implements RunningLocationWsApiSpec {
 		@Valid @Payload LocationMessage payload,
 		SimpMessageHeaderAccessor accessor
 	) {
-		Long runnerId = (Long)accessor.getSessionAttributes().get(ATTR_MEMBER_ID);
-		RoomEvent event = new RoomEvent("LOCATION", runnerId, payload.x(), payload.y(), payload.timestamp());
-		String dest = "/topic/runnings/" + runningId;
+		MemberPrincipal principal = (MemberPrincipal)accessor.getSessionAttributes().get("Principal");
+		Long runnerId = principal.memberId();
 
+		RoomEvent event = new RoomEvent("LOCATION", runningId, runnerId, payload.x(), payload.y(), payload.timestamp());
+		String dest = "/topic/runnings/" + runningId;
 		messagingTemplate.convertAndSend(dest, event);
 	}
 
@@ -48,7 +49,7 @@ public class RunningLocationWsController implements RunningLocationWsApiSpec {
 	) {
 	}
 
-	public record RoomEvent(String type, Long runnerId, Double x, Double y, long timestamp) {
+	public record RoomEvent(String type, Long runningId, Long runnerId, Double x, Double y, long timestamp) {
 	}
 
 }

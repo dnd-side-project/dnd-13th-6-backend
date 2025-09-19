@@ -61,15 +61,16 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
 	private boolean hasHandshakeAuthentication(StompHeaderAccessor accessor) {
 		Map<String, Object> attrs = accessor.getSessionAttributes();
-		return attrs.get(AUTHENTICATION) instanceof Authentication;
+		return attrs != null && attrs.get(AUTHENTICATION) instanceof Authentication;
 	}
 
 	private void storePrincipal(StompHeaderAccessor accessor, Authentication auth) {
 		MemberPrincipal principal = authService.principalOf(auth);
 		if (principal != null) {
 			Map<String, Object> attrs = accessor.getSessionAttributes();
-			attrs.put(MEMBER_PRINCIPAL, principal);
-
+			if (attrs != null) {
+				attrs.put(MEMBER_PRINCIPAL, principal);
+			}
 		}
 	}
 

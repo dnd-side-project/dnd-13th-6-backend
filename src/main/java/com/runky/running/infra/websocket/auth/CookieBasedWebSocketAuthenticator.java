@@ -25,6 +25,9 @@ public class CookieBasedWebSocketAuthenticator {
 			return null;
 
 		Cookie[] cookies = servletRequest.getServletRequest().getCookies();
+		if (cookies == null) {
+			return null;
+		}
 
 		return Arrays.stream(cookies)
 			.filter(cookie -> ACCESS_TOKEN.equals(cookie.getName()))

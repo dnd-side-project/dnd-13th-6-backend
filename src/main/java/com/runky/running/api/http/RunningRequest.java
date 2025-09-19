@@ -1,4 +1,4 @@
-package com.runky.running.api;
+package com.runky.running.api.http;
 
 import com.runky.running.application.RunningCriteria;
 
@@ -21,14 +21,14 @@ public sealed interface RunningRequest {
 			);
 		}
 
-		record Summary(
+		public record Summary(
 			Double totalDistanceMinutes,
 			Long durationSeconds,
 			Double avgSpeedMPS
 		) {
 		}
 
-		record Track(
+		public record Track(
 			String format,
 			String points,
 			int pointCount

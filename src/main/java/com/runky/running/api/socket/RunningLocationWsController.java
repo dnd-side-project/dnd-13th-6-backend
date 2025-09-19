@@ -1,5 +1,5 @@
 // src/main/java/com/runky/running/api/RunningLocationWsController.java
-package com.runky.running.api;
+package com.runky.running.api.socket;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;

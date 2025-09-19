@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.runky.running.infra.RunningJpaRepository;
+import com.runky.running.infra.jpa.RunningJpaRepository;
 import com.runky.utils.DatabaseCleanUp;
 
 @SpringBootTest

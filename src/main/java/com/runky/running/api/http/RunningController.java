@@ -1,4 +1,4 @@
-package com.runky.running.api;
+package com.runky.running.api.http;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
+import com.runky.running.api.socket.WsDestinations;
 import com.runky.running.application.RunningCriteria;
 import com.runky.running.application.RunningFacade;
 import com.runky.running.application.RunningResult;

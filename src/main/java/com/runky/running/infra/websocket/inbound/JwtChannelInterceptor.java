@@ -66,11 +66,8 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
 	private void storePrincipal(StompHeaderAccessor accessor, Authentication auth) {
 		MemberPrincipal principal = authService.principalOf(auth);
-		if (principal != null) {
-			Map<String, Object> attrs = accessor.getSessionAttributes();
-			if (attrs != null) {
-				attrs.put(MEMBER_PRINCIPAL, principal);
-			}
+		if (accessor.getSessionAttributes() != null) {
+			accessor.getSessionAttributes().put(MEMBER_PRINCIPAL, principal);
 		}
 	}
 

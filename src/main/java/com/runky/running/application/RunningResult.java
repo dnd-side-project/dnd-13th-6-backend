@@ -9,6 +9,9 @@ public final class RunningResult {
 	private RunningResult() {
 	}
 
+	public record RemovedRunning(int count) {
+	}
+
 	public record Start(Long runningId, Long runnerId, String status, LocalDateTime startedAt) {
 		public static Start from(RunningInfo.Start info) {
 			return new Start(

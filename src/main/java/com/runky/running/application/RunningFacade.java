@@ -73,9 +73,16 @@ public class RunningFacade {
 	}
 
 	@Transactional(readOnly = true)
-	public RunningResult.RunResult getRunResult(final RunningCriteria.RunResult criteria) {
+	public RunningResult.RunResult getRunResult(RunningCriteria.RunResult criteria) {
 		var info = runningService.getRunResult(
 			new RunningCommand.RunResult(criteria.runningId(), criteria.runningId()));
 		return RunningResult.RunResult.from(info);
+	}
+
+	public RunningResult.RemovedRunning removeActiveRunning(RunningCriteria.RemoveActiveRunning criteria) {
+		int count = runningService.removeActiveRunning(
+			new RunningCommand.RemoveActiveRunning(criteria.runnerId(), criteria.runningId())
+		);
+		return new RunningResult.RemovedRunning(count);
 	}
 }

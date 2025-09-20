@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -79,5 +80,15 @@ public class RunningController implements RunningApiSpec {
 	) {
 		var result = runningFacade.getRunResult(new RunningCriteria.RunResult(requester.memberId(), runningId));
 		return ApiResponse.success(RunningResponse.RunResult.from(result));
+	}
+
+	@DeleteMapping("/{runningId}/active")
+	public ApiResponse<RunningResponse.RemovedRunning> removeActiveRunning(
+		@AuthenticationPrincipal MemberPrincipal requester,
+		@PathVariable Long runningId
+	) {
+		var result = runningFacade.removeActiveRunning(
+			new RunningCriteria.RemoveActiveRunning(requester.memberId(), runningId));
+		return ApiResponse.success(RunningResponse.RemovedRunning.from(result));
 	}
 }

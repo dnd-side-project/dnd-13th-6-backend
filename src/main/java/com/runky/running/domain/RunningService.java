@@ -236,4 +236,12 @@ public class RunningService {
 	private LocalDate toWeekEnd(LocalDate weekStart) {
 		return weekStart.plusDays(6);
 	}
+
+	public int removeActiveRunning(RunningCommand.RemoveActiveRunning command) {
+		return runningRepository.deleteByIdAndRunnerIdAndStatus(
+			command.runningId(),
+			command.runnerId(),
+			Running.Status.RUNNING
+		);
+	}
 }

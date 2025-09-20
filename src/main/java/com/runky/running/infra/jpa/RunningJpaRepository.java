@@ -63,4 +63,6 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 	List<Running> findBetweenFromAndToByRunnerId(Long runnerId, LocalDateTime from, LocalDateTime to);
 
 	Optional<Running> findByRunnerIdAndStatusAndEndedAtIsNull(Long memberId, Running.Status status);
+
+	int deleteByIdAndRunnerIdAndStatus(Long runningId, Long runnerId, Running.Status status);
 }

@@ -1,6 +1,8 @@
 package com.runky.reward.application;
 
-public class RewardResult {
+public final class RewardResult {
+	private RewardResult() {
+	}
 
 	public record Badge(
 		Long badgeId,

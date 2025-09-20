@@ -24,4 +24,7 @@ public final class RunningCommand {
 
 	public record RunResult(Long runnerId, Long runningId) {
 	}
+
+	public record RemoveActiveRunning(Long runnerId, Long runningId) {
+	}
 }

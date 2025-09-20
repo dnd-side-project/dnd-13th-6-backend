@@ -4,17 +4,17 @@ import java.time.LocalDateTime;
 
 import com.runky.running.domain.RunningCommand;
 
-public sealed interface RunningCriteria {
+public final class RunningCriteria {
+	private RunningCriteria() {
+	}
 
-	record Start(
-		Long runnerId
-	) {
+	public record Start(Long runnerId) {
 		RunningCommand.Start toCommand() {
 			return new RunningCommand.Start(runnerId);
 		}
 	}
 
-	record End(
+	public record End(
 		Long runningId,
 		Long runnerId,
 		Double totalDistanceMinutes,
@@ -24,20 +24,20 @@ public sealed interface RunningCriteria {
 		String points,
 		int pointCount
 
-	) implements RunningCriteria {
-		RunningCommand.End toCommand() {
+	) {
+		public RunningCommand.End toCommand() {
 			return new RunningCommand.End(
 				runningId, runnerId, totalDistanceMinutes, durationSeconds, avgSpeedMPS, format, points, pointCount
 			);
 		}
 	}
 
-	record TodaySummary(Long runnerId, LocalDateTime now) implements RunningCriteria {
+	public record TodaySummary(Long runnerId, LocalDateTime now) {
 	}
 
-	record MyWeeklyTotalDistance(Long runnerId) implements RunningCriteria {
+	public record MyWeeklyTotalDistance(Long runnerId) {
 	}
 
-	record RunResult(Long runnerId, Long runningId) {
+	public record RunResult(Long runnerId, Long runningId) {
 	}
 }

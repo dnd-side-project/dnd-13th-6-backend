@@ -5,31 +5,31 @@ import java.time.LocalDateTime;
 
 import com.runky.running.application.RunningResult;
 
-public sealed interface RunningResponse {
+public final class RunningResponse {
+	private RunningResponse() {
+	}
 
-	record Start(Long runningId, Long runnerId, String status, String pub, String sub,
-				 LocalDateTime startedAt)
-		implements RunningResponse {
+	public record Start(Long runningId, Long runnerId, String status, String pub, String sub,
+						LocalDateTime startedAt) {
 		public static Start from(String pub, String sub, RunningResult.Start result) {
 			return new Start(result.runningId(), result.runnerId(), result.status(), pub, sub, result.startedAt());
 		}
 	}
 
-	record End(Long runningId, Long runnerId, String string, LocalDateTime startedAt, LocalDateTime endedAt)
-		implements RunningResponse {
+	public record End(Long runningId, Long runnerId, String string, LocalDateTime startedAt, LocalDateTime endedAt) {
 		public static End from(RunningResult.End result) {
 			return new End(result.runningId(), result.runnerId(), result.status(), result.startedAt(),
 				result.endedAt());
 		}
 	}
 
-	record TodaySummary(Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMps) {
+	public record TodaySummary(Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMps) {
 		public static TodaySummary from(RunningResult.TodaySummary r) {
 			return new RunningResponse.TodaySummary(r.totalDistanceMeters(), r.durationSeconds(), r.avgSpeedMps());
 		}
 	}
 
-	record MyWeeklyTotalDistance(
+	public record MyWeeklyTotalDistance(
 		double totalDistanceKm,
 		double totalDistanceMeter,
 		LocalDate weekStart,
@@ -40,7 +40,7 @@ public sealed interface RunningResponse {
 		}
 	}
 
-	record RunResult(
+	public record RunResult(
 		Long runningId, Long runnerId,
 		Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMps,
 		LocalDateTime startedAt, LocalDateTime endedAt,

@@ -2,36 +2,26 @@ package com.runky.running.domain;
 
 import java.time.LocalDateTime;
 
-public sealed interface RunningCommand {
-	record Start(
-		Long runnerId
-	) implements RunningCommand {
+public final class RunningCommand {
+	private RunningCommand() {
 	}
 
-	record End(
-		Long runningId,
-		Long runnerId,
-		Double totalDistanceMinutes,
-		Long durationSeconds,
-		Double avgSpeedMPS,
-		String format,
-		String points,
-		int pointCount
-	) implements RunningCommand {
+	public record Start(Long runnerId) {
 	}
 
-	record WeekDistance(
-		Long runnerId,
-		LocalDateTime from,
-		LocalDateTime to
-	) implements RunningCommand {
+	public record End(
+		Long runningId, Long runnerId,
+		Double totalDistanceMinutes, Long durationSeconds, Double avgSpeedMPS,
+		String format, String points, int pointCount
+	) {
 	}
 
-	record MyWeeklyTotalDistance(
-		Long runnerId
-	) implements RunningCommand {
+	public record WeekDistance(Long runnerId, LocalDateTime from, LocalDateTime to) {
 	}
 
-	record RunResult(Long runnerId, Long runningId) {
+	public record MyWeeklyTotalDistance(Long runnerId) {
+	}
+
+	public record RunResult(Long runnerId, Long runningId) {
 	}
 }

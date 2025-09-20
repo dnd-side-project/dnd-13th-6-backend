@@ -1,5 +1,7 @@
 package com.runky.running.api.http;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -36,7 +38,10 @@ public final class RunningResponse {
 		LocalDate weekEnd
 	) {
 		public static MyWeeklyTotalDistance from(RunningResult.MyWeeklyTotalDistance r) {
-			return new MyWeeklyTotalDistance(r.totalDistanceKm(), r.totalDistanceMeter(), r.weekStart(), r.weekEnd());
+			BigDecimal km = BigDecimal.valueOf(r.totalDistanceMeter())
+				.divide(new BigDecimal("1000"));
+			double totalDistanceKm = km.setScale(2, RoundingMode.DOWN).doubleValue();
+			return new MyWeeklyTotalDistance(totalDistanceKm, r.totalDistanceMeter(), r.weekStart(), r.weekEnd());
 		}
 	}
 

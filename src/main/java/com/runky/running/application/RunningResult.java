@@ -44,13 +44,11 @@ public final class RunningResult {
 	public record MyWeeklyTotalDistance(
 		Long runnerId,
 		double totalDistanceMeter,
-		double totalDistanceKm,
 		LocalDate weekStart,
 		LocalDate weekEnd
 	) {
 		public static MyWeeklyTotalDistance from(RunningInfo.MyWeek info) {
-			double km = Math.round((info.totalMeters() / 1000.0) * 10.0) / 10.0; // 소수 1자리 반올림
-			return new MyWeeklyTotalDistance(info.runnerId(), info.totalMeters(), km, info.weekStart(), info.weekEnd());
+			return new MyWeeklyTotalDistance(info.runnerId(), info.totalMeters(), info.weekStart(), info.weekEnd());
 		}
 	}
 

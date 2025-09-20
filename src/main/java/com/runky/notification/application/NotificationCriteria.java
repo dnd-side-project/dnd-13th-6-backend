@@ -1,16 +1,15 @@
 package com.runky.notification.application;
 
-public sealed interface NotificationCriteria {
+public final class NotificationCriteria {
 
-	record RegisterDeviceToken(Long memberId, String token, String deviceType) implements NotificationCriteria {
+	public record RegisterDeviceToken(Long memberId, String token, String deviceType) {
+	}
+
+	public record DeleteDeviceToken(Long memberId, String token) {
 
 	}
 
-	record DeleteDeviceToken(Long memberId, String token) implements NotificationCriteria {
-
-	}
-
-	record GetRecentTopN(Long receiverId, int limit) implements NotificationCriteria {
+	public record GetRecentTopN(Long receiverId, int limit) {
 	}
 
 }

@@ -19,7 +19,7 @@ public interface AuthApiSpec {
 		summary = "카카오 OAuth 콜백",
 		description = "카카오 Authorization Code를 교환하여 로그인 처리합니다. 신규 사용자는 signupToken 쿠키를, 기존 사용자는 AT/RT 쿠키를 발급합니다."
 	)
-	ResponseEntity<ApiResponse<AuthResponse>> kakaoCallback(
+	ResponseEntity<ApiResponse<?>> kakaoCallback(
 		@Schema(description = "카카오 OAuth Authorization Code", example = "SplxlOBeZQQYbYS6WxSbIA")
 		@RequestParam("code") String code
 	);

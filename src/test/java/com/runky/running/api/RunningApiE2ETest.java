@@ -159,7 +159,7 @@ class RunningApiE2ETest {
 
 	@Nested
 	@DisplayName("GET /api/runnings/today")
-	class TodaySummary {
+	class TodayPushSummary {
 
 		private final String START_URL = "/api/runnings/start";
 		private final String END_URL = "/api/runnings/{runningId}/end";

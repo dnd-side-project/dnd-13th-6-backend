@@ -1,6 +1,9 @@
 package com.runky.cheer.domain;
 
-public interface CheerInfo {
-	record Detail(Long cheerId, Long runningId, Long senderId, Long receiverId, java.time.Instant sentAt) {
+public final class CheerInfo {
+	private CheerInfo() {
+	}
+
+	public record Detail(Long cheerId, Long runningId, Long senderId, Long receiverId, java.time.Instant sentAt) {
 	}
 }

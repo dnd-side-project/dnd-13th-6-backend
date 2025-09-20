@@ -23,7 +23,7 @@ public class NotificationFacade {
 
 	@Transactional
 	public void registerDeviceToken(NotificationCriteria.RegisterDeviceToken criteria) {
-		var registerInfo = new PushCommand.DeviceToken.Register(criteria.memberId(), criteria.token(),
+		var registerInfo = new PushCommand.RegisterDeviceToken(criteria.memberId(), criteria.token(),
 			criteria.deviceType());
 
 		pushService.registerDeviceToken(registerInfo);
@@ -31,7 +31,7 @@ public class NotificationFacade {
 
 	@Transactional
 	public DeviceTokenDeletionResult deleteDeviceToken(NotificationCriteria.DeleteDeviceToken criteria) {
-		var deleteInfo = new PushCommand.DeviceToken.Delete(criteria.memberId(), criteria.token());
+		var deleteInfo = new PushCommand.DeleteDeviceToken(criteria.memberId(), criteria.token());
 		int count = pushService.deleteDeviceToken(deleteInfo).count();
 		return new DeviceTokenDeletionResult(count);
 	}

@@ -1,8 +1,8 @@
 package com.runky.notification.api;
 
-public sealed interface DeviceTokenResponse {
+public final class DeviceTokenResponse {
 
-	record Delete(int count) implements DeviceTokenResponse {
+	public record Delete(int count) {
 	}
 
 }

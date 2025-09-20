@@ -1,6 +1,5 @@
 package com.runky.notification.domain.push;
 
-import static com.runky.notification.domain.aggregate.PushInfo.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -18,6 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import com.runky.global.error.GlobalException;
 import com.runky.notification.domain.aggregate.PushCommand;
+import com.runky.notification.domain.aggregate.PushInfo;
 import com.runky.notification.error.NotificationErrorCode;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,7 +41,7 @@ class DeviceTokenServiceTest {
 				.thenAnswer(inv -> inv.getArgument(0));
 
 			// when
-			deviceTokenService.register(new PushCommand.DeviceToken.Register(1L, "tkn-123", "MOBILE"));
+			deviceTokenService.register(new PushCommand.RegisterDeviceToken(1L, "tkn-123", "MOBILE"));
 
 			// then
 			verify(deviceTokenRepository)
@@ -59,7 +59,7 @@ class DeviceTokenServiceTest {
 
 			// when
 			GlobalException thrown = assertThrows(GlobalException.class,
-				() -> deviceTokenService.register(new PushCommand.DeviceToken.Register(1L, "dup-token", "MOBILE")));
+				() -> deviceTokenService.register(new PushCommand.RegisterDeviceToken(1L, "dup-token", "MOBILE")));
 
 			// then
 			assertThat(thrown)
@@ -70,7 +70,7 @@ class DeviceTokenServiceTest {
 
 	@Nested
 	@DisplayName("delete()")
-	class DeletionResultDeviceToken {
+	class DeletionDTResultDeviceToken {
 		@Test
 		@DisplayName("삭제 대상이 있으면 삭제 개수를 반환한다.")
 		void deleteExisting() {
@@ -78,8 +78,8 @@ class DeviceTokenServiceTest {
 			when(deviceTokenRepository.deleteByMemberIdAndToken(1L, "tkn-123")).thenReturn(1);
 
 			// when
-			DeviceTokenInfo.DeletionResult result =
-				deviceTokenService.delete(new PushCommand.DeviceToken.Delete(1L, "tkn-123"));
+			PushInfo.DeletionDTResult result =
+				deviceTokenService.delete(new PushCommand.DeleteDeviceToken(1L, "tkn-123"));
 
 			// then
 			assertThat(result.count()).isEqualTo(1);
@@ -93,7 +93,7 @@ class DeviceTokenServiceTest {
 
 			// when
 			GlobalException thrown = assertThrows(GlobalException.class,
-				() -> deviceTokenService.delete(new PushCommand.DeviceToken.Delete(1L, "nope")));
+				() -> deviceTokenService.delete(new PushCommand.DeleteDeviceToken(1L, "nope")));
 
 			// then
 			assertThat(thrown)
@@ -111,8 +111,8 @@ class DeviceTokenServiceTest {
 			when(deviceTokenRepository.existsActiveByMemberId(1L))
 				.thenReturn(true);
 
-			DeviceTokenInfo.ExistenceCheck existenceCheck =
-				deviceTokenService.isExists(new PushCommand.DeviceToken.CheckExistence(1L));
+			PushInfo.DeviceExistenceCheck existenceCheck =
+				deviceTokenService.isExists(new PushCommand.CheckDTExistence(1L));
 
 			assertThat(existenceCheck.exists()).isTrue();
 		}
@@ -123,8 +123,8 @@ class DeviceTokenServiceTest {
 			when(deviceTokenRepository.existsActiveByMemberId(1L))
 				.thenReturn(false);
 
-			DeviceTokenInfo.ExistenceCheck existenceCheck =
-				deviceTokenService.isExists(new PushCommand.DeviceToken.CheckExistence(1L));
+			PushInfo.DeviceExistenceCheck existenceCheck =
+				deviceTokenService.isExists(new PushCommand.CheckDTExistence(1L));
 
 			assertThat(existenceCheck.exists()).isFalse();
 		}

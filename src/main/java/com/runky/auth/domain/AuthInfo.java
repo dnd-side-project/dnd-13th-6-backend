@@ -1,7 +1,10 @@
 package com.runky.auth.domain;
 
-public sealed interface AuthInfo {
-	record TokenPair(String accessToken, String refreshToken) implements AuthInfo {
+public final class AuthInfo {
+	private AuthInfo() {
+	}
+
+	public record TokenPair(String accessToken, String refreshToken) {
 	}
 
 }

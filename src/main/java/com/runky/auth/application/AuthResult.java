@@ -1,14 +1,17 @@
 package com.runky.auth.application;
 
-public sealed interface AuthResult {
-	enum AuthStatus {NEW_USER, EXISTING_USER}
-
-	record SigninComplete(String accessToken, String refreshToken) implements AuthResult {
+public final class AuthResult {
+	private AuthResult() {
 	}
 
-	record OAuthLogin(boolean isNewUser, String signupToken, String accessToken, String refreshToken,
-					  AuthStatus authStatus
-	) implements AuthResult {
+	public enum AuthStatus {NEW_USER, EXISTING_USER}
+
+	public record SigninComplete(String accessToken, String refreshToken) {
+	}
+
+	public record OAuthLogin(boolean isNewUser, String signupToken, String accessToken, String refreshToken,
+							 AuthStatus authStatus
+	) {
 		public static OAuthLogin newUser(String signupToken) {
 			return new OAuthLogin(true, signupToken, null, null, AuthStatus.NEW_USER);
 		}
@@ -18,7 +21,7 @@ public sealed interface AuthResult {
 		}
 	}
 
-	record rotatedToken(String accessToken, String refreshToken) {
+	public record rotatedToken(String accessToken, String refreshToken) {
 	}
 
 }

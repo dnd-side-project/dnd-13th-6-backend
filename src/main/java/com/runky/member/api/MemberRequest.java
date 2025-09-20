@@ -1,17 +1,17 @@
 package com.runky.member.api;
 
-public class MemberRequest {
+public final class MemberRequest {
 
-    public record Nickname(
-            String nickname
-    ) {
-    }
+	private MemberRequest() {
+	}
 
-    public record Badge(
-            Long badgeId
-    ) {
-    }
+	public record Nickname(
+		String nickname
+	) {
+	}
 
-    private MemberRequest() {
-    }
+	public record Badge(
+		Long badgeId
+	) {
+	}
 }

@@ -27,8 +27,8 @@ public class PushService {
 	private final TemplateCatalog templateCatalog;
 
 	@Transactional
-	public SenTPush.Summary pushToOne(PushCommand.Notify.ToOne command) {
-		String token = deviceTokenService.getActiveToken(new PushCommand.Get(command.receiverId())).token();
+	public PushSummary pushToOne(PushCommand.NotifyToOne command) {
+		String token = deviceTokenService.getActiveToken(new PushCommand.GetDeviceToken(command.receiverId())).token();
 
 		NotificationMessage notificationMessage = command.args();
 		NotificationTemplate template = templateCatalog.resolve(notificationMessage.type());
@@ -42,12 +42,13 @@ public class PushService {
 				command.senderId(), command.receiverId(), template, notificationMessage.variables()
 			)
 		);
-		return new SenTPush.Summary(send.success(), send.failure(), send.invalidTokens());
+		return new PushSummary(send.success(), send.failure(), send.invalidTokens());
 	}
 
 	@Transactional
-	public SenTPush.Summary pushToMany(PushCommand.Notify.ToMany command) {
-		List<String> tokens = deviceTokenService.getActiveTokens(new PushCommand.Gets(command.receiverIds())).tokens();
+	public PushSummary pushToMany(PushCommand.NotifyToMany command) {
+		List<String> tokens = deviceTokenService.getActiveTokens(
+			new PushCommand.GetAllDeviceToken(command.receiverIds())).tokens();
 
 		NotificationMessage notificationMessage = command.args();
 		NotificationTemplate template = templateCatalog.resolve(notificationMessage.type());
@@ -61,21 +62,21 @@ public class PushService {
 				command.senderId(), command.receiverIds(), template, notificationMessage.variables()
 			)
 		);
-		return new SenTPush.Summary(send.success(), send.failure(), send.invalidTokens());
+		return new PushSummary(send.success(), send.failure(), send.invalidTokens());
 	}
 
 	@Transactional
-	public void registerDeviceToken(PushCommand.DeviceToken.Register command) {
-		deviceTokenService.register(new PushCommand.DeviceToken.Register(command.memberId(), command.token(),
+	public void registerDeviceToken(PushCommand.RegisterDeviceToken command) {
+		deviceTokenService.register(new PushCommand.RegisterDeviceToken(command.memberId(), command.token(),
 			command.deviceType()));
 	}
 
 	@Transactional
-	public DeviceTokenInfo.DeletionResult deleteDeviceToken(PushCommand.DeviceToken.Delete command) {
-		DeviceTokenInfo.DeletionResult info = deviceTokenService.delete(
-			new PushCommand.DeviceToken.Delete(command.memberId(), command.token()));
+	public DeletionDTResult deleteDeviceToken(PushCommand.DeleteDeviceToken command) {
+		DeletionDTResult info = deviceTokenService.delete(
+			new PushCommand.DeleteDeviceToken(command.memberId(), command.token()));
 
-		return new DeviceTokenInfo.DeletionResult(info.count());
+		return new DeletionDTResult(info.count());
 	}
 
 }

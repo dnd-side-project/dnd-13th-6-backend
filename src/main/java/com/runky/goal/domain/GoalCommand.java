@@ -4,44 +4,46 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
-public class GoalCommand {
+public final class GoalCommand {
+	private GoalCommand() {
+	}
 
-    public record Snapshot(LocalDate date) {
-    }
+	public record Snapshot(LocalDate date) {
+	}
 
-    public record CrewSnapshot(
-            Long crewId,
-            Set<Long> memberIds,
-            LocalDate localDate
-    ) {
-    }
+	public record CrewSnapshot(
+		Long crewId,
+		Set<Long> memberIds,
+		LocalDate localDate
+	) {
+	}
 
-    public record GetMemberSnapshot(
-            Long memberId,
-            LocalDate localDate
-    ) {
-    }
+	public record GetMemberSnapshot(
+		Long memberId,
+		LocalDate localDate
+	) {
+	}
 
-    public record GetCrewSnapshot(
-            Long crewId,
-            LocalDate localDate
-    ) {
-    }
+	public record GetCrewSnapshot(
+		Long crewId,
+		LocalDate localDate
+	) {
+	}
 
-    public record Update(
-            Long memberId,
-            BigDecimal goal
-    ) {
-    }
+	public record Update(
+		Long memberId,
+		BigDecimal goal
+	) {
+	}
 
-    public record CrewSnapshots(
-            Set<Long> crewIds,
-            LocalDate localDate
-    ) {
-    }
+	public record CrewSnapshots(
+		Set<Long> crewIds,
+		LocalDate localDate
+	) {
+	}
 
-    public record Init(
-            Long memberId
-    ) {
-    }
+	public record Init(
+		Long memberId
+	) {
+	}
 }

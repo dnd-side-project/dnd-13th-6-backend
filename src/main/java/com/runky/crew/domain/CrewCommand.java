@@ -1,81 +1,81 @@
 package com.runky.crew.domain;
 
-public class CrewCommand {
-    public record Create(
-            Long userId,
-            String name
-    ) {
-    }
+public final class CrewCommand {
+	private CrewCommand() {
+	}
 
-    public record Join(
-            Long userId,
-            String code
-    ) {
-    }
+	public record Create(
+		Long userId,
+		String name
+	) {
+	}
 
-    public record Detail(
-            Long crewId,
-            Long userId
-    ) {
-    }
+	public record Join(
+		Long userId,
+		String code
+	) {
+	}
 
-    public record Leave(
-            Long crewId,
-            Long userId,
-            Long newLeaderId
-    ) {
-    }
+	public record Detail(
+		Long crewId,
+		Long userId
+	) {
+	}
 
-    public record Members(
-            Long crewId,
-            Long userId
-    ) {
-    }
+	public record Leave(
+		Long crewId,
+		Long userId,
+		Long newLeaderId
+	) {
+	}
 
-    public record UpdateNotice(
-            Long crewId,
-            Long userId,
-            String notice
-    ) {
-    }
+	public record Members(
+		Long crewId,
+		Long userId
+	) {
+	}
 
-    public record UpdateName(
-            Long crewId,
-            Long userId,
-            String name
-    ) {
-    }
+	public record UpdateNotice(
+		Long crewId,
+		Long userId,
+		String notice
+	) {
+	}
 
-    public record Disband(
-            Long crewId,
-            Long userId
-    ) {
-    }
+	public record UpdateName(
+		Long crewId,
+		Long userId,
+		String name
+	) {
+	}
 
-    public record Delegate(
-            Long crewId,
-            Long userId,
-            Long newLeaderId
-    ) {
-    }
+	public record Disband(
+		Long crewId,
+		Long userId
+	) {
+	}
 
-    public record Ban(
-            Long crewId,
-            Long userId,
-            Long banMemberId
-    ) {
-    }
+	public record Delegate(
+		Long crewId,
+		Long userId,
+		Long newLeaderId
+	) {
+	}
 
-    public record Related(
-            Long userId
-    ) {
-    }
+	public record Ban(
+		Long crewId,
+		Long userId,
+		Long banMemberId
+	) {
+	}
 
-    public record Init(
-            Long memberId
-    ) {
-    }
+	public record Related(
+		Long userId
+	) {
+	}
 
-    private CrewCommand() {
-    }
+	public record Init(
+		Long memberId
+	) {
+	}
 }

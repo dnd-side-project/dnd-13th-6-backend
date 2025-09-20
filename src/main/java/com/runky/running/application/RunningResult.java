@@ -5,9 +5,11 @@ import java.time.LocalDateTime;
 
 import com.runky.running.domain.RunningInfo;
 
-public sealed interface RunningResult {
+public final class RunningResult {
+	private RunningResult() {
+	}
 
-	record Start(Long runningId, Long runnerId, String status, LocalDateTime startedAt) implements RunningResult {
+	public record Start(Long runningId, Long runnerId, String status, LocalDateTime startedAt) {
 		public static Start from(RunningInfo.Start info) {
 			return new Start(
 				info.runningId(),
@@ -18,8 +20,8 @@ public sealed interface RunningResult {
 		}
 	}
 
-	record End(Long runningId, Long runnerId, String status, LocalDateTime startedAt, LocalDateTime endedAt
-	) implements RunningResult {
+	public record End(Long runningId, Long runnerId, String status, LocalDateTime startedAt, LocalDateTime endedAt
+	) {
 
 		public static End from(RunningInfo.End info) {
 			return new End(
@@ -32,27 +34,25 @@ public sealed interface RunningResult {
 		}
 	}
 
-	record TodaySummary(Double totalDistanceMeters, Long durationSeconds, Double avgSpeedMps) {
+	public record TodaySummary(Double totalDistanceMeters, Long durationSeconds, Double avgSpeedMps) {
 		public static TodaySummary from(RunningInfo.TodaySummary info) {
 			return new TodaySummary(info.totalDistanceMeters(), info.durationSeconds(), info.avgSpeedMps());
 		}
 
 	}
 
-	record MyWeeklyTotalDistance(
+	public record MyWeeklyTotalDistance(
 		Long runnerId,
 		double totalDistanceMeter,
-		double totalDistanceKm,
 		LocalDate weekStart,
 		LocalDate weekEnd
 	) {
 		public static MyWeeklyTotalDistance from(RunningInfo.MyWeek info) {
-			double km = Math.round((info.totalMeters() / 1000.0) * 10.0) / 10.0; // 소수 1자리 반올림
-			return new MyWeeklyTotalDistance(info.runnerId(), info.totalMeters(), km, info.weekStart(), info.weekEnd());
+			return new MyWeeklyTotalDistance(info.runnerId(), info.totalMeters(), info.weekStart(), info.weekEnd());
 		}
 	}
 
-	record RunResult(
+	public record RunResult(
 		Long runningId, Long runnerId,
 		Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMps,
 		LocalDateTime startedAt, LocalDateTime endedAt,

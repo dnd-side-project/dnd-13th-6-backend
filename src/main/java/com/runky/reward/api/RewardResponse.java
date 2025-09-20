@@ -2,7 +2,7 @@ package com.runky.reward.api;
 
 import java.util.List;
 
-public class RewardResponse {
+public final class RewardResponse {
 
 	private RewardResponse() {
 	}

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Tag(name = "Member API", description = "Runky Member API입니다.")
 public interface MemberApiSpec {
@@ -44,5 +45,14 @@ public interface MemberApiSpec {
 	ApiResponse<MemberResponse.Badge> getMemberBadge(
 		@Parameter(hidden = true) MemberPrincipal requester,
 		Long targetId
+	);
+
+	@Operation(
+		summary = "회원 탈퇴",
+		description = "유저의 리프레쉬토큰,유저의 회원정보를 영구 삭제합니다."
+	)
+	ApiResponse<Void> deleteAccount(
+		@Parameter(hidden = true) MemberPrincipal requester,
+		HttpServletResponse response
 	);
 }

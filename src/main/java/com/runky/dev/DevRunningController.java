@@ -13,9 +13,10 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/dev/api/running")
 @RequiredArgsConstructor
-public class DevRunningController {
+public class DevRunningController implements DevRunningApiSpec {
 	private final RunningJpaRepository repository;
 
+	@Override
 	@DeleteMapping("/{runningId}/active")
 	public ApiResponse<Void> removeActiveRunning(@PathVariable Long runningId) {
 		repository.deleteById(runningId);

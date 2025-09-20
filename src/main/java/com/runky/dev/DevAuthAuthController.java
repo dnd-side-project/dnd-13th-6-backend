@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/dev/api/auth")
 @RequiredArgsConstructor
-public class DevAuthController {
+public class DevAuthAuthController implements DevAuthApiSpec {
 	private final DevAuthFacade authFacade;
 	private final DevAuthResponseHelper responseHelper;
 

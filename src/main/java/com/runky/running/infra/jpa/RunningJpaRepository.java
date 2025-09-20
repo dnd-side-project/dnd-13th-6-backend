@@ -65,4 +65,6 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 	Optional<Running> findByRunnerIdAndStatusAndEndedAtIsNull(Long memberId, Running.Status status);
 
 	int deleteByIdAndRunnerIdAndStatus(Long runningId, Long runnerId, Running.Status status);
+
+	void deleteById(Long id);
 }

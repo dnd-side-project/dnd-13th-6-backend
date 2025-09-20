@@ -55,5 +55,14 @@ public interface RunningApiSpec {
 		)
 		Long runningId
 	);
+
+	@Operation(
+		summary = "런닝 결과 단건 조회",
+		description = "특정 런닝 ID에 대한 최종 기록(일반적으로 종료된 세션 기준)을 조회합니다."
+	)
+	ApiResponse<RunningResponse.RemovedRunning> removeActiveRunning(
+		@Parameter(hidden = true) MemberPrincipal requester,
+		@Schema(description = "삭제할 런닝 ID") Long runningId
+	);
 }
 

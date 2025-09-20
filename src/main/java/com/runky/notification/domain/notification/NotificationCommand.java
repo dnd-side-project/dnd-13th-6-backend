@@ -3,20 +3,20 @@ package com.runky.notification.domain.notification;
 import java.util.List;
 import java.util.Map;
 
-public sealed interface NotificationCommand {
+public final class NotificationCommand {
+	private NotificationCommand() {
+	}
 
-	record RecordByTemplate(Long senderId, Long receiverId,
-							NotificationTemplate template, Map<NotificationTemplate.VarKey, String> variables)
-		implements NotificationCommand {
+	public record RecordByTemplate(Long senderId, Long receiverId,
+								   NotificationTemplate template, Map<NotificationTemplate.VarKey, String> variables) {
 
 	}
 
-	record RecordsByTemplate(Long senderId, List<Long> receiverIds,
-							 NotificationTemplate template, Map<NotificationTemplate.VarKey, String> variables)
-		implements NotificationCommand {
+	public record RecordsByTemplate(Long senderId, List<Long> receiverIds,
+									NotificationTemplate template, Map<NotificationTemplate.VarKey, String> variables) {
 	}
 
-	record GetRecentTopN(Long receiverId, int limit) implements NotificationCommand {
+	public record GetRecentTopN(Long receiverId, int limit) {
 	}
 
 }

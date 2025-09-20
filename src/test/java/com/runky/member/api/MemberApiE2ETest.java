@@ -55,7 +55,7 @@ class MemberApiE2ETest {
 
 	@Nested
 	@DisplayName("GET /api/members/me")
-	class Get {
+	class GetDeviceToken {
 
 		private final String BASE_URL = "/api/members/me";
 
@@ -137,7 +137,7 @@ class MemberApiE2ETest {
 
 	@Nested
 	@DisplayName("GET /api/members/{memberId}/badge")
-	class GetMemberBadge {
+	class GetDeviceTokenMemberBadge {
 		@Test
 		@DisplayName("특정 유저의 뱃지를 조회한다.")
 		void getMemberBadge() {

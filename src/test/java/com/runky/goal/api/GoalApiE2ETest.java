@@ -78,7 +78,7 @@ public class GoalApiE2ETest {
 
 	@Nested
 	@DisplayName("GET /api/goals/me")
-	class Get {
+	class GetDeviceToken {
 		private final String BASE_URL = "/api/goals/me";
 
 		@Test
@@ -99,7 +99,7 @@ public class GoalApiE2ETest {
 
 	@Nested
 	@DisplayName("GET /api/goals/crews/{crewId}")
-	class GetCrewGoal {
+	class GetDeviceTokenCrewGoal {
 		private final String BASE_URL = "/api/goals/crews/{crewId}";
 
 		@Test
@@ -123,7 +123,7 @@ public class GoalApiE2ETest {
 
 	@Nested
 	@DisplayName("GET /api/goals/me/last/achieve")
-	class GetAchieve {
+	class GetDeviceTokenAchieve {
 		private final String BASE_URL = "/api/goals/me/last/achieve";
 
 		@Test
@@ -145,7 +145,7 @@ public class GoalApiE2ETest {
 
 	@Nested
 	@DisplayName("GET /api/goals/crews/{crewId}/last/achieve")
-	class GetCrewAchieve {
+	class GetDeviceTokenCrewAchieve {
 		private final String BASE_URL = "/api/goals/crews/{crewId}/last/achieve";
 
 		@Test
@@ -169,7 +169,7 @@ public class GoalApiE2ETest {
 
 	@Nested
 	@DisplayName("GET /api/goals/me/last/clovers")
-	class GetMemberGoalClovers {
+	class GetDeviceTokenMemberGoalClovers {
 		private final String BASE_URL = "/api/goals/me/last/clovers";
 
 		@Test
@@ -192,7 +192,7 @@ public class GoalApiE2ETest {
 
 	@Nested
 	@DisplayName("GET /api/goals/crews/last/clovers")
-	class GetCrewGoalClovers {
+	class GetDeviceTokenCrewGoalClovers {
 		private final String BASE_URL = "/api/goals/crews/last/clovers";
 
 		@Test

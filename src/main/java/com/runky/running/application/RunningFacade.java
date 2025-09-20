@@ -40,7 +40,7 @@ public class RunningFacade {
 		var memberFindCmd = new MemberCommand.Find(criteria.runnerId());
 		String runnerNickname = memberService.getMember(memberFindCmd).getNickname().value();
 
-		var pushToManyCmd = new PushCommand.Notify.ToMany(
+		var pushToManyCmd = new PushCommand.NotifyToMany(
 			criteria.runnerId(), receiverIds,
 			new NotificationMessage.RunStarted(new Nickname(runnerNickname)),
 			null

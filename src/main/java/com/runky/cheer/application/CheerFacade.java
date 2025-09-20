@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.runky.cheer.domain.CheerCommand;
 import com.runky.cheer.domain.CheerInfo;
 import com.runky.cheer.domain.CheerService;
-import com.runky.crew.domain.CrewService;
 import com.runky.global.error.GlobalException;
 import com.runky.member.infrastructure.persistence.JpaMemberRepository;
 import com.runky.notification.domain.aggregate.PushCommand;
@@ -23,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class CheerFacade {
 
 	private final RunningService runningService;
-	private final CrewService crewService;
 	private final PushService pushService;
 	private final CheerService cheerService;
 	private final JpaMemberRepository memberRepository;
@@ -48,7 +46,7 @@ public class CheerFacade {
 			new CheerCommand.Create(criteria.runningId(), criteria.senderId(), criteria.receiverId(),
 				criteria.message()));
 
-		pushService.pushToOne(new PushCommand.Notify.ToOne(
+		pushService.pushToOne(new PushCommand.NotifyToOne(
 			criteria.senderId(), criteria.receiverId(), new NotificationMessage.Cheer(new Nickname(nickname)), null
 		));
 

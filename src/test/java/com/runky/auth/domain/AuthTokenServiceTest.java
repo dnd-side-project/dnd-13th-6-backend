@@ -43,10 +43,15 @@ class AuthTokenServiceTest {
 	void issue_success() {
 		// given
 		Long memberId = 1L;
+		Long memberId2 = 2L;
+
 		String role = "USER";
 
 		// when
 		AuthInfo.TokenPair pair = service.issue(memberId, role);
+		System.out.println(pair.accessToken());
+		AuthInfo.TokenPair pair2 = service.issue(memberId2, role);
+		System.out.println(pair2.accessToken());
 
 		// then
 		assertThat(pair.accessToken()).isNotBlank();

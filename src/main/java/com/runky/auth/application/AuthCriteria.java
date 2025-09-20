@@ -1,7 +1,7 @@
 package com.runky.auth.application;
 
-public sealed interface AuthCriteria {
+public final class AuthCriteria {
 
-	record AdditionalSignUpData(String nickname) implements AuthCriteria {
+	public record AdditionalSignUpData(String nickname) {
 	}
 }

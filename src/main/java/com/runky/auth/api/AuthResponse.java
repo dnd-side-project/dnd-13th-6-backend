@@ -1,20 +1,17 @@
 package com.runky.auth.api;
 
-public sealed interface AuthResponse {
+public final class AuthResponse {
 
-	/**
-	 * 신규 가입 유저 응답
-	 */
-	record NewUser(String nextAction) implements AuthResponse {
+	private AuthResponse() {
+	}
+
+	public record NewUser(String nextAction) {
 		public NewUser() {
 			this("COMPLETE_SIGNUP");
 		}
 	}
 
-	/**
-	 * 기존 가입 유저 응답
-	 */
-	record ExistingUser(String nextAction) implements AuthResponse {
+	public record ExistingUser(String nextAction) {
 		public ExistingUser() {
 			this("LOGIN_DONE");
 		}

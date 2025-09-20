@@ -91,17 +91,15 @@ public class AuthResponseHelper {
 	/**
 	 * 본문 + 쿠키 + 리다이렉션을 포함한 ResponseEntity 생성
 	 */
-	public <T> ResponseEntity<ApiResponse<T>> successWithCookiesAndRedirect(
-		ApiResponse<T> body,
+	public ResponseEntity<ApiResponse<?>> successWithCookiesAndRedirect(
+		ApiResponse<?> body,
 		List<ResponseCookie> cookies,
 		String location
 	) {
 		HttpHeaders headers = new HttpHeaders();
 		dedupByName(cookies).forEach(cookie -> headers.add(HttpHeaders.SET_COOKIE, cookie.toString()));
-		headers.setLocation(URI.create(location)); // 리다이렉션 URI 설정
+		headers.setLocation(URI.create(location));
 
-		// 303 See Other는 POST 요청 후 GET으로 리다이렉트할 때 주로 사용됩니다.
-		// OAuth 콜백은 GET이므로 302 Found도 괜찮습니다.
 		return ResponseEntity.status(HttpStatus.SEE_OTHER)
 			.headers(headers)
 			.body(body);

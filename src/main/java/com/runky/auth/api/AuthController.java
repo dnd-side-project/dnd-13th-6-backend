@@ -64,7 +64,7 @@ public class AuthController implements AuthApiSpec {
 	//		};
 	//	}
 	@GetMapping("/login/oauth2/code/kakao")
-	public ResponseEntity<ApiResponse<AuthResponse>> kakaoCallback(
+	public ResponseEntity<ApiResponse<?>> kakaoCallback(
 		@RequestParam("code") String code
 	) {
 		AuthResult.OAuthLogin result = authFacade.handleOAuthLogin(code);

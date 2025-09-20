@@ -11,6 +11,13 @@ public final class RunningResponse {
 	private RunningResponse() {
 	}
 
+	public record RemovedRunning(int count) {
+
+		public static RemovedRunning from(RunningResult.RemovedRunning result) {
+			return new RemovedRunning(result.count());
+		}
+	}
+
 	public record Start(Long runningId, Long runnerId, String status, String pub, String sub,
 						LocalDateTime startedAt) {
 		public static Start from(String pub, String sub, RunningResult.Start result) {

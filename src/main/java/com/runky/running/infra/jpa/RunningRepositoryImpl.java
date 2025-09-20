@@ -38,7 +38,7 @@ public class RunningRepositoryImpl implements RunningRepository {
 	}
 
 	@Override
-	public List<RunningInfo.RunningResult> findTotalDistancesPeriod(LocalDateTime from, LocalDateTime to) {
+	public List<RunningInfo.RunningResult> findTotalDistancesPeriod(final LocalDateTime from, final LocalDateTime to) {
 		return jpaRepository.findRunnerDistanceResultsByPeriod(from, to);
 	}
 
@@ -77,8 +77,14 @@ public class RunningRepositoryImpl implements RunningRepository {
 	}
 
 	@Override
-	public List<Running> findBetweenFromAndToByRunnerId(Long runnerId, LocalDateTime from, LocalDateTime to) {
+	public List<Running> findBetweenFromAndToByRunnerId(final Long runnerId, final LocalDateTime from,
+		final LocalDateTime to) {
 		return jpaRepository.findBetweenFromAndToByRunnerId(runnerId, from, to);
+	}
+
+	@Override
+	public int deleteByIdAndRunnerIdAndStatus(final Long runningId, final Long runnerId, final Running.Status status) {
+		return jpaRepository.deleteByIdAndRunnerIdAndStatus(runningId, runnerId, status);
 	}
 
 }

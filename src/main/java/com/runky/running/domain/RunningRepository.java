@@ -31,4 +31,5 @@ public interface RunningRepository {
 
 	List<Running> findBetweenFromAndToByRunnerId(Long runnerId, LocalDateTime from, LocalDateTime to);
 
+	int deleteByIdAndRunnerIdAndStatus(Long runningId, Long runnerId, Running.Status status);
 }

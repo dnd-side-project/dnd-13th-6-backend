@@ -1,7 +1,9 @@
 package com.runky.auth.api;
 
-public sealed interface AuthRequest {
+public final class AuthRequest {
+	private AuthRequest() {
+	}
 
-	record Signup(String nickname) implements AuthRequest {
+	public record Signup(String nickname) {
 	}
 }

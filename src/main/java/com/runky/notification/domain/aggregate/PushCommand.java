@@ -5,43 +5,30 @@ import java.util.Map;
 
 import com.runky.notification.domain.notification.NotificationMessage;
 
-public sealed interface PushCommand {
-
-	sealed interface Notify extends PushCommand {
-		record ToOne(
-			Long senderId,
-			Long receiverId,
-			NotificationMessage args,
-			Map<String, String> data
-		) implements Notify {
-		}
-
-		record ToMany(
-			Long senderId,
-			List<Long> receiverIds,
-			NotificationMessage args,
-			Map<String, String> data
-		) implements Notify {
-		}
+public final class PushCommand {
+	private PushCommand() {
 	}
 
-	sealed interface DeviceToken extends PushCommand {
-		record Register(Long memberId, String token, String deviceType) implements DeviceToken {
-		}
-
-		record Delete(Long memberId, String token) implements DeviceToken {
-		}
-
+	public record RegisterDeviceToken(Long memberId, String token, String deviceType) {
 	}
 
-	// Query //
-	record Get(Long memberId) implements DeviceToken {
+	public record DeleteDeviceToken(Long memberId, String token) {
 	}
 
-	record Gets(List<Long> memberIds) implements DeviceToken {
+	public record GetDeviceToken(Long memberId) {
 	}
 
-	record CheckExistence(Long memberId) implements DeviceToken {
+	public record GetAllDeviceToken(List<Long> memberIds) {
+	}
+
+	public record CheckDTExistence(Long memberId) {
+	}
+
+	public record NotifyToOne(Long senderId, Long receiverId, NotificationMessage args, Map<String, String> data) {
+	}
+
+	public record NotifyToMany(Long senderId, List<Long> receiverIds, NotificationMessage args,
+							   Map<String, String> data) {
 	}
 
 }

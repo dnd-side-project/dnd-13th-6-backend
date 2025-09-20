@@ -40,10 +40,10 @@ class NotificationServiceTest {
 		Long receiverId = 2L;
 		Long senderId = 10L;
 
-		pushService.registerDeviceToken(new PushCommand.DeviceToken.Register(receiverId, "token-xyz", "IOS"));
+		pushService.registerDeviceToken(new PushCommand.RegisterDeviceToken((receiverId), "token-xyz", "IOS"));
 
 		for (int i = 1; i <= 20; i++) {
-			var cmd = new PushCommand.Notify.ToOne(
+			var cmd = new PushCommand.NotifyToOne(
 				senderId,
 				receiverId,
 				new NotificationMessage.Cheer(new Nickname("닉네임" + i)),

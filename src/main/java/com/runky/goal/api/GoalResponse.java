@@ -2,23 +2,23 @@ package com.runky.goal.api;
 
 import java.math.BigDecimal;
 
-public class GoalResponse {
+public final class GoalResponse {
 
-    public record Goal(
-            BigDecimal goal
-    ) {
-    }
+	private GoalResponse() {
+	}
 
-    public record Achieve(
-            boolean achieved
-    ) {
-    }
+	public record Goal(
+		BigDecimal goal
+	) {
+	}
 
-    public record Clover(
-            Long count
-    ) {
-    }
+	public record Achieve(
+		boolean achieved
+	) {
+	}
 
-    private GoalResponse() {
-    }
+	public record Clover(
+		Long count
+	) {
+	}
 }

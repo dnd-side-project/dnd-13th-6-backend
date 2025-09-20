@@ -1,6 +1,6 @@
 package com.runky.member.api;
 
-public class MemberResponse {
+public final class MemberResponse {
 
 	private MemberResponse() {
 	}

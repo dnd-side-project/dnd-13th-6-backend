@@ -1,6 +1,10 @@
 package com.runky.member.api;
 
+import java.util.List;
+
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,20 +12,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.runky.auth.api.AuthResponseHelper;
+import com.runky.auth.api.TokenCookieProvider;
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
 import com.runky.member.application.MemberCriteria;
 import com.runky.member.application.MemberFacade;
 import com.runky.member.application.MemberResult;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("api/members")
+@RequestMapping("/api/members")
 @RequiredArgsConstructor
 public class MemberController implements MemberApiSpec {
 
 	private final MemberFacade memberFacade;
+	private final TokenCookieProvider cookieProvider;
+	private final AuthResponseHelper responseHelper;
 
 	@Override
 	@GetMapping("/me")
@@ -60,5 +69,19 @@ public class MemberController implements MemberApiSpec {
 		@PathVariable(value = "memberId") Long targetId) {
 		MemberResult.WithBadge result = memberFacade.getMember(new MemberCriteria.Get(targetId));
 		return ApiResponse.success(new MemberResponse.Badge(result.id(), result.badgeId(), result.badgeImageUrl()));
+	}
+
+	@DeleteMapping("/me")
+	public ApiResponse<Void> deleteAccount(
+		@AuthenticationPrincipal MemberPrincipal requester,
+		HttpServletResponse response
+	) {
+		memberFacade.deleteAccount(requester.memberId());
+
+		ResponseCookie clearAT = cookieProvider.delete("accessToken");
+		ResponseCookie clearRT = cookieProvider.delete("refreshToken");
+		ResponseCookie clearST = cookieProvider.delete("signupToken");
+
+		return responseHelper.successWithCookies(List.of(clearAT, clearRT, clearST), response);
 	}
 }

@@ -2,27 +2,23 @@ package com.runky.notification.domain.aggregate;
 
 import java.util.List;
 
-public sealed interface PushInfo {
-
-	sealed interface SenTPush extends PushInfo {
-		record Summary(int success, int failure, List<String> invalidTokens) implements SenTPush {
-		}
-
+public final class PushInfo {
+	private PushInfo() {
 	}
 
-	sealed interface DeviceTokenInfo extends PushInfo {
+	public record DeletionDTResult(int count) {
+	}
 
-		record DeletionResult(int count) implements DeviceTokenInfo {
-		}
+	public record ActiveDeviceToken(String token) {
+	}
 
-		record ActiveToken(String token) implements DeviceTokenInfo {
-		}
+	public record ActiveDeviceTokens(List<String> tokens) {
+	}
 
-		record ActiveTokens(List<String> tokens) implements DeviceTokenInfo {
-		}
+	public record DeviceExistenceCheck(boolean exists) {
+	}
 
-		record ExistenceCheck(boolean exists) implements DeviceTokenInfo {
-		}
+	public record PushSummary(int success, int failure, List<String> invalidTokens) {
 	}
 
 }

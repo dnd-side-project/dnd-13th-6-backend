@@ -30,4 +30,9 @@ public final class MemberCommand {
 		Set<Long> memberIds
 	) {
 	}
+
+	public record DeleteMember(
+		Long memberId
+	) {
+	}
 }

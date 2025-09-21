@@ -1,4 +1,4 @@
-package com.runky.dev;
+package com.runky.developer;
 
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Dev Running API", description = "관리자 Running API 입니다.")
+@Tag(name = "Common Running API", description = "프론트(dev,local.. etc) API 입니다.")
 public interface DevRunningApiSpec {
 
 	@Operation(

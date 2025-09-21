@@ -6,6 +6,6 @@ public interface OAuthClient {
 	String fetchAccessToken(String authorizationCode);
 
 	OAuthUserInfo fetchUserInfo(String accessToken);
-
-	String devFetchAccessToken(String authorizationCode);
+	
+	String fetchAccessTokenForBranch(String authorizationCode, String branch);
 }

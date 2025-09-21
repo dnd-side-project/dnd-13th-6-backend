@@ -60,7 +60,7 @@ public class KakaoOAuthClient implements OAuthClient {
 	private String buildRedirectUri(String branch) {
 
 		return switch (branch) {
-			case "local" -> "https://localhost:8080/dev/api/auth/login/oauth2/code/kakao/local";
+			case "local" -> "https://localhost:3000/dev/api/auth/login/oauth2/code/kakao/local";
 			case "dev" -> "https://api.runky.store/dev/api/auth/login/oauth2/code/kakao/dev";
 			default -> props.redirectUrl();
 		};

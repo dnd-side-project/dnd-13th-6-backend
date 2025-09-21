@@ -51,7 +51,7 @@ public class SecurityConfig {
 				.permitAll()
 				.requestMatchers("/health")
 				.permitAll()
-				.requestMatchers("/dev/api/running/**", "/dev/api/auth")
+				.requestMatchers("/dev/api/running/**", "/dev/api/auth/**")
 				.permitAll()
 				.anyRequest()
 				.authenticated()

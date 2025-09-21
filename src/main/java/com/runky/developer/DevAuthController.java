@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,7 +28,7 @@ public class DevAuthController implements DevAuthApiSpec {
 	@GetMapping("/login/oauth2/code/kakao/{branch}")
 	public ResponseEntity<ApiResponse<DevAuthResponse>> devKakaoCallback(
 		@RequestParam("code") String code,
-		@RequestParam("branch") String branch
+		@PathVariable("branch") String branch
 	) {
 		var result = authFacade.handleOAuthLogin(code);
 		String domain = null;

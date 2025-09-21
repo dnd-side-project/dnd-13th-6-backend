@@ -1,4 +1,4 @@
-package com.runky.dev;// package com.runky.dev;
+package com.runky.developer;// package com.runky.dev;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,11 +13,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Dev Auth API", description = "관리자 Auth API 입니다.")
+@Tag(name = "Dev Auth API", description = "개발자 Dev API 입니다.")
 public interface DevAuthApiSpec {
 
 	@Operation(
-		summary = "카카오 로그인 콜백 (DEV)",
+		summary = "카카오 로그인 콜백",
 		description = """
 			카카오 OAuth2 콜백(code)을 받아 로그인 흐름을 완료합니다.
 			- NEW_USER: signupToken 부여 및 온보딩 페이지로 리다이렉트
@@ -30,15 +30,16 @@ public interface DevAuthApiSpec {
 		)
 	)
 	ResponseEntity<ApiResponse<DevAuthResponse>> devKakaoCallback(
-		@Parameter(description = "카카오 인증 코드", example = "auth_code_from_kakao") String code
+		@Parameter(description = "카카오 인증 코드", example = "auth_code_from_kakao") String code,
+		@Parameter(description = "프론트 브랜치명입니다. 브랜치 환경에 따라 리다이렉트 주소가 다릅니다.", example = "branch = dev,local..etc") String branch
 	);
 
 	@Operation(
-		summary = "회원가입 완료 (DEV)",
+		summary = "회원가입 완료",
 		description = "온보딩 추가정보를 수집하여 가입을 완료하고, AT/RT를 응답 헤더로 반환합니다."
 	)
 	ResponseEntity<ApiResponse<Void>> devCompleteSignup(
-		@Parameter(description = "사전 발급된 가입 토큰", example = "signup-token-xxx")
+		@Parameter(description = "사전 발급된 가입 토큰", example = "X-Signup-Token")
 		@RequestHeader("X-Signup-Token") String signupToken,
 		@io.swagger.v3.oas.annotations.parameters.RequestBody(
 			required = true,
@@ -49,20 +50,20 @@ public interface DevAuthApiSpec {
 	);
 
 	@Operation(
-		summary = "리프레시로 재발급 (DEV)",
+		summary = "리프레시로 재발급",
 		description = "Refresh Token을 이용해 Access/Refresh Token을 재발급하고, 둘 다 응답 헤더로 반환합니다."
 	)
 	ResponseEntity<ApiResponse<Void>> devRefresh(
-		@Parameter(description = "리프레시 토큰", example = "refresh-token-xxx")
+		@Parameter(description = "리프레시 토큰", example = "X-Refresh-Token")
 		@RequestHeader("X-Refresh-Token") String refreshToken
 	);
 
 	@Operation(
-		summary = "로그아웃 (DEV)",
+		summary = "로그아웃",
 		description = "Refresh Token 기반 로그아웃 처리. (DEV: 쿠키 제거 없이 헤더만 사용)"
 	)
 	ResponseEntity<ApiResponse<Void>> devLogout(
-		@Parameter(description = "리프레시 토큰", example = "refresh-token-xxx")
+		@Parameter(description = "리프레시 토큰", example = "X-Refresh-Token")
 		@RequestHeader("X-Refresh-Token") String refreshToken
 	);
 }

@@ -44,15 +44,25 @@ public class KakaoOAuthClient implements OAuthClient {
 		);
 	}
 
-	public String devFetchAccessToken(String authorizationCode) {
+	/** 브랜치별 redirect_uri */
+	@Override
+	public String fetchAccessTokenForBranch(String authorizationCode, String branch) {
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		body.add("grant_type", "authorization_code");
 		body.add("client_id", props.clientId());
-		body.add("redirect_uri", "https://api.runky.store/dev/api/auth/login/oauth2/code/kakao");
+		body.add("redirect_uri", buildRedirectUri(branch));
 		body.add("code", authorizationCode);
 
 		KakaoTokenResponse tokenResponse = kakaoApiHttpClient.getAccessToken(body);
-
 		return tokenResponse.accessToken();
+	}
+
+	private String buildRedirectUri(String branch) {
+
+		return switch (branch) {
+			case "local" -> "http://localhost:8080/dev/api/auth/login/oauth2/code/kakao/local";
+			case "dev" -> "https://api.runky.store/dev/api/auth/login/oauth2/code/kakao/dev";
+			default -> props.redirectUrl();
+		};
 	}
 }

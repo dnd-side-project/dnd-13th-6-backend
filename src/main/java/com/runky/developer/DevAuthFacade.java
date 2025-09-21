@@ -42,19 +42,13 @@ public class DevAuthFacade {
 	private final GoalService goalService;
 	private final CrewService crewService;
 
-	/**
-	 * 1) code → accessToken → providerId 조회
-	 * 2) 기존 회원이면 즉시 토큰 발급
-	 * 3) 신규면 signupToken 발급
-	 * 차후 exist + get -> Optional find로 리팩토링 필요
-	 */
+	// DevAuthFacade
 	@Transactional
-	public AuthResult.OAuthLogin handleOAuthLogin(String authorizationCode) {
-		String accessToken = oAuthClient.devFetchAccessToken(authorizationCode);
+	public AuthResult.OAuthLogin handleOAuthLogin(String authorizationCode, String branch) {
+		String accessToken = oAuthClient.fetchAccessTokenForBranch(authorizationCode, branch);
 		OAuthUserInfo info = oAuthClient.fetchUserInfo(accessToken);
 
 		boolean exists = memberReader.existsByExternalAccount(info.provider(), info.providerId());
-
 		if (!exists) {
 			String signupToken = signupTokenService.issue(info);
 			return AuthResult.OAuthLogin.newUser(signupToken);

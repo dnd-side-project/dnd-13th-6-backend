@@ -30,7 +30,7 @@ public class DevAuthController implements DevAuthApiSpec {
 		@RequestParam("code") String code,
 		@PathVariable("branch") String branch
 	) {
-		var result = authFacade.handleOAuthLogin(code);
+		var result = authFacade.handleOAuthLogin(code, branch);
 		String domain = null;
 		switch (branch) {
 			case "local" -> {

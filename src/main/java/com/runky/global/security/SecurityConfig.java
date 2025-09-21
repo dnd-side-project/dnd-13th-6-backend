@@ -65,7 +65,7 @@ public class SecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOriginPatterns(Arrays.asList(
-			"https://web.runky.store", "http://web.runky.store",
+			"https://*.runky.store", "http://*.runky.store",
 			"https://localhost:3000", "http://localhost:3000"
 		));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

@@ -1,4 +1,4 @@
-package com.runky.dev;
+package com.runky.developer;
 
 import java.util.Map;
 
@@ -20,34 +20,42 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/dev/api/auth")
 @RequiredArgsConstructor
-public class DevAuthAuthController implements DevAuthApiSpec {
+public class DevAuthController implements DevAuthApiSpec {
 	private final DevAuthFacade authFacade;
 	private final DevAuthResponseHelper responseHelper;
 
-	/**
-	 * 카카오 콜백: code 교환 후 분기
-	 * - NEW_USER: signupToken 쿠키 + AuthResponse.NewUser
-	 * - EXISTING_USER: AT/RT 쿠키 + AuthResponse.ExistingUser
-	 */
-	@GetMapping("/login/oauth2/code/kakao")
-	public ResponseEntity<ApiResponse<DevAuthResponse>> devKakaoCallback(@RequestParam("code") String code) {
+	@GetMapping("/login/oauth2/code/kakao/{branch}")
+	public ResponseEntity<ApiResponse<DevAuthResponse>> devKakaoCallback(
+		@RequestParam("code") String code,
+		@RequestParam("branch") String branch
+	) {
 		var result = authFacade.handleOAuthLogin(code);
+		String domain = null;
+		switch (branch) {
+			case "local" -> {
+				domain = "localhost:3000";
+			}
+			case "dev" -> {
+				domain = "test.runky.store";
+			}
+		}
+		String NEW_USER_REDIRECT_URL = "https://" + domain + "/onboarding/terms";
+		String EXISTING_USER_REDIRECT_URL = "https://" + domain + "/main";
 
 		return switch (result.authStatus()) {
 			case NEW_USER -> responseHelper.redirectWithFragment(
 				ApiResponse.success(new DevAuthResponse.NewUser(result.signupToken())),
-				"https://localhost:3000/onboarding/terms",
+				NEW_USER_REDIRECT_URL,
 				Map.of("next", "COMPLETE_SIGNUP", "signupToken", result.signupToken())
 			);
 			case EXISTING_USER -> responseHelper.redirectWithFragment(
 				ApiResponse.success(new DevAuthResponse.ExistingUser(result.accessToken(), result.refreshToken())),
-				"https://localhost:3000/main",
+				EXISTING_USER_REDIRECT_URL,
 				Map.of("accessToken", result.accessToken(), "refreshToken", result.refreshToken())
 			);
 		};
 	}
 
-	/** 회원가입 완료 → AT/RT를 응답 헤더로 반환 */
 	@PostMapping("/signup/complete")
 	public ResponseEntity<ApiResponse<Void>> devCompleteSignup(
 		@RequestHeader("X-Signup-Token") String signupToken,
@@ -63,7 +71,6 @@ public class DevAuthAuthController implements DevAuthApiSpec {
 		);
 	}
 
-	/** RT로 재발급 → AT/RT를 응답 헤더로 반환 */
 	@PostMapping("/token/refresh")
 	public ResponseEntity<ApiResponse<Void>> devRefresh(
 		@RequestHeader("X-Refresh-Token") String refreshToken
@@ -76,7 +83,6 @@ public class DevAuthAuthController implements DevAuthApiSpec {
 		);
 	}
 
-	/** 로그아웃 → 헤더만 사용 (쿠키 제거 없음) */
 	@PostMapping("/logout")
 	public ResponseEntity<ApiResponse<Void>> devLogout(
 		@RequestHeader("X-Refresh-Token") String refreshToken

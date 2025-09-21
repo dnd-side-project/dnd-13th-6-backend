@@ -1,4 +1,4 @@
-package com.runky.dev;
+package com.runky.developer;
 
 import java.net.URI;
 import java.net.URLEncoder;

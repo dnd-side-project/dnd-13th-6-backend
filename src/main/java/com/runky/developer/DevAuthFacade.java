@@ -1,4 +1,4 @@
-package com.runky.dev;
+package com.runky.developer;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

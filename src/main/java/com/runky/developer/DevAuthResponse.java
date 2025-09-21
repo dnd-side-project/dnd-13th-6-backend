@@ -1,4 +1,4 @@
-package com.runky.dev;
+package com.runky.developer;
 
 public sealed interface DevAuthResponse
 	permits DevAuthResponse.NewUser, DevAuthResponse.ExistingUser, DevAuthResponse.Tokens {

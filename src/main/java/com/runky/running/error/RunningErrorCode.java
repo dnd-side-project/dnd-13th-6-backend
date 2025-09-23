@@ -26,6 +26,11 @@ public enum RunningErrorCode implements ErrorCode {
 	/* R3xx: 권한/입력 검증 */
 	FORBIDDEN_RUNNING_ACCESS(HttpStatus.FORBIDDEN, "R301", "해당 런닝에 접근 권한이 없습니다."),
 	INVALID_END_METRICS(HttpStatus.BAD_REQUEST, "R302", "종료 메트릭 값이 올바르지 않습니다."),
+	// 웹소켓
+	INVALID_LOCATION_VALUE(HttpStatus.BAD_REQUEST, "R303", "위치 좌표 또는 입력 값이 올바르지 않습니다."),
+	PAYLOAD_INVALID(HttpStatus.BAD_REQUEST, "R304", "메시지 포맷이 올바르지 않습니다."),
+	UNAUTHORIZED_SESSION(HttpStatus.UNAUTHORIZED, "R305", "세션 인증 정보가 없습니다."),
+	INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "R399", "알 수 없는 오류가 발생했습니다."),
 
 	/* R9xx: 인프라/제약 위반/기타 */
 	UNIQUE_ACTIVE_CONSTRAINT_VIOLATED(HttpStatus.CONFLICT, "R901", "활성 런닝 중복 제약에 위배되었습니다."),

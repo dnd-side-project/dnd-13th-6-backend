@@ -1,4 +1,4 @@
-package com.runky.cheer.api;
+package com.runky.cheer.interfaces;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,5 +33,5 @@ public class CheerController implements CheerApiSpec {
 		);
 		return ApiResponse.success(CheerResponse.Sent.from(result));
 	}
-	
+
 }

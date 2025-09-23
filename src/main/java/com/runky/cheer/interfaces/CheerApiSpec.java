@@ -1,4 +1,4 @@
-package com.runky.cheer.api;
+package com.runky.cheer.interfaces;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;

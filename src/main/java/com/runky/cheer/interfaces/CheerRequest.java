@@ -1,4 +1,4 @@
-package com.runky.cheer.api;
+package com.runky.cheer.interfaces;
 
 public final class CheerRequest {
 	private CheerRequest() {

@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import com.runky.auth.api.AuthRequest;
+import com.runky.auth.interfaces.AuthRequest;
 import com.runky.global.response.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;

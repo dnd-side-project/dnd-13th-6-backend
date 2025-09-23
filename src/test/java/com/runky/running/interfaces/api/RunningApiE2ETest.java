@@ -1,4 +1,4 @@
-package com.runky.running.interfaces;
+package com.runky.running.interfaces.api;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -23,8 +23,6 @@ import com.runky.running.domain.Running;
 import com.runky.running.domain.RunningRepository;
 import com.runky.running.domain.RunningTrack;
 import com.runky.running.domain.RunningTrackRepository;
-import com.runky.running.interfaces.api.RunningRequest;
-import com.runky.running.interfaces.api.RunningResponse;
 import com.runky.utils.DatabaseCleanUp;
 import com.runky.utils.TestTokenIssuer;
 

@@ -1,4 +1,4 @@
-package com.runky.running.api.http;
+package com.runky.running.interfaces.http;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

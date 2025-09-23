@@ -1,4 +1,4 @@
-package com.runky.running.api.http;
+package com.runky.running.interfaces.http;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,20 +24,22 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/runnings")
 @RequiredArgsConstructor
-public class RunningController implements RunningApiSpec {
+public class RunningController implements com.runky.running.interfaces.http.RunningApiSpec {
 	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
 	private final RunningFacade runningFacade;
 
 	@Override
 	@PostMapping("/start")
-	public ApiResponse<RunningResponse.Start> start(@AuthenticationPrincipal MemberPrincipal requester) {
+	public ApiResponse<com.runky.running.interfaces.http.RunningResponse.Start> start(
+		@AuthenticationPrincipal MemberPrincipal requester) {
 		RunningResult.Start result = runningFacade.start(new RunningCriteria.Start(requester.memberId()));
 
 		String publish = WsDestinations.publish(result.runningId());
 		String subscribe = WsDestinations.subscribe(result.runningId());
 
-		RunningResponse.Start response = RunningResponse.Start.from(publish, subscribe, result);
+		RunningResponse.Start response = RunningResponse.Start.from(
+			publish, subscribe, result);
 		return ApiResponse.success(response);
 	}
 
@@ -46,12 +48,13 @@ public class RunningController implements RunningApiSpec {
 	public ApiResponse<RunningResponse.End> end(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable Long runningId,
-		@RequestBody RunningRequest.End request
+		@RequestBody com.runky.running.api.http.RunningRequest.End request
 	) {
 		RunningCriteria.End criteria = request.toCriteria(runningId, requester.memberId());
 		RunningResult.End result = runningFacade.end(criteria);
 
-		RunningResponse.End response = RunningResponse.End.from(result);
+		RunningResponse.End response = RunningResponse.End.from(
+			result);
 		return ApiResponse.success(response);
 	}
 
@@ -74,7 +77,7 @@ public class RunningController implements RunningApiSpec {
 	}
 
 	@GetMapping("/{runningId}")
-	public ApiResponse<RunningResponse.RunResult> getRunResult(
+	public ApiResponse<com.runky.running.interfaces.http.RunningResponse.RunResult> getRunResult(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable("runningId") Long runningId
 	) {

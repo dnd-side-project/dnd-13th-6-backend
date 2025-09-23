@@ -1,4 +1,3 @@
-// src/main/java/com/runky/running/api/RunningLocationWsController.java
 package com.runky.running.api.socket;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -21,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-public class RunningLocationWsController implements RunningLocationWsApiSpec {
+public class RunningLocationWsController implements com.runky.running.api.socket.RunningLocationWsApiSpec {
 
 	private final SimpMessagingTemplate messagingTemplate;
 
@@ -44,12 +43,12 @@ public class RunningLocationWsController implements RunningLocationWsApiSpec {
 		Double x,
 		@NotNull @DecimalMin(value = "-90", inclusive = true) @DecimalMax(value = "90", inclusive = true)
 		Double y,
-		@NotNull @PositiveOrZero
-		long timestamp
+		@PositiveOrZero
+		Long timestamp
 	) {
 	}
 
-	public record RoomEvent(String type, Long runningId, Long runnerId, Double x, Double y, long timestamp) {
+	public record RoomEvent(String type, Long runningId, Long runnerId, Double x, Double y, Long timestamp) {
 	}
 
 }

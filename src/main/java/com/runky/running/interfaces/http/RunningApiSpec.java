@@ -1,4 +1,4 @@
-package com.runky.running.api.http;
+package com.runky.running.interfaces.http;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
@@ -21,7 +21,7 @@ public interface RunningApiSpec {
 	ApiResponse<RunningResponse.End> end(
 		@Parameter(hidden = true) MemberPrincipal requester,
 		@Schema(description = "종료할 런닝 ID") Long runningId,
-		@Schema(description = "런닝 요약 및 트랙 정보") RunningRequest.End request
+		@Schema(description = "런닝 요약 및 트랙 정보") com.runky.running.api.http.RunningRequest.End request
 	);
 
 	@Operation(

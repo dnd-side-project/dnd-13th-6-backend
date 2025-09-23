@@ -1,6 +1,5 @@
-package com.runky.crew.api;
+package com.runky.crew.interfaces;
 
-import com.runky.crew.api.CrewResponse.Related.RunningMember;
 import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.runky.crew.application.CrewCriteria;
 import com.runky.crew.application.CrewFacade;
 import com.runky.crew.application.CrewResult;
+import com.runky.crew.interfaces.CrewResponse.Related.RunningMember;
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
 
@@ -147,17 +147,17 @@ public class CrewController implements CrewApiSpec {
 		return ApiResponse.success(new CrewResponse.Ban(result.targetId(), result.nickname()));
 	}
 
-    @Override
-    @GetMapping("/members/running")
-    public ApiResponse<CrewResponse.Related> getRunningRelatedMembers(
-            @AuthenticationPrincipal MemberPrincipal requester) {
-        List<CrewResult.RelatedRunningMember> results =
-                crewFacade.getRelatedRunningMember(new CrewCriteria.RelatedRunningMember(requester.memberId()));
+	@Override
+	@GetMapping("/members/running")
+	public ApiResponse<CrewResponse.Related> getRunningRelatedMembers(
+		@AuthenticationPrincipal MemberPrincipal requester) {
+		List<CrewResult.RelatedRunningMember> results =
+			crewFacade.getRelatedRunningMember(new CrewCriteria.RelatedRunningMember(requester.memberId()));
 
-        List<RunningMember> runningMembers = results.stream()
-                .map(result -> new CrewResponse.Related.RunningMember(result.nickname(), result.badgeImageUrl()))
-                .toList();
+		List<RunningMember> runningMembers = results.stream()
+			.map(result -> new CrewResponse.Related.RunningMember(result.nickname(), result.badgeImageUrl()))
+			.toList();
 
-        return ApiResponse.success(new CrewResponse.Related(runningMembers));
-    }
+		return ApiResponse.success(new CrewResponse.Related(runningMembers));
+	}
 }

@@ -1,4 +1,4 @@
-package com.runky.crew.api;
+package com.runky.crew.interfaces;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

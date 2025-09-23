@@ -1,4 +1,4 @@
-package com.runky.goal.api;
+package com.runky.goal.interfaces;
 
 import static org.assertj.core.api.Assertions.*;
 

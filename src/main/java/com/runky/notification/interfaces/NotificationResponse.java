@@ -1,4 +1,4 @@
-package com.runky.notification.api;
+package com.runky.notification.interfaces;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

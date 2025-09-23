@@ -1,4 +1,4 @@
-package com.runky.notification.api;
+package com.runky.notification.interfaces;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;

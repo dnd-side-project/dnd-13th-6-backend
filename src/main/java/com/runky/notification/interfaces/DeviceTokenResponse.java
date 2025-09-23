@@ -1,4 +1,4 @@
-package com.runky.notification.api;
+package com.runky.notification.interfaces;
 
 public final class DeviceTokenResponse {
 

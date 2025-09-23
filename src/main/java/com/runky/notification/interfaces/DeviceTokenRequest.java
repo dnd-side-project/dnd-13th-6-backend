@@ -1,4 +1,4 @@
-package com.runky.notification.api;
+package com.runky.notification.interfaces;
 
 import com.runky.notification.application.NotificationCriteria;
 

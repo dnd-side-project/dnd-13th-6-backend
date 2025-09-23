@@ -1,4 +1,4 @@
-package com.runky.notification.api;
+package com.runky.notification.interfaces;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;

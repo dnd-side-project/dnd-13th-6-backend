@@ -1,4 +1,4 @@
-package com.runky.running.api.socket;
+package com.runky.running.interfaces.websocket;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-public class RunningLocationWsController implements com.runky.running.api.socket.RunningLocationWsApiSpec {
+public class RunningLocationWsController implements RunningLocationWsApiSpec {
 
 	private final SimpMessagingTemplate messagingTemplate;
 

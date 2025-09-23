@@ -1,4 +1,4 @@
-package com.runky.running.api.http;
+package com.runky.running.interfaces.api;
 
 import com.runky.running.application.RunningCriteria;
 

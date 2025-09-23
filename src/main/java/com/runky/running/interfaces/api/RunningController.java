@@ -1,4 +1,4 @@
-package com.runky.running.interfaces.http;
+package com.runky.running.interfaces.api;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -14,24 +14,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
-import com.runky.running.api.socket.WsDestinations;
 import com.runky.running.application.RunningCriteria;
 import com.runky.running.application.RunningFacade;
 import com.runky.running.application.RunningResult;
+import com.runky.running.interfaces.websocket.WsDestinations;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/runnings")
 @RequiredArgsConstructor
-public class RunningController implements com.runky.running.interfaces.http.RunningApiSpec {
+public class RunningController implements com.runky.running.interfaces.api.RunningApiSpec {
 	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
 	private final RunningFacade runningFacade;
 
 	@Override
 	@PostMapping("/start")
-	public ApiResponse<com.runky.running.interfaces.http.RunningResponse.Start> start(
+	public ApiResponse<com.runky.running.interfaces.api.RunningResponse.Start> start(
 		@AuthenticationPrincipal MemberPrincipal requester) {
 		RunningResult.Start result = runningFacade.start(new RunningCriteria.Start(requester.memberId()));
 
@@ -48,7 +48,7 @@ public class RunningController implements com.runky.running.interfaces.http.Runn
 	public ApiResponse<RunningResponse.End> end(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable Long runningId,
-		@RequestBody com.runky.running.api.http.RunningRequest.End request
+		@RequestBody com.runky.running.interfaces.api.RunningRequest.End request
 	) {
 		RunningCriteria.End criteria = request.toCriteria(runningId, requester.memberId());
 		RunningResult.End result = runningFacade.end(criteria);
@@ -77,7 +77,7 @@ public class RunningController implements com.runky.running.interfaces.http.Runn
 	}
 
 	@GetMapping("/{runningId}")
-	public ApiResponse<com.runky.running.interfaces.http.RunningResponse.RunResult> getRunResult(
+	public ApiResponse<com.runky.running.interfaces.api.RunningResponse.RunResult> getRunResult(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable("runningId") Long runningId
 	) {

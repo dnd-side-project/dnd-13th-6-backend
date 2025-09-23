@@ -1,4 +1,4 @@
-package com.runky.running.api.socket;
+package com.runky.running.interfaces.websocket;
 
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 
@@ -25,14 +25,14 @@ public interface RunningLocationWsApiSpec {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "메시지가 성공적으로 토픽에 발행됨",
 			content = @Content(mediaType = "application/json",
-				schema = @Schema(implementation = RunningLocationWsController.RoomEvent.class)))
+				schema = @Schema(implementation = com.runky.running.interfaces.websocket.RunningLocationWsController.RoomEvent.class)))
 	})
 	void publish(
 
 		@Parameter(name = "runningId", description = "참여 중인 런닝방 ID",
 			in = ParameterIn.PATH, required = true, example = "1")
 		Long runningId,
-		RunningLocationWsController.LocationMessage payload,
+		com.runky.running.interfaces.websocket.RunningLocationWsController.LocationMessage payload,
 		SimpMessageHeaderAccessor accessor
 	);
 

@@ -1,4 +1,4 @@
-package com.runky.running.api;
+package com.runky.running.interfaces;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -19,12 +19,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.runky.global.response.ApiResponse;
-import com.runky.running.api.http.RunningRequest;
-import com.runky.running.api.http.RunningResponse;
 import com.runky.running.domain.Running;
 import com.runky.running.domain.RunningRepository;
 import com.runky.running.domain.RunningTrack;
 import com.runky.running.domain.RunningTrackRepository;
+import com.runky.running.interfaces.api.RunningRequest;
+import com.runky.running.interfaces.api.RunningResponse;
 import com.runky.utils.DatabaseCleanUp;
 import com.runky.utils.TestTokenIssuer;
 

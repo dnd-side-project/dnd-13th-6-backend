@@ -1,4 +1,4 @@
-package com.runky.running.api.socket;
+package com.runky.running.interfaces.websocket;
 
 public final class WsDestinations {
 	private WsDestinations() {

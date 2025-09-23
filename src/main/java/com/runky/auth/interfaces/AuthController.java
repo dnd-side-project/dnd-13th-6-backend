@@ -1,4 +1,4 @@
-package com.runky.auth.api;
+package com.runky.auth.interfaces;
 
 import java.util.List;
 

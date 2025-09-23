@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.runky.auth.api.AuthResponseHelper;
-import com.runky.auth.api.TokenCookieProvider;
+import com.runky.auth.interfaces.AuthResponseHelper;
+import com.runky.auth.interfaces.TokenCookieProvider;
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
 import com.runky.member.application.MemberCriteria;

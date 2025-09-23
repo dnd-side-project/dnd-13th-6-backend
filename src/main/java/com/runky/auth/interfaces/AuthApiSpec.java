@@ -1,4 +1,4 @@
-package com.runky.auth.api;
+package com.runky.auth.interfaces;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;

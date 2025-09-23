@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.runky.auth.api.AuthRequest;
 import com.runky.auth.application.AuthCriteria;
+import com.runky.auth.interfaces.AuthRequest;
 import com.runky.global.response.ApiResponse;
 
 import lombok.RequiredArgsConstructor;

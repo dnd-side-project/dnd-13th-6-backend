@@ -1,9 +1,9 @@
-package com.runky.reward.api;
+package com.runky.reward.interfaces;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
-import com.runky.reward.api.RewardResponse.Gotcha;
-import com.runky.reward.api.RewardResponse.Images;
+import com.runky.reward.interfaces.RewardResponse.Gotcha;
+import com.runky.reward.interfaces.RewardResponse.Images;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

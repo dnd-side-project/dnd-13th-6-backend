@@ -1,4 +1,4 @@
-package com.runky.reward.api;
+package com.runky.reward.interfaces;
 
 import java.util.List;
 

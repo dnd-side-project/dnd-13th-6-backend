@@ -1,4 +1,4 @@
-package com.runky.reward.api;
+package com.runky.reward.interfaces;
 
 import java.util.List;
 
@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
-import com.runky.reward.api.RewardResponse.Gotcha;
 import com.runky.reward.application.RewardCriteria;
 import com.runky.reward.application.RewardFacade;
 import com.runky.reward.application.RewardResult;
+import com.runky.reward.interfaces.RewardResponse.Gotcha;
 
 import lombok.RequiredArgsConstructor;
 

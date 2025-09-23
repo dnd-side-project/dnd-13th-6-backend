@@ -1,4 +1,4 @@
-package com.runky.member.api;
+package com.runky.member.interfaces;
 
 import static org.assertj.core.api.Assertions.*;
 

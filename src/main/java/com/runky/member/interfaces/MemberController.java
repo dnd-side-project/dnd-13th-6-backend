@@ -1,4 +1,4 @@
-package com.runky.member.api;
+package com.runky.member.interfaces;
 
 import java.util.List;
 

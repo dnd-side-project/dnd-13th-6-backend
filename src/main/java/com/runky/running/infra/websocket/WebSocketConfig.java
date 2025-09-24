@@ -7,6 +7,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import com.runky.running.infra.websocket.exception.StompErrorFrameHandler;
 import com.runky.running.infra.websocket.handshake.CookieAuthHandshakeInterceptor;
 import com.runky.running.infra.websocket.inbound.InboundChannelLogger;
 import com.runky.running.infra.websocket.inbound.JwtChannelInterceptor;
@@ -22,6 +23,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	private final InboundChannelLogger inboundChannelLogger;
 	private final OutboundChannelLogger outboundChannelLogger;
 	private final CookieAuthHandshakeInterceptor cookieAuthHandshakeInterceptor;
+
+	private final StompErrorFrameHandler stompErrorFrameHandler;
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -41,6 +44,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 				"https://localhost:*", "http://localhost:*",
 				"null"
 			);
+		registry.setErrorHandler(stompErrorFrameHandler);
+
 	}
 
 	@Override

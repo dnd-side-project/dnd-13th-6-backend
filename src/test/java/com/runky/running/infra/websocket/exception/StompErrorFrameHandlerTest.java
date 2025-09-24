@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.runky.running.error.RunningErrorCode;
 
-class StompErrorFrameHandlerTest_MinimalJsonNode {
+class StompErrorFrameHandlerTest {
 
 	private final ObjectMapper om = new ObjectMapper();
 	private final StompErrorFrameHandler handler = new StompErrorFrameHandler(om);
@@ -74,5 +74,5 @@ class StompErrorFrameHandlerTest_MinimalJsonNode {
 		// then 2) 바디: JsonNode로 code만 검증
 		JsonNode node = om.readTree(errorMsg.getPayload());
 		assertThat(node.get("code").asText()).isEqualTo(expected.getCode());
-	}트
+	}
 }

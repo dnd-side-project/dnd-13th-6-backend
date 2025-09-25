@@ -14,9 +14,9 @@ public class WeeklyCrewGoalSnapshotReader extends JpaPagingItemReader<CrewGoalSn
     public WeeklyCrewGoalSnapshotReader(EntityManagerFactory emf, LocalDate date) {
         super();
         setEntityManagerFactory(emf);
-        WeekUnit weekUnit = WeekUnit.from(date.minusWeeks(1));
+        WeekUnit lastWeek = WeekUnit.from(date.minusWeeks(1));
         setQueryString("SELECT cgs FROM CrewGoalSnapshot cgs WHERE cgs.weekUnit = :weekUnit");
-        setParameterValues(Map.of("weekUnit", weekUnit));
+        setParameterValues(Map.of("weekUnit", lastWeek));
         setPageSize(500);
     }
 }

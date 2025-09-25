@@ -8,13 +8,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "member_goal_snapshot")
+@Table(name = "member_goal_snapshot", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_member_week", columnNames = {"member_id", "iso_year", "iso_week"})
+})
 public class MemberGoalSnapshot extends BaseTimeEntity {
 
     @Id

@@ -18,7 +18,7 @@ public class SnapshotScheduler {
     private final JobLauncher jobLauncher;
     private final Job weeklySnapshotJob;
     private final Job weeklyGoalAchieveJob;
-    private final Job weeklyCreGoalAchieveJob;
+    private final Job weeklyCrewGoalAchieveJob;
 
     public SnapshotScheduler(JobLauncher jobLauncher,
                              @Qualifier("weeklyGoalSnapshotJob") Job weeklySnapshotJob,
@@ -27,7 +27,7 @@ public class SnapshotScheduler {
         this.jobLauncher = jobLauncher;
         this.weeklySnapshotJob = weeklySnapshotJob;
         this.weeklyGoalAchieveJob = weeklyGoalAchieveJob;
-        this.weeklyCreGoalAchieveJob = weeklyCreGoalAchieveJob;
+        this.weeklyCrewGoalAchieveJob = weeklyCreGoalAchieveJob;
     }
 
     @Scheduled(cron = "0 0 2 * * MON")
@@ -63,6 +63,6 @@ public class SnapshotScheduler {
                 .addLocalDate("snapshotDate", snapshotDate)
                 .toJobParameters();
 
-        jobLauncher.run(weeklyCreGoalAchieveJob, jobParameters);
+        jobLauncher.run(weeklyCrewGoalAchieveJob, jobParameters);
     }
 }

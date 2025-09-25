@@ -52,7 +52,8 @@ public class WeeklyGoalAchieveStepConfig {
 
     @Bean
     @StepScope
-    public WeeklyMemberGoalWriter weeklyMemberGoalWriter(CloverRepository cloverRepository) {
-        return new WeeklyMemberGoalWriter(cloverRepository);
+    public WeeklyMemberGoalWriter weeklyMemberGoalWriter(CloverRepository cloverRepository,
+                                                         @Value("#{jobParameters['snapshotDate']}") LocalDate date) {
+        return new WeeklyMemberGoalWriter(cloverRepository, date);
     }
 }

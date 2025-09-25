@@ -51,7 +51,15 @@ public class MemberGoalSnapshot extends BaseTimeEntity {
         return new MemberGoalSnapshot(memberId, new Goal(BigDecimal.ZERO), false, localDate);
     }
 
+    public void addDistance(BigDecimal distance) {
+        this.runDistance = this.runDistance.add(distance);
+    }
+
     public void achieve() {
         this.achieved = true;
+    }
+
+    public boolean isAchieved() {
+        return goal.isLessThanOrEqualTo(runDistance);
     }
 }

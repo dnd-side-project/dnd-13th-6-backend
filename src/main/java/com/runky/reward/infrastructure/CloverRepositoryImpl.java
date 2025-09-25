@@ -26,4 +26,9 @@ public class CloverRepositoryImpl implements CloverRepository {
     public Optional<Clover> findByUserIdWithLock(Long userId) {
         return cloverJpaRepository.findByUserIdWithLock(userId);
     }
+
+    @Override
+    public void addClover(Long userId, Long amount) {
+        cloverJpaRepository.addClover(userId, amount);
+    }
 }

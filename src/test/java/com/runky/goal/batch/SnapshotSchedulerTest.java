@@ -112,26 +112,18 @@ class SnapshotSchedulerTest {
     @Test
     @DisplayName("개인 목표 달성 체크 시, 목표를 달성한 회원만 보상 지급이 호출된다.")
     void checkGoalAchieve() throws Exception {
-        Running running1 = Running.start(1L, LocalDate.of(2025, 8, 24).atStartOfDay());
-        LocalDateTime end1 = LocalDateTime.of(LocalDate.of(2025, 8, 24), LocalTime.of(0, 50));
-        running1.finish(10.00, 3600L, 2.78, end1);
-        runningRepository.save(running1);
-        Running running2 = Running.start(2L, LocalDate.of(2025, 8, 24).atStartOfDay());
-        LocalDateTime end2 = LocalDateTime.of(LocalDate.of(2025, 8, 24), LocalTime.of(0, 50));
-        running2.finish(10.00, 3600L, 2.78, end2);
-        runningRepository.save(running2);
-
-        MemberGoal memberGoal1 = MemberGoal.from(1L);
-        memberGoal1.updateGoal(new BigDecimal("10.00"));
-        goalRepository.save(memberGoal1.createSnapshot(LocalDate.of(2025, 8, 18)));
-        MemberGoal memberGoal2 = MemberGoal.from(2L);
-        memberGoal2.updateGoal(new BigDecimal("15.00"));
-        goalRepository.save(memberGoal2.createSnapshot(LocalDate.of(2025, 8, 18)));
-
+        LocalDate snapshotDate = LocalDate.of(2025, 8, 25);
         cloverRepository.save(Clover.of(1L));
         cloverRepository.save(Clover.of(2L));
+        MemberGoalSnapshot memberGoalSnapshot1 = new MemberGoalSnapshot(1L, new Goal(BigDecimal.TEN), false,
+                snapshotDate.minusWeeks(1));
+        memberGoalSnapshot1.addDistance(new BigDecimal("10.00"));
+        memberGoalSnapshot1.achieve();
+        MemberGoalSnapshot memberGoalSnapshot2 = new MemberGoalSnapshot(2L, new Goal(new BigDecimal("15.00")), false,
+                snapshotDate.minusWeeks(1));
+        memberGoalSnapshot2.addDistance(new BigDecimal("10.00"));
+        goalRepository.saveAll(List.of(memberGoalSnapshot1, memberGoalSnapshot2));
 
-        LocalDate snapshotDate = LocalDate.of(2025, 8, 25);
         JobParameters jobParameters = new JobParametersBuilder()
                 .addString("snapshotDate", snapshotDate.toString())
                 .toJobParameters();

@@ -28,4 +28,8 @@ public class Goal {
     public BigDecimal value() {
         return value;
     }
+
+    public boolean isLessThanOrEqualTo(BigDecimal other) {
+        return this.value.compareTo(other) <= 0;
+    }
 }

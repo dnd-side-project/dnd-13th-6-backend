@@ -60,6 +60,10 @@ public class CrewGoalSnapshot extends BaseTimeEntity {
         return new CrewGoalSnapshot(crewId, new Goal(BigDecimal.ZERO), false, WeekUnit.from(date));
     }
 
+    public void addDistance(BigDecimal distance) {
+        this.runDistance = this.runDistance.add(distance);
+    }
+
     public void achieve() {
         this.achieved = true;
     }

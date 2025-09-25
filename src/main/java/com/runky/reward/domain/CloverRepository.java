@@ -11,4 +11,6 @@ public interface CloverRepository {
     Optional<Clover> findByUserIdWithLock(Long userId);
 
     void addClover(Long userId, Long amount);
+
+    void addCloverInCrew(Long crewId, Long amount);
 }

@@ -15,13 +15,10 @@ import com.runky.goal.domain.MemberGoalSnapshot;
 import com.runky.goal.domain.WeekUnit;
 import com.runky.reward.domain.Clover;
 import com.runky.reward.domain.CloverRepository;
-import com.runky.running.domain.Running;
 import com.runky.running.domain.RunningRepository;
 import com.runky.utils.DatabaseCleanUp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
@@ -54,8 +51,6 @@ class SnapshotSchedulerTest {
     private GoalRepository goalRepository;
     @Autowired
     private CloverRepository cloverRepository;
-    @Autowired
-    private RunningRepository runningRepository;
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
 
@@ -145,35 +140,14 @@ class SnapshotSchedulerTest {
     @Test
     @DisplayName("크루 목표 달성 체크 시, 목표를 달성한 회원은 클로버 보상을 받는다.")
     void checkCrewGoalAchieve() throws Exception {
-        Running running1 = Running.start(1L, LocalDate.of(2025, 8, 24).atStartOfDay());
-        LocalDateTime end1 = LocalDateTime.of(LocalDate.of(2025, 8, 24), LocalTime.of(0, 50));
-        running1.finish(9.00, 3600L, 2.78, end1);
-        runningRepository.save(running1);
-        Running running2 = Running.start(2L, LocalDate.of(2025, 8, 24).atStartOfDay());
-        LocalDateTime end2 = LocalDateTime.of(LocalDate.of(2025, 8, 24), LocalTime.of(0, 50));
-        running2.finish(10.00, 3600L, 2.78, end2);
-        runningRepository.save(running2);
-        Running running3 = Running.start(3L, LocalDate.of(2025, 8, 24).atStartOfDay());
-        LocalDateTime end3 = LocalDateTime.of(LocalDate.of(2025, 8, 24), LocalTime.of(0, 50));
-        running3.finish(11.00, 3600L, 2.78, end3);
-        runningRepository.save(running3);
-
-        MemberGoal memberGoal1 = MemberGoal.from(1L);
-        memberGoal1.updateGoal(new BigDecimal("10.00"));
-        goalRepository.save(memberGoal1.createSnapshot(LocalDate.of(2025, 8, 18)));
-        MemberGoal memberGoal2 = MemberGoal.from(2L);
-        memberGoal2.updateGoal(new BigDecimal("10.00"));
-        goalRepository.save(memberGoal2.createSnapshot(LocalDate.of(2025, 8, 18)));
-        MemberGoal memberGoal3 = MemberGoal.from(3L);
-        memberGoal3.updateGoal(new BigDecimal("10.00"));
-        goalRepository.save(memberGoal3.createSnapshot(LocalDate.of(2025, 8, 18)));
-
         Crew crew = Crew.of(new CrewCommand.Create(1L, "crew1"), new Code("code12"));
         crew.joinMember(2L);
         crew.joinMember(3L);
         Crew savedCrew = crewRepository.save(crew);
         CrewGoalSnapshot crewGoalSnapshot = new CrewGoalSnapshot(savedCrew.getId(), new Goal(new BigDecimal("30.00")),
                 false, WeekUnit.from(LocalDate.of(2025, 8, 18)));
+        crewGoalSnapshot.addDistance(new BigDecimal("35.00"));
+        crewGoalSnapshot.achieve();
         goalRepository.saveAllCrewGoalSnapshots(List.of(crewGoalSnapshot));
 
         cloverRepository.save(Clover.of(1L));
@@ -195,8 +169,5 @@ class SnapshotSchedulerTest {
                 () -> assertThat(clover2.getCount()).isEqualTo(3L),
                 () -> assertThat(clover3.getCount()).isEqualTo(3L)
         );
-        CrewGoalSnapshot afterSnapshot = goalRepository.findCrewGoalSnapshot(savedCrew.getId(),
-                WeekUnit.from(LocalDate.of(2025, 8, 18))).orElseThrow();
-        assertThat(afterSnapshot.getAchieved()).isTrue();
     }
 }

@@ -19,4 +19,16 @@ public interface CloverJpaRepository extends JpaRepository<Clover, Long> {
     @Modifying
     @Query("UPDATE Clover c SET c.count = c.count + :amount WHERE c.userId = :userId")
     void addClover(Long userId, Long amount);
+
+    @Modifying
+    @Query("UPDATE Clover c " +
+            "SET c.count = c.count + :amount " +
+            "WHERE c.userId IN (" +
+            "  SELECT cm.memberId " +
+            "  FROM CrewMember cm " +
+            "  WHERE cm.crew.id = :crewId " +
+            "  AND cm.role IN (com.runky.crew.domain.CrewMember.Role.LEADER, com.runky.crew.domain.CrewMember.Role.MEMBER)"
+            +
+            ")")
+    void addCloverInCrew(Long crewId, Long amount);
 }

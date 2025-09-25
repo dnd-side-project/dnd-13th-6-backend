@@ -31,4 +31,9 @@ public class CloverRepositoryImpl implements CloverRepository {
     public void addClover(Long userId, Long amount) {
         cloverJpaRepository.addClover(userId, amount);
     }
+
+    @Override
+    public void addCloverInCrew(Long crewId, Long amount) {
+        cloverJpaRepository.addCloverInCrew(crewId, amount);
+    }
 }

@@ -1,4 +1,4 @@
-package com.runky.goal.batch;
+package com.runky.goal.domain.batch;
 
 import com.runky.goal.domain.GoalRepository;
 import com.runky.goal.domain.MemberGoalSnapshot;

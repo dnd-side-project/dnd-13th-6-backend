@@ -1,4 +1,4 @@
-package com.runky.goal.batch;
+package com.runky.goal.domain.batch;
 
 public record MemberGoalAchieveInfo(
         Long memberId,

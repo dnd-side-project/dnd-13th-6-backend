@@ -1,13 +1,14 @@
-package com.runky.goal.batch;
+package com.runky.goal.application.step;
 
+import com.runky.goal.domain.batch.CrewGoalAchieveInfo;
 import com.runky.goal.domain.CrewGoalSnapshot;
+import com.runky.goal.domain.batch.WeeklyCrewGoalSnapshotProcessor;
+import com.runky.goal.domain.batch.WeeklyCrewGoalSnapshotReader;
+import com.runky.goal.domain.batch.WeeklyCrewGoalSnapshotWriter;
 import com.runky.reward.domain.CloverRepository;
 import jakarta.persistence.EntityManagerFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
@@ -18,16 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@RequiredArgsConstructor
-public class WeeklyCrewGoalAchieveJobConfig {
-
-    @Bean
-    public Job weeklyCrewGoalAchieveJob(JobRepository jobRepository,
-                                        Step weeklyCrewGoalAchieveStep) {
-        return new JobBuilder("weeklyCrewGoalAchieveJob", jobRepository)
-                .start(weeklyCrewGoalAchieveStep)
-                .build();
-    }
+public class WeeklyCrewGoalAchieveStepConfig {
 
     @Bean
     public Step weeklyCrewGoalAchieveStep(JobRepository jobRepository,
@@ -45,19 +37,19 @@ public class WeeklyCrewGoalAchieveJobConfig {
 
     @Bean
     @StepScope
-    public CrewGoalSnapshotReader crewGoalSnapshotReader(EntityManagerFactory emf) {
-        return new CrewGoalSnapshotReader(emf);
+    public WeeklyCrewGoalSnapshotReader crewGoalSnapshotReader(EntityManagerFactory emf) {
+        return new WeeklyCrewGoalSnapshotReader(emf);
     }
 
     @Bean
     @StepScope
-    public CrewGoalSnapshotProcessor crewGoalSnapshotProcessor() {
-        return new CrewGoalSnapshotProcessor();
+    public WeeklyCrewGoalSnapshotProcessor crewGoalSnapshotProcessor() {
+        return new WeeklyCrewGoalSnapshotProcessor();
     }
 
     @Bean
     @StepScope
-    public CrewGoalSnapshotWriter crewGoalSnapshotWriter(CloverRepository cloverRepository) {
-        return new CrewGoalSnapshotWriter(cloverRepository);
+    public WeeklyCrewGoalSnapshotWriter crewGoalSnapshotWriter(CloverRepository cloverRepository) {
+        return new WeeklyCrewGoalSnapshotWriter(cloverRepository);
     }
 }

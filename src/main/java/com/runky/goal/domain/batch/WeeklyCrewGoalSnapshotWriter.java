@@ -1,4 +1,4 @@
-package com.runky.goal.batch;
+package com.runky.goal.domain.batch;
 
 import com.runky.reward.domain.CloverRepository;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,7 @@ import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 
 @RequiredArgsConstructor
-public class CrewGoalSnapshotWriter implements ItemWriter<CrewGoalAchieveInfo> {
+public class WeeklyCrewGoalSnapshotWriter implements ItemWriter<CrewGoalAchieveInfo> {
     private final CloverRepository cloverRepository;
 
     @Override

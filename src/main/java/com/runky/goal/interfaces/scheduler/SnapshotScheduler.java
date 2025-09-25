@@ -1,4 +1,4 @@
-package com.runky.goal.batch;
+package com.runky.goal.interfaces.scheduler;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

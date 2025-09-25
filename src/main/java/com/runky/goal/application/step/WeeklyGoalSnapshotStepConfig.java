@@ -1,16 +1,20 @@
-package com.runky.goal.batch;
+package com.runky.goal.application.step;
 
 import com.runky.goal.domain.CrewGoalSnapshot;
 import com.runky.goal.domain.GoalRepository;
+import com.runky.goal.domain.batch.CrewGoalProcessor;
+import com.runky.goal.domain.batch.CrewGoalReader;
+import com.runky.goal.domain.batch.CrewGoalSum;
+import com.runky.goal.domain.batch.CrewGoalWriter;
+import com.runky.goal.domain.batch.MemberGoalProcessor;
+import com.runky.goal.domain.batch.MemberGoalReader;
+import com.runky.goal.domain.batch.MemberGoalWriter;
 import com.runky.goal.domain.MemberGoal;
 import com.runky.goal.domain.MemberGoalSnapshot;
 import jakarta.persistence.EntityManagerFactory;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,18 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@RequiredArgsConstructor
-public class WeeklyGoalSnapshotJobConfig {
-
-    @Bean
-    public Job weeklyGoalSnapshotJob(Step memberGoalSnapshotStep,
-                                     Step crewGoalSnapshotStep,
-                                     JobRepository jobRepository) {
-        return new JobBuilder("weeklyGoalSnapshotJob", jobRepository)
-                .start(memberGoalSnapshotStep)
-                .next(crewGoalSnapshotStep)
-                .build();
-    }
+public class WeeklyGoalSnapshotStepConfig {
 
     @Bean
     public Step memberGoalSnapshotStep(JobRepository jobRepository,
@@ -40,6 +33,20 @@ public class WeeklyGoalSnapshotJobConfig {
                                        MemberGoalWriter writer) {
         return new StepBuilder("memberGoalSnapshotStep", jobRepository)
                 .<MemberGoal, MemberGoalSnapshot>chunk(500, tm)
+                .reader(reader)
+                .processor(processor)
+                .writer(writer)
+                .build();
+    }
+
+    @Bean
+    public Step crewGoalSnapshotStep(JobRepository jobRepository,
+                                     PlatformTransactionManager tm,
+                                     CrewGoalReader reader,
+                                     CrewGoalProcessor processor,
+                                     CrewGoalWriter writer) {
+        return new StepBuilder("crewGoalSnapshotStep", jobRepository)
+                .<CrewGoalSum, CrewGoalSnapshot>chunk(300, tm)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
@@ -64,19 +71,6 @@ public class WeeklyGoalSnapshotJobConfig {
         return new MemberGoalWriter(goalRepository);
     }
 
-    @Bean
-    public Step crewGoalSnapshotStep(JobRepository jobRepository,
-                                     PlatformTransactionManager tm,
-                                     CrewGoalReader reader,
-                                     CrewGoalProcessor processor,
-                                     CrewGoalWriter writer) {
-        return new StepBuilder("crewGoalSnapshotStep", jobRepository)
-                .<CrewGoalSum, CrewGoalSnapshot>chunk(300, tm)
-                .reader(reader)
-                .processor(processor)
-                .writer(writer)
-                .build();
-    }
 
     @Bean
     @StepScope

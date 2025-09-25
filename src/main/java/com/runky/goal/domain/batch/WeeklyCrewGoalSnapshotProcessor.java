@@ -1,9 +1,9 @@
-package com.runky.goal.batch;
+package com.runky.goal.domain.batch;
 
 import com.runky.goal.domain.CrewGoalSnapshot;
 import org.springframework.batch.item.ItemProcessor;
 
-public class CrewGoalSnapshotProcessor implements ItemProcessor<CrewGoalSnapshot, CrewGoalAchieveInfo> {
+public class WeeklyCrewGoalSnapshotProcessor implements ItemProcessor<CrewGoalSnapshot, CrewGoalAchieveInfo> {
 
     @Override
     public CrewGoalAchieveInfo process(CrewGoalSnapshot item) throws Exception {

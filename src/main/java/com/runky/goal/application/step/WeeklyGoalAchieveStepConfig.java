@@ -1,14 +1,15 @@
-package com.runky.goal.batch;
+package com.runky.goal.application.step;
 
+import com.runky.goal.domain.batch.MemberGoalAchieveInfo;
 import com.runky.goal.domain.MemberGoalSnapshot;
+import com.runky.goal.domain.batch.WeeklyMemberGoalProcessor;
+import com.runky.goal.domain.batch.WeeklyMemberGoalReader;
+import com.runky.goal.domain.batch.WeeklyMemberGoalWriter;
 import com.runky.reward.domain.CloverRepository;
 import jakarta.persistence.EntityManagerFactory;
 import java.time.LocalDate;
-import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
@@ -20,17 +21,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@RequiredArgsConstructor
-public class WeeklyGoalAchieveJobConfig {
-
-
-    @Bean
-    public Job weeklyGoalAchieveJob(JobRepository jobRepository,
-                                    Step weeklyGoalAchieveStep) {
-        return new JobBuilder("weeklyGoalAchieveJob", jobRepository)
-                .start(weeklyGoalAchieveStep)
-                .build();
-    }
+public class WeeklyGoalAchieveStepConfig {
 
     @Bean
     public Step weeklyGoalAchieveStep(JobRepository jobRepository,

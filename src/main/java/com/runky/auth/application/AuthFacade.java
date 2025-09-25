@@ -1,5 +1,6 @@
 package com.runky.auth.application;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,10 +36,11 @@ public class AuthFacade {
 
 	private final TokenDecoder tokenDecoder;
 	private final AuthTokenService authTokenService;
-
 	private final RewardService rewardService;
 	private final GoalService goalService;
 	private final CrewService crewService;
+
+	private final ApplicationEventPublisher eventPublisher;
 
 	/**
 	 * 1) code → accessToken → providerId 조회
@@ -75,13 +77,13 @@ public class AuthFacade {
 			new MemberCommand.RegisterFromExternal(
 				info.provider(), info.providerId(), command.nickname()
 			));
+		AuthInfo.TokenPair pair = authTokenService.issue(saved.id(), saved.role().name());
 		signupTokenService.delete(signupToken);
-
 		rewardService.init(new RewardCommand.Init(saved.id()));
 		goalService.init(new GoalCommand.Init(saved.id()));
 		crewService.init(new CrewCommand.Init(saved.id()));
+		//		eventPublisher.publishEvent(new AuthEvent.SignupCompleted(saved.id()));
 
-		AuthInfo.TokenPair pair = authTokenService.issue(saved.id(), saved.role().name());
 		return new AuthResult.SigninComplete(pair.accessToken(), pair.refreshToken());
 	}
 

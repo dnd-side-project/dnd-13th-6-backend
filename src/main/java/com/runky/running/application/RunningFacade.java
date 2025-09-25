@@ -3,16 +3,16 @@ package com.runky.running.application;
 import java.time.ZoneId;
 import java.util.List;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.runky.crew.domain.CrewService;
 import com.runky.member.domain.MemberCommand;
 import com.runky.member.domain.MemberService;
-import com.runky.notification.domain.aggregate.PushCommand;
-import com.runky.notification.domain.aggregate.PushService;
 import com.runky.notification.domain.notification.Nickname;
 import com.runky.notification.domain.notification.NotificationMessage;
+import com.runky.notification.interfaces.consumer.NotificationEvent;
 import com.runky.running.domain.RunningCommand;
 import com.runky.running.domain.RunningInfo;
 import com.runky.running.domain.RunningService;
@@ -24,9 +24,9 @@ import lombok.RequiredArgsConstructor;
 public class RunningFacade {
 	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 	private final RunningService runningService;
-	private final PushService pushService;
 	private final MemberService memberService;
 	private final CrewService crewService;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public RunningResult.Start start(RunningCriteria.Start criteria) {
@@ -40,13 +40,10 @@ public class RunningFacade {
 		var memberFindCmd = new MemberCommand.Find(criteria.runnerId());
 		String runnerNickname = memberService.getMember(memberFindCmd).getNickname().value();
 
-		var pushToManyCmd = new PushCommand.NotifyToMany(
+		var pushToManyCmd = new NotificationEvent.NotifyToMany(
 			criteria.runnerId(), receiverIds,
-			new NotificationMessage.RunStarted(new Nickname(runnerNickname)),
-			null
-		);
-		pushService.pushToMany(pushToManyCmd);
-
+			new NotificationMessage.RunStarted(new Nickname(runnerNickname)));
+		eventPublisher.publishEvent(pushToManyCmd);
 		return RunningResult.Start.from(info);
 	}
 

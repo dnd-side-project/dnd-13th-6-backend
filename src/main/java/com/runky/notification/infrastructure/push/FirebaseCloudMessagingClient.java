@@ -53,7 +53,6 @@ public class FirebaseCloudMessagingClient implements PushSender {
 					.setTitle(nvl(payload.title()))
 					.setBody(nvl(payload.body()))
 					.build())
-				.putAllData(ns(payload.data()))
 				.build();
 
 			fcm.send(message);
@@ -85,7 +84,6 @@ public class FirebaseCloudMessagingClient implements PushSender {
 						.setTitle(nvl(payload.title()))
 						.setBody(nvl(payload.body()))
 						.build())
-					.putAllData(ns(payload.data()))
 					.build();
 
 				BatchResponse br = fcm.sendEachForMulticast(message);

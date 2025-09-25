@@ -4,29 +4,38 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.convert.ConversionFailedException;
+import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageDeliveryException;
+import org.springframework.messaging.MessageHandlingException;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.runky.global.response.ApiResponse;
 import com.runky.running.error.RunningErrorCode;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 class WebSocketExceptionHandlerTest {
 
@@ -58,6 +67,7 @@ class WebSocketExceptionHandlerTest {
 		}
 	}
 
+	/* ---------------------------------------------------------------------- */
 	@Nested
 	class MethodArgumentNotValid_핸들러 {
 
@@ -86,105 +96,122 @@ class WebSocketExceptionHandlerTest {
 		void 첫번째_FieldError만_메시지에_노출(List<FieldError> fieldErrors, String expectedField) {
 			MethodArgumentNotValidException exception = newMethodArgumentNotValidException(fieldErrors);
 			ApiResponse<Void> apiResponse = webSocketExceptionHandler.onMethodArgumentNotValid(exception, anyMessage());
-			assertError(apiResponse, RunningErrorCode.INVALID_LOCATION_VALUE, expectedField + ":");
+			assertError(apiResponse, RunningErrorCode.INVALID_INPUT, expectedField + ":");
 		}
 
 		@Test
 		void FieldError가_없으면_기본메시지() {
 			MethodArgumentNotValidException exception = newMethodArgumentNotValidException(List.of());
 			ApiResponse<Void> apiResponse = webSocketExceptionHandler.onMethodArgumentNotValid(exception, anyMessage());
-			assertError(apiResponse, RunningErrorCode.INVALID_LOCATION_VALUE,
-				RunningErrorCode.INVALID_LOCATION_VALUE.getMessage());
-		}
-
-		@ParameterizedTest(name = "x 최솟값 미만: x={0} ⇒ 허용은 -180 이상(포함)")
-		@CsvSource({"-180.0001", "-1000"})
-		void x_최솟값_미만이면_INVALID로_매핑(double ignored) {
-			MethodArgumentNotValidException ex = newMethodArgumentNotValidException(
-				List.of(fieldError("x", "허용 범위는 -180 이상입니다")));
-			ApiResponse<Void> res = webSocketExceptionHandler.onMethodArgumentNotValid(ex, anyMessage());
-			assertError(res, RunningErrorCode.INVALID_LOCATION_VALUE, "x", "-180");
-		}
-
-		@ParameterizedTest(name = "x 최댓값 초과: x={0} ⇒ 허용은 180 이하(포함)")
-		@CsvSource({"180.0001", "1000"})
-		void x_최댓값_초과이면_INVALID로_매핑(double ignored) {
-			MethodArgumentNotValidException ex = newMethodArgumentNotValidException(
-				List.of(fieldError("x", "허용 범위는 180 이하입니다")));
-			ApiResponse<Void> res = webSocketExceptionHandler.onMethodArgumentNotValid(ex, anyMessage());
-			assertError(res, RunningErrorCode.INVALID_LOCATION_VALUE, "x", "180");
-		}
-
-		@ParameterizedTest(name = "y 최솟값 미만: y={0} ⇒ 허용은 -90 이상(포함)")
-		@CsvSource({"-90.0001", "-1000"})
-		void y_최솟값_미만이면_INVALID로_매핑(double ignored) {
-			MethodArgumentNotValidException ex = newMethodArgumentNotValidException(
-				List.of(fieldError("y", "허용 범위는 -90 이상입니다")));
-			ApiResponse<Void> res = webSocketExceptionHandler.onMethodArgumentNotValid(ex, anyMessage());
-			assertError(res, RunningErrorCode.INVALID_LOCATION_VALUE, "y", "-90");
-		}
-
-		@ParameterizedTest(name = "y 최댓값 초과: y={0} ⇒ 허용은 90 이하(포함)")
-		@CsvSource({"90.0001", "1000"})
-		void y_최댓값_초과이면_INVALID로_매핑(double ignored) {
-			MethodArgumentNotValidException ex = newMethodArgumentNotValidException(
-				List.of(fieldError("y", "허용 범위는 90 이하입니다")));
-			ApiResponse<Void> res = webSocketExceptionHandler.onMethodArgumentNotValid(ex, anyMessage());
-			assertError(res, RunningErrorCode.INVALID_LOCATION_VALUE, "y", "90");
-		}
-
-		@ParameterizedTest(name = "timestamp 음수: ts={0} ⇒ 허용은 0 이상(포함)")
-		@CsvSource({"-1", "-100"})
-		void timestamp_음수이면_INVALID로_매핑(long ignored) {
-			MethodArgumentNotValidException ex = newMethodArgumentNotValidException(
-				List.of(fieldError("timestamp", "0 이상이어야 합니다")));
-			ApiResponse<Void> res = webSocketExceptionHandler.onMethodArgumentNotValid(ex, anyMessage());
-			assertError(res, RunningErrorCode.INVALID_LOCATION_VALUE, "timestamp", "0");
+			assertError(apiResponse, RunningErrorCode.INVALID_INPUT,
+				RunningErrorCode.INVALID_INPUT.getMessage());
 		}
 	}
 
+	/* ---------------------------------------------------------------------- */
 	@Nested
-	class 메시징_파이프라인_핸들러들 {
+	class 바인딩_변환_검증_기타 {
 
 		@Test
-		void StompConversion_은_PAYLOAD_INVALID로_매핑() {
-			org.springframework.messaging.simp.stomp.StompConversionException exception =
-				new org.springframework.messaging.simp.stomp.StompConversionException("bad stomp");
-			ApiResponse<Void> apiResponse =
-				webSocketExceptionHandler.onStompConversion(exception, anyMessage());
-			assertError(apiResponse, RunningErrorCode.PAYLOAD_INVALID,
+		void MessageConversionException_은_PAYLOAD_INVALID로_매핑() {
+			ApiResponse<Void> response =
+				webSocketExceptionHandler.onPayloadConversion(new MessageConversionException("invalid json"),
+					anyMessage());
+			assertError(response, RunningErrorCode.PAYLOAD_INVALID,
 				RunningErrorCode.PAYLOAD_INVALID.getMessage());
 		}
 
-		@ParameterizedTest(name = "Outbound 변환 예외 메시지: \"{0}\" → PAYLOAD_INVALID")
-		@ValueSource(strings = {"invalid json", "unknown type", ""})
-		void OutboundConversion_은_PAYLOAD_INVALID로_매핑(String exceptionMessage) {
-			ApiResponse<Void> responseFromMessageConversion =
-				webSocketExceptionHandler.onOutboundConversion(new MessageConversionException(exceptionMessage),
-					anyMessage());
-			ApiResponse<Void> responseFromJsonProcessing =
-				webSocketExceptionHandler.onOutboundConversion(new JsonProcessingException(exceptionMessage) {
+		@Test
+		void JsonProcessingException_은_OUTBOUND_SERIALIZATION_ERROR로_매핑() {
+			ApiResponse<Void> response =
+				webSocketExceptionHandler.onOutboundSerialization(new JsonProcessingException("boom") {
 				}, anyMessage());
-			assertError(responseFromMessageConversion, RunningErrorCode.PAYLOAD_INVALID,
-				RunningErrorCode.PAYLOAD_INVALID.getMessage());
-			assertError(responseFromJsonProcessing, RunningErrorCode.PAYLOAD_INVALID,
-				RunningErrorCode.PAYLOAD_INVALID.getMessage());
+			assertError(response, RunningErrorCode.OUTBOUND_SERIALIZATION_ERROR,
+				RunningErrorCode.OUTBOUND_SERIALIZATION_ERROR.getMessage());
+		}
+
+		@Test
+		void ConversionFailedException_은_TYPE_CONVERSION_FAILED로_매핑() {
+			ConversionFailedException ex = new ConversionFailedException(
+				TypeDescriptor.valueOf(String.class),
+				TypeDescriptor.valueOf(Long.class),
+				"abc",
+				new NumberFormatException("For input string: \"abc\"")
+			);
+			ApiResponse<Void> res = webSocketExceptionHandler.onTypeConversion(ex, anyMessage());
+			assertError(res, RunningErrorCode.TYPE_CONVERSION_FAILED, "타입 변환 실패", "target=java.lang.Long");
+		}
+
+		@Test
+		void ConstraintViolationException_은_CONSTRAINT_VIOLATION로_매핑() {
+			ConstraintViolationException ex = new ConstraintViolationException("violate",
+				Set.<ConstraintViolation<?>>of());
+			ApiResponse<Void> res = webSocketExceptionHandler.onConstraintViolation(ex, anyMessage());
+			assertError(res, RunningErrorCode.CONSTRAINT_VIOLATION,
+				RunningErrorCode.CONSTRAINT_VIOLATION.getMessage());
+		}
+	}
+
+	/* ---------------------------------------------------------------------- */
+	@Nested
+	class 인증_인가_핸들러들 {
+
+		@Test
+		void AccessDeniedException_은_FORBIDDEN_WS_ACCESS로_매핑() {
+			ApiResponse<Void> res = webSocketExceptionHandler.onAccessDenied(
+				new AccessDeniedException("forbidden"), null, anyMessage());
+			assertError(res, RunningErrorCode.FORBIDDEN_WS_ACCESS,
+				RunningErrorCode.FORBIDDEN_WS_ACCESS.getMessage());
+		}
+
+		@Test
+		void AuthenticationCredentialsNotFound_은_UNAUTHORIZED_SESSION으로_매핑() {
+			ApiResponse<Void> res = webSocketExceptionHandler.onUnauthorizedSession(
+				new AuthenticationCredentialsNotFoundException("no auth"), anyMessage());
+			assertError(res, RunningErrorCode.UNAUTHORIZED_SESSION,
+				RunningErrorCode.UNAUTHORIZED_SESSION.getMessage());
+		}
+	}
+
+	/* ---------------------------------------------------------------------- */
+	@Nested
+	class 메시징_실행_전송_핸들러들 {
+
+		@Test
+		void MessageHandlingException_은_MESSAGE_HANDLING_ERROR로_매핑() {
+			MessageHandlingException ex = new MessageHandlingException(anyMessage(), "handling failed",
+				new IllegalStateException("boom cause"));
+			ApiResponse<Void> res = webSocketExceptionHandler.onMessageHandling(ex, anyMessage());
+			assertError(res, RunningErrorCode.MESSAGE_HANDLING_ERROR, "boom cause");
+		}
+
+		@Test
+		void MessageDeliveryException_은_EVENT_PUBLISH_FAILED로_매핑() {
+			MessageDeliveryException ex = new MessageDeliveryException("no subscribers");
+			ApiResponse<Void> res = webSocketExceptionHandler.onMessageDelivery(ex, anyMessage());
+			assertError(res, RunningErrorCode.EVENT_PUBLISH_FAILED,
+				RunningErrorCode.EVENT_PUBLISH_FAILED.getMessage());
 		}
 
 		@NullAndEmptySource
 		@ValueSource(strings = {"broker down", "no session"})
-		void MessagingException_은_INTERNAL_ERROR로_매핑(String exceptionMessage) {
-			MessagingException exception = new MessagingException(exceptionMessage);
-			ApiResponse<Void> apiResponse =
-				webSocketExceptionHandler.onMessaging(exception, anyMessage());
-			assertError(apiResponse, RunningErrorCode.INTERNAL_ERROR, RunningErrorCode.INTERNAL_ERROR.getMessage());
+		@ParameterizedTest(name = "MessagingException(\"{0}\") → MESSAGING_ERROR")
+		void MessagingException_은_MESSAGING_ERROR로_매핑(String msg) {
+			MessagingException ex = new MessagingException(msg);
+			ApiResponse<Void> res = webSocketExceptionHandler.onMessaging(ex, anyMessage());
+			assertError(res, RunningErrorCode.MESSAGING_ERROR,
+				RunningErrorCode.MESSAGING_ERROR.getMessage());
 		}
+	}
+
+	/* ---------------------------------------------------------------------- */
+	@Nested
+	class 폴백 {
 
 		@Test
-		void Throwable_Fallback_도_INTERNAL_ERROR로_매핑() {
-			ApiResponse<Void> apiResponse =
-				webSocketExceptionHandler.onAny(new RuntimeException("boom"), anyMessage());
-			assertError(apiResponse, RunningErrorCode.INTERNAL_ERROR, RunningErrorCode.INTERNAL_ERROR.getMessage());
+		void Throwable_Fallback_은_INTERNAL_ERROR로_매핑() {
+			ApiResponse<Void> res = webSocketExceptionHandler.onAny(new RuntimeException("boom"), anyMessage());
+			assertError(res, RunningErrorCode.INTERNAL_ERROR, RunningErrorCode.INTERNAL_ERROR.getMessage());
 		}
 	}
 }

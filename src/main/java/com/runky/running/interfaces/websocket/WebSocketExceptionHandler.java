@@ -1,12 +1,18 @@
 package com.runky.running.interfaces.websocket;
 
+import java.security.Principal;
+
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageDeliveryException;
+import org.springframework.messaging.MessageHandlingException;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.runky.global.response.ApiResponse;
 import com.runky.running.error.RunningErrorCode;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,85 +30,151 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class WebSocketExceptionHandler {
 
+	// DTO 바인딩/검증 예외
+
 	/**
-	 * 언제 발생하나?
-	 * - Inbound 바인딩/검증 단계에서 발생.
-	 * - 클라이언트가 보낸 STOMP payload가 @Valid @Payload 대상 DTO로 바인딩된 뒤,
-	 *   Bean Validation 제약(@NotNull, @DecimalMin/@Max, @PositiveOrZero 등)을 위반하면
-	 *   Spring이 BindingResult를 만들어 MethodArgumentNotValidException으로 포장한다.
-	 * 대표 사례
-	 * - 좌표 범위 위반(x∉[-180,180], y∉[-90,90]), null 필드, 음수 timestamp 등
-	 * 반환
-	 * - INVALID_LOCATION_VALUE(R303)
+	 * @Valid @Payload DTO 검증 실패
+	 * ex) 필수 값 누락, 범위 위반 등
+	 * --> INVALID_INPUT(R300)
 	 */
 	@MessageExceptionHandler(MethodArgumentNotValidException.class)
 	@SendToUser(destinations = "/queue/errors", broadcast = false)
 	public ApiResponse<Void> onMethodArgumentNotValid(MethodArgumentNotValidException ex, Message<?> message) {
-		FieldError fieldError = ex.getBindingResult().getFieldErrors().stream().findFirst().orElse(null);
-		String reason = (fieldError == null)
-			? RunningErrorCode.INVALID_LOCATION_VALUE.getMessage()
-			: fieldError.getField() + ": " + fieldError.getDefaultMessage();
+		FieldError fe = ex.getBindingResult().getFieldErrors().stream().findFirst().orElse(null);
+		String reason = (fe == null) ? RunningErrorCode.INVALID_INPUT.getMessage()
+			: fe.getField() + ": " + fe.getDefaultMessage();
 		log.debug("[WS][Validation] {}", reason, ex);
-		return ApiResponse.error(RunningErrorCode.INVALID_LOCATION_VALUE, reason);
+		return ApiResponse.error(RunningErrorCode.INVALID_INPUT, reason);
 	}
 
 	/**
-	 * 언제 발생하나?
-	 * - Inbound STOMP 프레임 → 메시지 변환 과정에서 발생.
-	 * - STOMP 헤더/프레임을 목표 타입으로 변환하는 도중(예: 구독/전송 프레임 파싱 실패) 예외가 터진다.
-	 * 대표 사례
-	 * - 잘못된 STOMP 프레임 포맷, 헤더 누락/형식 오류
-	 * 반환
-	 * - PAYLOAD_INVALID(R304)
+	 * 메서드 파라미터 Bean Validation 제약 위반(@Validated + @Min 등)
+	 * --> CONSTRAINT_VIOLATION(R310)
 	 */
-	@MessageExceptionHandler(org.springframework.messaging.simp.stomp.StompConversionException.class)
+	@MessageExceptionHandler(ConstraintViolationException.class)
 	@SendToUser(destinations = "/queue/errors", broadcast = false)
-	public ApiResponse<Void> onStompConversion(org.springframework.messaging.simp.stomp.StompConversionException ex,
-		Message<?> msg) {
-		log.debug("[WS][StompConversion] {}", ex.getMessage(), ex);
+	public ApiResponse<Void> onConstraintViolation(ConstraintViolationException ex, Message<?> msg) {
+		String reason = ex.getConstraintViolations().stream().findFirst()
+			.map(v -> v.getPropertyPath() + ": " + v.getMessage())
+			.orElse(RunningErrorCode.CONSTRAINT_VIOLATION.getMessage());
+		log.debug("[WS][ConstraintViolation] {}", reason, ex);
+		return ApiResponse.error(RunningErrorCode.CONSTRAINT_VIOLATION, reason);
+	}
+
+	/**
+	 * @Payload 역직렬화/직렬화 실패(JSON ↔ DTO)
+	 * ex) 타입 불일치, enum 매핑 실패, JSON 구문 오류 등
+	 * --> PAYLOAD_INVALID(R304)
+	 */
+	@MessageExceptionHandler(MessageConversionException.class)
+	@SendToUser(destinations = "/queue/errors", broadcast = false)
+	public ApiResponse<Void> onPayloadConversion(MessageConversionException ex, Message<?> msg) {
+		log.debug("[WS][PayloadConversion] {}", ex.getMessage(), ex);
 		return ApiResponse.error(RunningErrorCode.PAYLOAD_INVALID, RunningErrorCode.PAYLOAD_INVALID.getMessage());
 	}
 
 	/**
-	 * 언제 발생하나?
-	 * - Inbound/Outbound JSON 직렬화/역직렬화 및 메시지 변환 단계에서 발생.
-	 * - Jackson(ObjectMapper) 또는 MessageConverter가 타입/포맷 불일치로 변환에 실패한 경우.
-	 * 대표 사례
-	 * - JSON 구문 오류, 필드 타입 불일치, 지원하지 않는 콘텐츠 타입
-	 * 반환
-	 * - PAYLOAD_INVALID(R304)
+	 * Outbound 응답 직렬화(Jackson) 실패
+	 * ex) 반환 객체에 순환참조, 직렬화 불가 타입 포함 등
+	 * --> OUTBOUND_SERIALIZATION_ERROR(R311)
 	 */
-	@MessageExceptionHandler({MessageConversionException.class, JsonProcessingException.class})
+	@MessageExceptionHandler(JsonProcessingException.class)
 	@SendToUser(destinations = "/queue/errors", broadcast = false)
-	public ApiResponse<Void> onOutboundConversion(Exception ex, Message<?> msg) {
-		log.debug("[WS][OutboundConversion] {}", ex.getMessage(), ex);
-		return ApiResponse.error(RunningErrorCode.PAYLOAD_INVALID, RunningErrorCode.PAYLOAD_INVALID.getMessage());
+	public ApiResponse<Void> onOutboundSerialization(JsonProcessingException ex, Message<?> msg) {
+		log.debug("[WS][OutboundSerialize] {}", ex.getOriginalMessage(), ex);
+		return ApiResponse.error(RunningErrorCode.OUTBOUND_SERIALIZATION_ERROR,
+			RunningErrorCode.OUTBOUND_SERIALIZATION_ERROR.getMessage());
 	}
 
 	/**
-	 * 언제 발생하나?
-	 * - 세션/인증 맥락이 필요한 구간에서 인증 정보가 없거나 무효할 때.
-	 * - Handshake/ChannelInterceptor/JWT 검증 실패, 세션 속성에서 Principal 누락 등.
-	 * 대표 사례
-	 * - 인증 토큰 만료/서명 오류, 세션 Attribute에 Principal 없음, SecurityContext 미설정
-	 * 반환
-	 * - UNAUTHORIZED_SESSION(R305)
+	 * @Header/@DestinationVariable 타입 변환 실패
+	 * ex) "abc" → Long 변환 시도
+	 * --> TYPE_CONVERSION_FAILED(R308)
 	 */
-	@MessageExceptionHandler({IllegalStateException.class, AuthenticationException.class})
+	@MessageExceptionHandler(ConversionFailedException.class)
+	@SendToUser(destinations = "/queue/errors", broadcast = false)
+	public ApiResponse<Void> onTypeConversion(ConversionFailedException ex, Message<?> msg) {
+		String reason = "타입 변환 실패: value=" + String.valueOf(ex.getValue())
+			+ ", target=" + ex.getTargetType();
+		log.debug("[WS][TypeConversion] {}", reason, ex);
+		return ApiResponse.error(RunningErrorCode.TYPE_CONVERSION_FAILED, reason);
+	}
+
+	// 컨트롤러 내부에서 발생한 인증/인가 예외
+
+	/**
+	 * 권한 부족(@PreAuthorize 등)
+	 * --> FORBIDDEN_WS_ACCESS(R306)
+	 */
+	@MessageExceptionHandler(AccessDeniedException.class)
+	@SendToUser(destinations = "/queue/errors", broadcast = false)
+	public ApiResponse<Void> onAccessDenied(AccessDeniedException ex, Principal principal, Message<?> msg) {
+		log.info("[WS][AccessDenied] user={} {}", principal != null ? principal.getName() : "anonymous", ex.toString());
+		return ApiResponse.error(RunningErrorCode.FORBIDDEN_WS_ACCESS,
+			RunningErrorCode.FORBIDDEN_WS_ACCESS.getMessage());
+	}
+
+	/**
+	 * 인증 정보 없음/무효(메서드 보안 시점)
+	 * --> UNAUTHORIZED_SESSION(R305)
+	 */
+	@MessageExceptionHandler({
+		AuthenticationCredentialsNotFoundException.class,
+		AuthenticationException.class
+	})
 	@SendToUser(destinations = "/queue/errors", broadcast = false)
 	public ApiResponse<Void> onUnauthorizedSession(Exception ex, Message<?> msg) {
-		log.warn("[WS][UnauthorizedSession] {}", ex.getMessage(), ex);
+		log.warn("[WS][Unauthorized] {}", ex.getMessage(), ex);
 		return ApiResponse.error(RunningErrorCode.UNAUTHORIZED_SESSION,
 			RunningErrorCode.UNAUTHORIZED_SESSION.getMessage());
 	}
 
+	// 도메인/비즈니스 로직 예외
+
 	/**
-	 * 언제 발생하나?
-	 * - 메시지를 브로커/구독 대상에게 전달하는 과정에서 실패할 때.
-	 * 대표 사례
-	 * - 구독 대상 없음, 브로커 연결/라우팅 문제, 전송 타임아웃
-	 * 반환
-	 * - EVENT_PUBLISH_FAILED(R902)
+	 * 잘못된 인자(서비스/도메인 입력 오류)
+	 * --> BUSINESS_INVALID_ARGUMENT(R321)
+	 */
+	@MessageExceptionHandler(IllegalArgumentException.class)
+	@SendToUser(destinations = "/queue/errors", broadcast = false)
+	public ApiResponse<Void> onIllegalArgument(IllegalArgumentException ex, Message<?> msg) {
+		log.info("[WS][Biz:IllegalArgument] {}", ex.toString(), ex);
+		return ApiResponse.error(RunningErrorCode.BUSINESS_INVALID_ARGUMENT,
+			ex.getMessage() != null ? ex.getMessage()
+				: RunningErrorCode.BUSINESS_INVALID_ARGUMENT.getMessage());
+	}
+
+	/**
+	 * 도메인 상태 위반
+	 * --> BUSINESS_ILLEGAL_STATE(R322)
+	 */
+	@MessageExceptionHandler(IllegalStateException.class)
+	@SendToUser(destinations = "/queue/errors", broadcast = false)
+	public ApiResponse<Void> onIllegalState(IllegalStateException ex, Message<?> msg) {
+		log.info("[WS][Biz:IllegalState] {}", ex.toString(), ex);
+		return ApiResponse.error(RunningErrorCode.BUSINESS_ILLEGAL_STATE,
+			ex.getMessage() != null ? ex.getMessage()
+				: RunningErrorCode.BUSINESS_ILLEGAL_STATE.getMessage());
+	}
+
+	// 메시지 실행/전송 예외
+
+	/**
+	 * @MessageMapping 실행 중 예외 래핑
+	 * --> MESSAGE_HANDLING_ERROR(R312)
+	 */
+	@MessageExceptionHandler(MessageHandlingException.class)
+	@SendToUser(destinations = "/queue/errors", broadcast = false)
+	public ApiResponse<Void> onMessageHandling(MessageHandlingException ex, Message<?> msg) {
+		String reason = ex.getCause() != null ? ex.getCause().getMessage()
+			: RunningErrorCode.MESSAGE_HANDLING_ERROR.getMessage();
+		log.warn("[WS][Handling] {}", reason, ex);
+		return ApiResponse.error(RunningErrorCode.MESSAGE_HANDLING_ERROR, reason);
+	}
+
+	/**
+	 * convertAndSend 중 전송 실패
+	 * --> EVENT_PUBLISH_FAILED(R902)
 	 */
 	@MessageExceptionHandler(MessageDeliveryException.class)
 	@SendToUser(destinations = "/queue/errors", broadcast = false)
@@ -112,19 +185,17 @@ public class WebSocketExceptionHandler {
 	}
 
 	/**
-	 * 언제 발생하나?
-	 * - 메시징 파이프라인 전반에서 발생하는 일반적인 예외의 상위 타입.
-	 * 대표 사례
-	 * - 채널/브로커 다운, 세션 상태 비정상, 라우팅 실패 등 구체 핸들러에 매칭되지 않은 MessagingException
-	 * 반환
-	 * - INTERNAL_ERROR(R399)
+	 * 메시징 전반의 일반 예외(위에서 매칭되지 않은 MessagingException)
+	 * --> MESSAGING_ERROR(R313)
 	 */
 	@MessageExceptionHandler(MessagingException.class)
 	@SendToUser(destinations = "/queue/errors", broadcast = false)
 	public ApiResponse<Void> onMessaging(MessagingException ex, Message<?> msg) {
 		log.warn("[WS][Messaging] {}", ex.getMessage(), ex);
-		return ApiResponse.error(RunningErrorCode.INTERNAL_ERROR, RunningErrorCode.INTERNAL_ERROR.getMessage());
+		return ApiResponse.error(RunningErrorCode.MESSAGING_ERROR, RunningErrorCode.MESSAGING_ERROR.getMessage());
 	}
+
+	// 폴백
 
 	@MessageExceptionHandler(Throwable.class)
 	@SendToUser(destinations = "/queue/errors", broadcast = false)
@@ -132,4 +203,5 @@ public class WebSocketExceptionHandler {
 		log.error("[WS][Unhandled] {}", ex.getMessage(), ex);
 		return ApiResponse.error(RunningErrorCode.INTERNAL_ERROR, RunningErrorCode.INTERNAL_ERROR.getMessage());
 	}
+
 }

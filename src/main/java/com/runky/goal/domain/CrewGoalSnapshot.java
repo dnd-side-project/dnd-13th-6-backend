@@ -28,6 +28,9 @@ public class CrewGoalSnapshot extends BaseTimeEntity {
     @Embedded
     private Goal goal;
 
+    @Column(name = "run_distance", nullable = false)
+    private BigDecimal runDistance;
+
     @Column(name = "achieved", nullable = false)
     private Boolean achieved;
 
@@ -40,6 +43,7 @@ public class CrewGoalSnapshot extends BaseTimeEntity {
     public CrewGoalSnapshot(Long crewId, Goal goal, Boolean achieved, WeekUnit weekUnit) {
         this.crewId = crewId;
         this.goal = goal;
+        this.runDistance = BigDecimal.ZERO;
         this.achieved = achieved;
         this.weekUnit = weekUnit;
     }

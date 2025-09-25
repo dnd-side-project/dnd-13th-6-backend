@@ -27,6 +27,9 @@ public class MemberGoalSnapshot extends BaseTimeEntity {
     @Embedded
     private Goal goal;
 
+    @Column(name = "run_distance", nullable = false)
+    private BigDecimal runDistance;
+
     @Column(name = "achieved", nullable = false)
     private Boolean achieved;
 
@@ -39,6 +42,7 @@ public class MemberGoalSnapshot extends BaseTimeEntity {
     public MemberGoalSnapshot(Long memberId, Goal goal, Boolean achieved, LocalDate localDate) {
         this.memberId = memberId;
         this.goal = goal;
+        this.runDistance = BigDecimal.ZERO;
         this.achieved = achieved;
         this.weekUnit = WeekUnit.from(localDate);
     }

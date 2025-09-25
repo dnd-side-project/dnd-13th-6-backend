@@ -1,5 +1,6 @@
 package com.runky.cheer.application;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -8,10 +9,9 @@ import com.runky.cheer.domain.CheerInfo;
 import com.runky.cheer.domain.CheerService;
 import com.runky.global.error.GlobalException;
 import com.runky.member.infrastructure.persistence.JpaMemberRepository;
-import com.runky.notification.domain.aggregate.PushCommand;
-import com.runky.notification.domain.aggregate.PushService;
 import com.runky.notification.domain.notification.Nickname;
 import com.runky.notification.domain.notification.NotificationMessage;
+import com.runky.notification.interfaces.consumer.NotificationEvent;
 import com.runky.running.domain.RunningService;
 import com.runky.running.error.RunningErrorCode;
 
@@ -22,9 +22,9 @@ import lombok.RequiredArgsConstructor;
 public class CheerFacade {
 
 	private final RunningService runningService;
-	private final PushService pushService;
 	private final CheerService cheerService;
 	private final JpaMemberRepository memberRepository;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional
 	public CheerResult.Sent send(CheerCriteria.Send criteria) {
@@ -46,7 +46,7 @@ public class CheerFacade {
 			new CheerCommand.Create(criteria.runningId(), criteria.senderId(), criteria.receiverId(),
 				criteria.message()));
 
-		pushService.pushToOne(new PushCommand.NotifyToOne(
+		eventPublisher.publishEvent(new NotificationEvent.NotifyToOne(
 			criteria.senderId(), criteria.receiverId(), new NotificationMessage.Cheer(new Nickname(nickname)), null
 		));
 

@@ -9,11 +9,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "member_clover_history")
+@Table(name = "member_clover_history", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_member_week", columnNames = {"member_id", "iso_year", "iso_week"})
+})
 public class MemberCloverHistory extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -12,7 +12,9 @@ public class WeeklyCrewGoalSnapshotWriter implements ItemWriter<CrewGoalAchieveI
     @Override
     public void write(Chunk<? extends CrewGoalAchieveInfo> chunk) throws Exception {
         for (CrewGoalAchieveInfo info : chunk) {
-            cloverRepository.addCloverInCrew(info.crewId(), 3L);
+            if (info.isAchieved()) {
+                cloverRepository.addCloverInCrew(info.crewId(), 3L);
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.runky.goal.application.step;
 
-import com.runky.goal.domain.batch.MemberGoalAchieveInfo;
 import com.runky.goal.domain.MemberGoalSnapshot;
+import com.runky.goal.domain.batch.MemberGoalAchieveInfo;
 import com.runky.goal.domain.batch.WeeklyMemberGoalProcessor;
 import com.runky.goal.domain.batch.WeeklyMemberGoalReader;
 import com.runky.goal.domain.batch.WeeklyMemberGoalWriter;
@@ -40,8 +40,7 @@ public class WeeklyGoalAchieveStepConfig {
     @Bean
     @StepScope
     public WeeklyMemberGoalReader weeklyMemberGoalReader(EntityManagerFactory emf,
-                                                         @Value("#{jobParameters['snapshotDate']}") String dateStr) {
-        LocalDate date = LocalDate.parse(dateStr);
+                                                         @Value("#{jobParameters['snapshotDate']}") LocalDate date) {
         return new WeeklyMemberGoalReader(emf, date);
     }
 

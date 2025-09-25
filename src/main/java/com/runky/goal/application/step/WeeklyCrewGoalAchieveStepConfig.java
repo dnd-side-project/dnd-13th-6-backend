@@ -1,12 +1,13 @@
 package com.runky.goal.application.step;
 
-import com.runky.goal.domain.batch.CrewGoalAchieveInfo;
 import com.runky.goal.domain.CrewGoalSnapshot;
+import com.runky.goal.domain.batch.CrewGoalAchieveInfo;
 import com.runky.goal.domain.batch.WeeklyCrewGoalSnapshotProcessor;
 import com.runky.goal.domain.batch.WeeklyCrewGoalSnapshotReader;
 import com.runky.goal.domain.batch.WeeklyCrewGoalSnapshotWriter;
 import com.runky.reward.domain.CloverRepository;
 import jakarta.persistence.EntityManagerFactory;
+import java.time.LocalDate;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.repository.JobRepository;
@@ -14,6 +15,7 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -37,8 +39,9 @@ public class WeeklyCrewGoalAchieveStepConfig {
 
     @Bean
     @StepScope
-    public WeeklyCrewGoalSnapshotReader crewGoalSnapshotReader(EntityManagerFactory emf) {
-        return new WeeklyCrewGoalSnapshotReader(emf);
+    public WeeklyCrewGoalSnapshotReader crewGoalSnapshotReader(EntityManagerFactory emf,
+                                                               @Value("#{jobParameters['snapshotDate']}") LocalDate date) {
+        return new WeeklyCrewGoalSnapshotReader(emf, date);
     }
 
     @Bean

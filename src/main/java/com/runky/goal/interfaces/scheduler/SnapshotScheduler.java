@@ -48,7 +48,7 @@ public class SnapshotScheduler {
         LocalDate snapshotDate = LocalDate.now();
 
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("snapshotDate", snapshotDate.toString())
+                .addLocalDate("snapshotDate", snapshotDate)
                 .toJobParameters();
 
         jobLauncher.run(weeklyGoalAchieveJob, jobParameters);
@@ -60,7 +60,7 @@ public class SnapshotScheduler {
         LocalDate snapshotDate = LocalDate.now();
 
         JobParameters jobParameters = new JobParametersBuilder()
-                .addString("snapshotDate", snapshotDate.toString())
+                .addLocalDate("snapshotDate", snapshotDate)
                 .toJobParameters();
 
         jobLauncher.run(weeklyCreGoalAchieveJob, jobParameters);

@@ -11,10 +11,16 @@ import com.runky.auth.domain.port.TokenDecoder;
 import com.runky.auth.domain.signup.SignupTokenService;
 import com.runky.auth.domain.vo.OAuthUserInfo;
 import com.runky.auth.domain.vo.RefreshTokenClaims;
+import com.runky.crew.domain.CrewCommand;
+import com.runky.crew.domain.CrewService;
+import com.runky.goal.domain.GoalCommand;
+import com.runky.goal.domain.GoalService;
 import com.runky.member.domain.MemberCommand;
 import com.runky.member.domain.dto.MemberInfo;
 import com.runky.member.domain.service.MemberReader;
 import com.runky.member.domain.service.MemberRegistrar;
+import com.runky.reward.domain.RewardCommand;
+import com.runky.reward.domain.RewardService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +36,9 @@ public class AuthFacade {
 
 	private final TokenDecoder tokenDecoder;
 	private final AuthTokenService authTokenService;
+	private final RewardService rewardService;
+	private final GoalService goalService;
+	private final CrewService crewService;
 
 	private final ApplicationEventPublisher eventPublisher;
 
@@ -70,8 +79,10 @@ public class AuthFacade {
 			));
 		AuthInfo.TokenPair pair = authTokenService.issue(saved.id(), saved.role().name());
 		signupTokenService.delete(signupToken);
-
-		eventPublisher.publishEvent(new AuthEvent.SignupCompleted(saved.id()));
+		rewardService.init(new RewardCommand.Init(saved.id()));
+		goalService.init(new GoalCommand.Init(saved.id()));
+		crewService.init(new CrewCommand.Init(saved.id()));
+		//		eventPublisher.publishEvent(new AuthEvent.SignupCompleted(saved.id()));
 
 		return new AuthResult.SigninComplete(pair.accessToken(), pair.refreshToken());
 	}

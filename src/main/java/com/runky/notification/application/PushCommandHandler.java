@@ -32,7 +32,7 @@ public class PushCommandHandler {
 		String title = template.title();
 		String body = template.renderText(notificationMessage.variables());
 
-		pushSendService.sendToOne(token, title, body, command.data());
+		pushSendService.sendToOne(token, title, body);
 
 		notificationService.recordsByTemplate(
 			new NotificationCommand.RecordByTemplate(
@@ -50,7 +50,7 @@ public class PushCommandHandler {
 		String title = template.title();
 		String body = template.renderText(notificationMessage.variables());
 
-		pushSendService.sendToMany(tokens, title, body, command.data());
+		pushSendService.sendToMany(tokens, title, body);
 
 		notificationService.recordsByTemplate(
 			new NotificationCommand.RecordsByTemplate(

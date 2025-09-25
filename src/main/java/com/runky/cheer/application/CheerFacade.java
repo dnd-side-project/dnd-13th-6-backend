@@ -47,7 +47,7 @@ public class CheerFacade {
 				criteria.message()));
 
 		eventPublisher.publishEvent(new NotificationEvent.NotifyToOne(
-			criteria.senderId(), criteria.receiverId(), new NotificationMessage.Cheer(new Nickname(nickname)), null
+			criteria.senderId(), criteria.receiverId(), new NotificationMessage.Cheer(new Nickname(nickname))
 		));
 
 		return new CheerResult.Sent(

@@ -1,7 +1,6 @@
 package com.runky.notification.interfaces.consumer;
 
 import java.util.List;
-import java.util.Map;
 
 import com.runky.notification.domain.notification.NotificationMessage;
 
@@ -11,13 +10,11 @@ public final class NotificationEvent {
 	private NotificationEvent() {
 	}
 
-	public record NotifyToOne(@NotNull Long senderId, @NotNull Long receiverId, @NotNull NotificationMessage args,
-							  Map<String, String> data) {
+	public record NotifyToOne(@NotNull Long senderId, @NotNull Long receiverId, @NotNull NotificationMessage args) {
 	}
 
 	public record NotifyToMany(@NotNull Long senderId, @NotNull List<Long> receiverIds,
-							   @NotNull NotificationMessage args,
-							   Map<String, String> data) {
+							   @NotNull NotificationMessage args) {
 	}
 
 }

@@ -35,7 +35,7 @@ public class PushService {
 		String title = template.title();
 		String body = template.renderText(notificationMessage.variables());
 
-		var send = pushSendService.sendToOne(token, title, body, command.data());
+		var send = pushSendService.sendToOne(token, title, body);
 
 		notificationService.recordsByTemplate(
 			new NotificationCommand.RecordByTemplate(
@@ -55,7 +55,7 @@ public class PushService {
 		String title = template.title();
 		String body = template.renderText(notificationMessage.variables());
 
-		var send = pushSendService.sendToMany(tokens, title, body, command.data());
+		var send = pushSendService.sendToMany(tokens, title, body);
 
 		notificationService.recordsByTemplate(
 			new NotificationCommand.RecordsByTemplate(

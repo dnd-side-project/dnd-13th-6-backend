@@ -42,9 +42,7 @@ public class RunningFacade {
 
 		var pushToManyCmd = new NotificationEvent.NotifyToMany(
 			criteria.runnerId(), receiverIds,
-			new NotificationMessage.RunStarted(new Nickname(runnerNickname)),
-			null
-		);
+			new NotificationMessage.RunStarted(new Nickname(runnerNickname)));
 		eventPublisher.publishEvent(pushToManyCmd);
 		return RunningResult.Start.from(info);
 	}

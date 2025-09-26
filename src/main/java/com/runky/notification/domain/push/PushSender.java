@@ -1,7 +1,6 @@
 package com.runky.notification.domain.push;
 
 import java.util.List;
-import java.util.Map;
 
 public interface PushSender {
 
@@ -9,9 +8,9 @@ public interface PushSender {
 
 	SendResult sendMulticast(List<String> tokens, NotificationPayload payload);
 
-	record NotificationPayload(String title, String body, Map<String, String> data) {
+	record NotificationPayload(String title, String body) {
 		public static NotificationPayload of(String title, String body) {
-			return new NotificationPayload(title, body, Map.of());
+			return new NotificationPayload(title, body);
 		}
 	}
 

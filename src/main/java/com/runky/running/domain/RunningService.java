@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.runky.global.error.GlobalException;
-import com.runky.running.api.socket.WsDestinations;
 import com.runky.running.error.RunningErrorCode;
+import com.runky.running.interfaces.websocket.WsDestinations;
 
 import lombok.RequiredArgsConstructor;
 

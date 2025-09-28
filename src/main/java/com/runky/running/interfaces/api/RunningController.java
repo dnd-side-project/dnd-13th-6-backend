@@ -70,7 +70,7 @@ public class RunningController implements RunningApiSpec {
 	public ApiResponse<End> end(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable Long runningId,
-		@RequestBody com.runky.running.interfaces.api.RunningRequest.End request
+		@RequestBody RunningRequest.End request
 	) {
 		RunningCriteria.End criteria = request.toCriteria(runningId, requester.memberId());
 		RunningResult.End result = runningFacade.end(criteria);
@@ -78,7 +78,23 @@ public class RunningController implements RunningApiSpec {
 
 		messagingTemplate.convertAndSend("/topic/runnings/" + runningId,
 			new RoomEvent("ENDED", runningId, requester.memberId(), null, null, System.currentTimeMillis()));
-		
+
+		return ApiResponse.success(response);
+	}
+
+	@Override
+	@PostMapping("/end")
+	public ApiResponse<End> end(
+		@AuthenticationPrincipal MemberPrincipal requester,
+		@RequestBody RunningRequest.End request
+	) {
+		RunningCriteria.EndWithNoRunningId criteria = request.toCriteria(requester.memberId());
+		RunningResult.End result = runningFacade.end(criteria);
+		Long runningId = result.runningId();
+		messagingTemplate.convertAndSend("/topic/runnings/" + runningId,
+			new RoomEvent("ENDED", runningId, requester.memberId(), null, null, System.currentTimeMillis()));
+
+		End response = End.from(result);
 		return ApiResponse.success(response);
 	}
 

@@ -53,6 +53,13 @@ public class RunningFacade {
 		return RunningResult.End.from(info);
 	}
 
+	@Transactional
+	public RunningResult.End end(RunningCriteria.EndWithNoRunningId criteria) {
+		Long runningId = runningService.getRunningId(criteria.runnerId());
+		RunningInfo.End info = runningService.end(criteria.toCommand(runningId));
+		return RunningResult.End.from(info);
+	}
+
 	@Transactional(readOnly = true)
 	public RunningResult.TodaySummary getTodaySummary(RunningCriteria.TodaySummary criteria) {
 

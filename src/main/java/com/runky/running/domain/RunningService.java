@@ -94,6 +94,12 @@ public class RunningService {
 	}
 
 	@Transactional(readOnly = true)
+	public Long getRunningId(Long runnerId) {
+		return runningRepository.findIdByRunnerIdAndStatus(runnerId, Running.Status.RUNNING)
+			.orElseThrow(() -> new GlobalException(RunningErrorCode.NOT_ACTIVE_RUNNING));
+	}
+
+	@Transactional(readOnly = true)
 	public Long getRunnerId(final Long runningId) {
 		return runningRepository.findRunnerIdById(runningId)
 			.orElseThrow(() -> new GlobalException(RunningErrorCode.NOT_FOUND_RUNNING));

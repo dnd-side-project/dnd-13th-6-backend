@@ -21,7 +21,13 @@ public interface RunningApiSpec {
 	ApiResponse<RunningResponse.End> end(
 		@Parameter(hidden = true) MemberPrincipal requester,
 		@Schema(description = "종료할 런닝 ID") Long runningId,
-		@Schema(description = "런닝 요약 및 트랙 정보") com.runky.running.interfaces.api.RunningRequest.End request
+		@Schema(description = "런닝 요약 및 트랙 정보") RunningRequest.End request
+	);
+
+	@Operation(summary = "런닝 종료", description = "런닝 id 없이, 런닝을 종료하고 전체 기록을 저장합니다.")
+	ApiResponse<RunningResponse.End> end(
+		@Parameter(hidden = true) MemberPrincipal requester,
+		@Schema(description = "런닝 요약 및 트랙 정보") RunningRequest.End request
 	);
 
 	@Operation(

@@ -82,29 +82,41 @@ public class GoalRepositoryImpl implements GoalRepository {
 
 	@Override
 	public void saveAll(List<MemberGoalSnapshot> snapshots) {
-		String sql = "INSERT INTO member_goal_snapshot "
-			+ "(member_id, goal, achieved, iso_year, iso_week, created_at, updated_at) "
-			+ "VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
-		jdbcTemplate.batchUpdate(sql, snapshots, snapshots.size(), (ps, snapshot) -> {
-			ps.setLong(1, snapshot.getMemberId());
-			ps.setBigDecimal(2, snapshot.getGoal().value());
-			ps.setBoolean(3, snapshot.getAchieved());
-			ps.setInt(4, snapshot.getWeekUnit().isoYear());
-			ps.setInt(5, snapshot.getWeekUnit().isoWeek());
-		});
+        String sql = "INSERT INTO member_goal_snapshot "
+                + "(member_id, goal, run_distance, achieved, iso_year, iso_week, created_at, updated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW()) "
+                + "ON DUPLICATE KEY UPDATE "
+                + "goal = VALUES(goal), "
+                + "run_distance = VALUES(run_distance), "
+                + "achieved = VALUES(achieved), "
+                + "updated_at = NOW()";
+        jdbcTemplate.batchUpdate(sql, snapshots, snapshots.size(), (ps, snapshot) -> {
+            ps.setLong(1, snapshot.getMemberId());
+            ps.setBigDecimal(2, snapshot.getGoal().value());
+            ps.setBigDecimal(3, snapshot.getRunDistance());
+            ps.setBoolean(4, snapshot.getAchieved());
+            ps.setInt(5, snapshot.getWeekUnit().isoYear());
+            ps.setInt(6, snapshot.getWeekUnit().isoWeek());
+        });
 	}
 
 	@Override
 	public void saveAllCrewGoalSnapshots(List<CrewGoalSnapshot> snapshots) {
 		String sql = "INSERT INTO crew_goal_snapshot "
-			+ "(crew_id, goal, achieved, iso_year, iso_week, created_at, updated_at) "
-			+ "VALUES (?, ?, ?, ?, ?, NOW(), NOW())";
+			+ "(crew_id, goal, run_distance, achieved, iso_year, iso_week, created_at, updated_at) "
+			+ "VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW()) "
+                + "ON DUPLICATE KEY UPDATE "
+                + "goal = VALUES(goal), "
+                + "run_distance = VALUES(run_distance), "
+                + "achieved = VALUES(achieved), "
+                + "updated_at = NOW()";
 		jdbcTemplate.batchUpdate(sql, snapshots, snapshots.size(), (ps, snapshot) -> {
 			ps.setLong(1, snapshot.getCrewId());
 			ps.setBigDecimal(2, snapshot.getGoal().value());
-			ps.setBoolean(3, snapshot.getAchieved());
-			ps.setInt(4, snapshot.getWeekUnit().isoYear());
-			ps.setInt(5, snapshot.getWeekUnit().isoWeek());
+            ps.setBigDecimal(3, snapshot.getRunDistance());
+			ps.setBoolean(4, snapshot.getAchieved());
+			ps.setInt(5, snapshot.getWeekUnit().isoYear());
+			ps.setInt(6, snapshot.getWeekUnit().isoWeek());
 		});
 	}
 

@@ -1,4 +1,4 @@
-package com.runky.goal.interfaces;
+package com.runky.goal.interfaces.api;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;

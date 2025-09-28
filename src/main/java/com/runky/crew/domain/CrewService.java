@@ -92,21 +92,6 @@ public class CrewService {
 		return crewRepository.findAllCrewMembersOfUserWithoutUserId(userId);
 	}
 
-	@Transactional(readOnly = true)
-	public List<CrewActiveMemberInfo> getActiveMembersInfo() {
-		List<Crew> crews = crewRepository.findAll();
-
-		List<CrewActiveMemberInfo> infos = new ArrayList<>();
-		for (Crew crew : crews) {
-			List<CrewMember> activeMembers = crew.getActiveMembers();
-			Set<Long> activeMemberIds = activeMembers.stream()
-				.map(CrewMember::getId)
-				.collect(Collectors.toSet());
-			infos.add(new CrewActiveMemberInfo(crew.getId(), activeMemberIds));
-		}
-		return infos;
-	}
-
     @Transactional
     public List<CrewMember> findAllRelatedCrewMembers(CrewCommand.Related command) {
         List<CrewMember> relatedCrewMembers = crewRepository.findRelatedCrewMembers(command.userId());

@@ -74,8 +74,11 @@ public class RunningController implements RunningApiSpec {
 	) {
 		RunningCriteria.End criteria = request.toCriteria(runningId, requester.memberId());
 		RunningResult.End result = runningFacade.end(criteria);
-
 		End response = End.from(result);
+
+		messagingTemplate.convertAndSend("/topic/runnings/" + runningId,
+			new RoomEvent("ENDED", runningId, requester.memberId(), null, null, System.currentTimeMillis()));
+		
 		return ApiResponse.success(response);
 	}
 

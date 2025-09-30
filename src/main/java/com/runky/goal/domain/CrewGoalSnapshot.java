@@ -65,9 +65,16 @@ public class CrewGoalSnapshot extends BaseTimeEntity {
 
     public void addDistance(BigDecimal distance) {
         this.runDistance = this.runDistance.add(distance);
+        if (isAchieved()) {
+            achieve();
+        }
     }
 
     public void achieve() {
         this.achieved = true;
+    }
+
+    public boolean isAchieved() {
+        return goal.isLessThanOrEqualTo(runDistance);
     }
 }

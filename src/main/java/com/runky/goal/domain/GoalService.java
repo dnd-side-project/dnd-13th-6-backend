@@ -32,27 +32,16 @@ public class GoalService {
 		goalRepository.saveAll(snapshots);
 	}
 
-	@Transactional(readOnly = true)
-	public CrewGoalSnapshot createCrewSnapshot(GoalCommand.CrewSnapshot command) {
-		WeekUnit weekUnit = WeekUnit.from(command.localDate());
-		List<MemberGoalSnapshot> snapshots = goalRepository.findLatestSnapshotsOfWeek(command.memberIds(), weekUnit);
-		return CrewGoalSnapshot.of(snapshots, command.crewId(), command.localDate());
-	}
-
-	@Transactional
-	public void saveAllCrewSnapshots(List<CrewGoalSnapshot> crewSnapshots) {
-		goalRepository.saveAllCrewGoalSnapshots(crewSnapshots);
-	}
-
-	@Transactional(readOnly = true)
-	public Optional<MemberGoalSnapshot> findMemberGoalSnapshot(Long memberId, LocalDate localDate) {
-		return goalRepository.findMemberGoalSnapshotOfWeek(memberId, WeekUnit.from(localDate));
-	}
-
-	@Transactional(readOnly = true)
-	public Optional<CrewGoalSnapshot> findCrewGoalSnapshot(Long crewId, LocalDate date) {
-		return goalRepository.findCrewGoalSnapshot(crewId, WeekUnit.from(date));
-	}
+    @Transactional
+    public void updateDistances(GoalCommand.UpdateDistance cmd) {
+        MemberGoalSnapshot memberSnapshot = goalRepository.findSnapshotWithLock(cmd.memberId(), WeekUnit.from(cmd.date()))
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+        memberSnapshot.addDistance(cmd.distance());
+        List<CrewGoalSnapshot> crewSnapshots = goalRepository.findAllCrewSnapshotsWithLock(cmd.crewIds(), WeekUnit.from(cmd.date()));
+        for (CrewGoalSnapshot crewSnapshot : crewSnapshots) {
+            crewSnapshot.addDistance(cmd.distance());
+        }
+    }
 
 	@Transactional(readOnly = true)
 	public MemberGoalSnapshot getMemberGoalSnapshot(GoalCommand.GetMemberSnapshot command) {

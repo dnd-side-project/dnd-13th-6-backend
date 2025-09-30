@@ -17,4 +17,7 @@ public final class GoalCriteria {
 
 	public record LastWeekClover(Long memberId) {
 	}
+
+    public record UpdateDistance(Long memberId, BigDecimal distance) {
+    }
 }

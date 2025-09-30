@@ -56,6 +56,9 @@ public class MemberGoalSnapshot extends BaseTimeEntity {
 
     public void addDistance(BigDecimal distance) {
         this.runDistance = this.runDistance.add(distance);
+        if (isAchieved()) {
+            achieve();
+        }
     }
 
     public void achieve() {

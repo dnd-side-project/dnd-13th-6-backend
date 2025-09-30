@@ -3,6 +3,7 @@ package com.runky.goal.interfaces.event;
 import com.runky.auth.application.AuthEvent;
 import com.runky.goal.domain.GoalCommand;
 import com.runky.goal.domain.GoalService;
+import com.runky.running.application.RunningEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -18,5 +19,11 @@ public class GoalEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void consume(AuthEvent.SignupCompleted event) {
         goalService.init(new GoalCommand.Init(event.memberId()));
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handle(RunningEvent.Ended event) {
+
     }
 }

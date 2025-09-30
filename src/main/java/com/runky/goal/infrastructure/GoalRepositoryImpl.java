@@ -65,7 +65,17 @@ public class GoalRepositoryImpl implements GoalRepository {
 
 	}
 
-	@Override
+    @Override
+    public Optional<MemberGoalSnapshot> findSnapshotWithLock(Long memberId, WeekUnit weekUnit) {
+        return memberGoalSnapshotJpaRepository.findByMemberIdAndWeekUnit(memberId, weekUnit);
+    }
+
+    @Override
+    public List<CrewGoalSnapshot> findAllCrewSnapshotsWithLock(Set<Long> crewIds, WeekUnit weekUnit) {
+        return crewGoalSnapshotJpaRepository.findAllByCrewIdInAndWeekUnit(crewIds, weekUnit);
+    }
+
+    @Override
 	public MemberGoal save(MemberGoal memberGoal) {
 		return memberGoalJpaRepository.save(memberGoal);
 	}

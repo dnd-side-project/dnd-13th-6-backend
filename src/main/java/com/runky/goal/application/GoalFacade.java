@@ -79,4 +79,12 @@ public class GoalFacade {
 
         return new CrewGoalSnapshotResult.Clover(count);
     }
+
+    public void updateSnapshots(GoalCriteria.UpdateDistance cri) {
+        Set<Long> crewIds = crewService.getCrewsOfUser(cri.memberId()).stream()
+                .map(Crew::getId)
+                .collect(Collectors.toSet());
+
+        goalService.updateDistances(new GoalCommand.UpdateDistance(cri.memberId(), crewIds, cri.distance(), LocalDate.now()));
+    }
 }

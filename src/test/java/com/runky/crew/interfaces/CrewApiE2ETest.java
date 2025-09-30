@@ -2,6 +2,8 @@ package com.runky.crew.interfaces;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.runky.crew.interfaces.api.CrewRequest;
+import com.runky.crew.interfaces.api.CrewResponse;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package com.runky.crew.interfaces;
+package com.runky.crew.interfaces.api;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;

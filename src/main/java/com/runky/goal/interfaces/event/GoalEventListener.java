@@ -3,8 +3,6 @@ package com.runky.goal.interfaces.event;
 import com.runky.auth.application.AuthEvent;
 import com.runky.goal.application.GoalCriteria;
 import com.runky.goal.application.GoalFacade;
-import com.runky.goal.domain.GoalCommand;
-import com.runky.goal.domain.GoalService;
 import com.runky.running.application.RunningEvent;
 import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +15,11 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class GoalEventListener {
     private final GoalFacade goalFacade;
-    private final GoalService goalService;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void consume(AuthEvent.SignupCompleted event) {
-        goalService.init(new GoalCommand.Init(event.memberId()));
+        goalFacade.init(new GoalCriteria.Init(event.memberId()));
     }
 
     @Async

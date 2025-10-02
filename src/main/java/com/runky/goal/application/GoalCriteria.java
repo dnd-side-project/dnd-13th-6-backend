@@ -21,4 +21,9 @@ public final class GoalCriteria {
 
     public record UpdateDistance(Long memberId, BigDecimal distance, LocalDate date) {
     }
+
+    public record Init(
+            Long memberId
+    ) {
+    }
 }

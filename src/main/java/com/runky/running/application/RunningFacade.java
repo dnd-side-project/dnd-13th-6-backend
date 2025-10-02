@@ -50,7 +50,8 @@ public class RunningFacade {
 	@Transactional
 	public RunningResult.End end(RunningCriteria.End criteria) {
 		RunningInfo.End info = runningService.end(criteria.toCommand());
-        eventPublisher.publishEvent(new RunningEvent.Ended(info.runningId(), info.runnerId(), info.status(), info.startedAt(), info.endedAt()));
+        eventPublisher.publishEvent(new RunningEvent.Ended(info.runningId(), info.runnerId(), info.distance(),
+                info.status(), info.startedAt(), info.endedAt()));
 		return RunningResult.End.from(info);
 	}
 

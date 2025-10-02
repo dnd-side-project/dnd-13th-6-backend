@@ -79,8 +79,8 @@ public class RunningService {
 		);
 		trackRepository.save(runningTrack);
 
-		return new RunningInfo.End(running.getId(), running.getRunnerId(), running.getStatus().toString(),
-			running.getStartedAt(), running.getEndedAt());
+		return new RunningInfo.End(running.getId(), running.getRunnerId(), running.getTotalDistanceMeter(),
+                running.getStatus().toString(), running.getStartedAt(), running.getEndedAt());
 	}
 
 	@Transactional(readOnly = true)

@@ -16,7 +16,7 @@ public final class RunningInfo {
 		}
 	}
 
-	public record End(Long runningId, Long runnerId, String status, LocalDateTime startedAt, LocalDateTime endedAt) {
+	public record End(Long runningId, Long runnerId, Double distance, String status, LocalDateTime startedAt, LocalDateTime endedAt) {
 	}
 
 	public record TotalDistance(Long runnerId, Double totalDistance) {

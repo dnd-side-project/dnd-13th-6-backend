@@ -10,12 +10,12 @@ public final class RunningRequest {
 		public RunningCriteria.End toCriteria(Long runningId, Long runnerId) {
 			return new RunningCriteria.End(
 				runningId, runnerId,
-				summary.totalDistanceMinutes, summary.durationSeconds, summary.avgSpeedMPS,
+				summary.totalDistanceMeter, summary.durationSeconds, summary.avgSpeedMPS,
 				track.format, track.points, track.pointCount
 			);
 		}
 
-		public record Summary(Double totalDistanceMinutes, Long durationSeconds, Double avgSpeedMPS) {
+		public record Summary(Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMPS) {
 		}
 
 		public record Track(String format, String points, int pointCount) {

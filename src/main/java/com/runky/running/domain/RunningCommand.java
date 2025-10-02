@@ -10,9 +10,9 @@ public final class RunningCommand {
 	}
 
 	public record End(
-		Long runningId, Long runnerId,
-		Double totalDistanceMinutes, Long durationSeconds, Double avgSpeedMPS,
-		String format, String points, int pointCount
+            Long runningId, Long runnerId,
+            Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMPS,
+            String format, String points, int pointCount
 	) {
 	}
 

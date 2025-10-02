@@ -17,7 +17,7 @@ public final class RunningCriteria {
 	public record End(
 		Long runningId,
 		Long runnerId,
-		Double totalDistanceMinutes,
+		Double totalDistanceMeter,
 		Long durationSeconds,
 		Double avgSpeedMPS,
 		String format,
@@ -27,7 +27,7 @@ public final class RunningCriteria {
 	) {
 		public RunningCommand.End toCommand() {
 			return new RunningCommand.End(
-				runningId, runnerId, totalDistanceMinutes, durationSeconds, avgSpeedMPS, format, points, pointCount
+				runningId, runnerId, totalDistanceMeter, durationSeconds, avgSpeedMPS, format, points, pointCount
 			);
 		}
 	}

@@ -68,7 +68,7 @@ public class RunningService {
 		}
 
 		LocalDateTime now = LocalDateTime.now();
-		running.finish(command.totalDistanceMinutes(), command.durationSeconds(), command.avgSpeedMPS(), now);
+		running.finish(command.totalDistanceMeter(), command.durationSeconds(), command.avgSpeedMPS(), now);
 		runningRepository.save(running);
 
 		RunningTrack runningTrack = new RunningTrack(

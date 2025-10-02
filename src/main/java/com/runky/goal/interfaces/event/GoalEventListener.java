@@ -28,6 +28,7 @@ public class GoalEventListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(RunningEvent.Ended event) {
-        goalFacade.updateSnapshots(new GoalCriteria.UpdateDistance(event.runnerId(), BigDecimal.valueOf(event.distance())));
+        goalFacade.updateSnapshots(new GoalCriteria.UpdateDistance(event.runnerId(),
+                BigDecimal.valueOf(event.distance()), event.endedAt().toLocalDate()));
     }
 }

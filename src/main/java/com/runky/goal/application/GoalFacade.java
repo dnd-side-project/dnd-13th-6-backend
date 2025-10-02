@@ -85,6 +85,6 @@ public class GoalFacade {
                 .map(Crew::getId)
                 .collect(Collectors.toSet());
 
-        goalService.updateDistances(new GoalCommand.UpdateDistance(cri.memberId(), crewIds, cri.distance(), LocalDate.now()));
+        goalService.updateDistances(new GoalCommand.UpdateDistance(cri.memberId(), crewIds, cri.distance(), cri.date()));
     }
 }

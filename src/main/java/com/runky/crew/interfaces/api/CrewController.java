@@ -1,4 +1,4 @@
-package com.runky.crew.interfaces;
+package com.runky.crew.interfaces.api;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.runky.crew.application.CrewCriteria;
 import com.runky.crew.application.CrewFacade;
 import com.runky.crew.application.CrewResult;
-import com.runky.crew.interfaces.CrewResponse.Related.RunningMember;
+import com.runky.crew.interfaces.api.CrewResponse.Related.RunningMember;
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
 

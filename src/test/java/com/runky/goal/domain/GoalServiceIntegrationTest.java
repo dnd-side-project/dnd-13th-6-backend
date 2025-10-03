@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
+import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -78,4 +80,31 @@ class GoalServiceIntegrationTest {
 			assertThat(snapshot.getWeekUnit().isoWeek()).isEqualTo(35);
 		}
 	}
+
+    @Nested
+    @DisplayName("사용자 러닝 거리 업데이트 시,")
+    class UpdateDistances {
+        @Test
+        @DisplayName("해당 사용자의 스냅샷 러닝 거리가 업데이트 된다.")
+        void updateMemberSnapshotDistance() {
+            MemberGoal memberGoal = MemberGoal.from(1L);
+            memberGoal.updateGoal(new BigDecimal("15.00"));
+            MemberGoalSnapshot memberSnapshot = memberGoal.createSnapshot(LocalDate.of(2025, 10, 1));
+            CrewGoalSnapshot crewSnapshot1 = CrewGoalSnapshot.of(List.of(memberSnapshot), 1L, LocalDate.of(2025, 10, 1));
+            CrewGoalSnapshot crewSnapshot2 = CrewGoalSnapshot.of(List.of(memberSnapshot), 2L, LocalDate.of(2025, 10, 1));
+            goalRepository.save(memberSnapshot);
+            goalRepository.saveAllCrewGoalSnapshots(List.of(crewSnapshot1, crewSnapshot2));
+            LocalDate date = LocalDate.of(2025, 10, 2);
+
+            goalService.updateDistances(new GoalCommand.UpdateDistance(1L, Set.of(1L, 2L), new BigDecimal("3.50"), date));
+
+            MemberGoalSnapshot snapshot = goalRepository.findMemberGoalSnapshotOfWeek(1L, WeekUnit.from(date)).orElseThrow();
+            assertThat(snapshot.getRunDistance()).isEqualTo(new BigDecimal("3.50"));
+
+            List<CrewGoalSnapshot> crewSnapshots = goalRepository.findAllCrewGoalSnapshots(Set.of(1L, 2L), WeekUnit.from(date));
+            assertThat(crewSnapshots)
+                    .extracting("runDistance")
+                    .containsExactlyInAnyOrder(new BigDecimal("3.50"), new BigDecimal("3.50"));
+        }
+    }
 }

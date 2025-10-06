@@ -1,5 +1,6 @@
 package com.runky.running.application;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.runky.running.domain.RunningCommand;
@@ -43,4 +44,7 @@ public final class RunningCriteria {
 
 	public record RemoveActiveRunning(Long runnerId, Long runningId) {
 	}
+
+    public record Weekly(Long runnerId, LocalDate start) {
+    }
 }

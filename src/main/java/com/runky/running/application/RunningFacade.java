@@ -84,4 +84,13 @@ public class RunningFacade {
 		);
 		return new RunningResult.RemovedRunning(count);
 	}
+
+    public List<RunningResult.History> getWeeklyHistories(RunningCriteria.Weekly criteria) {
+        List<RunningInfo.History> histories =
+                runningService.getWeeklyHistories(new RunningCommand.Weekly(criteria.runnerId(), criteria.start()));
+
+        return histories.stream()
+                .map(RunningResult.History::from)
+                .toList();
+    }
 }

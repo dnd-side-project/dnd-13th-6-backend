@@ -52,4 +52,28 @@ public final class RunningInfo {
 			);
 		}
 	}
+
+    public record History(
+            Long id,
+            Long runnerId,
+            Running.Status status,
+            Double distance,
+            Long durationSeconds,
+            Double avgSpeedMPS,
+            LocalDateTime startedAt,
+            LocalDateTime endedAt
+    ) {
+        public static History from(Running running) {
+            return new History(
+                    running.getId(),
+                    running.getRunnerId(),
+                    running.getStatus(),
+                    running.getTotalDistanceMeter(),
+                    running.getDurationSeconds(),
+                    running.getAvgSpeedMPS(),
+                    running.getStartedAt(),
+                    running.getEndedAt()
+            );
+        }
+    }
 }

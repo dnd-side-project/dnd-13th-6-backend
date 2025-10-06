@@ -209,6 +209,19 @@ public class RunningService {
 		return new RunningInfo.MyWeek(command.runnerId(), totalMeters, weekStart, weekEnd);
 	}
 
+    @Transactional
+    public List<RunningInfo.History> getWeeklyHistories(RunningCommand.Weekly command) {
+        LocalDateTime start = command.start().atStartOfDay();
+        LocalDateTime end = command.start().plusDays(7).atStartOfDay();
+
+        List<Running> histories = runningRepository.findBetweenFromAndToByRunnerId(command.runnerId(), start, end);
+
+        return histories.stream()
+                .filter(r -> r.getStatus() == Running.Status.ENDED)
+                .map(RunningInfo.History::from)
+                .toList();
+    }
+
 	private LocalDate toWeekStart(LocalDate date) {
 		return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
 	}

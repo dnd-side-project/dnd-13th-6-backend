@@ -84,11 +84,6 @@ public class RunningService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<RunningInfo.RunningResult> getTotalDistancesPeriod(LocalDateTime from, LocalDateTime to) {
-		return runningRepository.findTotalDistancesPeriod(from, to);
-	}
-
-	@Transactional(readOnly = true)
 	public boolean isActive(final Long runningId) {
 		return runningRepository.existsByIdAndStatus(runningId, Running.Status.RUNNING);
 	}
@@ -149,21 +144,6 @@ public class RunningService {
 				final String sub = active ? WsDestinations.subscribe(runningId) : null;
 				return new RunningInfo.RunnerStatusAndSub(runnerId, active, sub);
 			})
-			.toList();
-	}
-
-	@Transactional(readOnly = true)
-	public List<RunningInfo.RunnerStatus> getRunnerStatuses(final List<Long> runnerIds) {
-		if (runnerIds == null || runnerIds.isEmpty())
-			return List.of();
-
-		final List<Long> ordered = runnerIds.stream().filter(Objects::nonNull).toList();
-
-		final Set<Long> active = runningRepository
-			.findRunnerIdsByStatusAndEndedAtIsNull(ordered, Running.Status.RUNNING);
-
-		return ordered.stream()
-			.map(id -> new RunningInfo.RunnerStatus(id, active.contains(id)))
 			.toList();
 	}
 

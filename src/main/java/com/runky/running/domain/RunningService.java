@@ -209,7 +209,6 @@ public class RunningService {
 		return new RunningInfo.MyWeek(command.runnerId(), totalMeters, weekStart, weekEnd);
 	}
 
-    @Transactional
     public List<RunningInfo.History> getWeeklyHistories(RunningCommand.Weekly command) {
         LocalDateTime start = command.start().atStartOfDay();
         LocalDateTime end = command.start().plusDays(7).atStartOfDay();
@@ -217,7 +216,19 @@ public class RunningService {
         List<Running> histories = runningRepository.findBetweenFromAndToByRunnerId(command.runnerId(), start, end);
 
         return histories.stream()
-                .filter(r -> r.getStatus() == Running.Status.ENDED)
+                .filter(Running::isEnded)
+                .map(RunningInfo.History::from)
+                .toList();
+    }
+
+    public List<RunningInfo.History> getMonthlyHistories(RunningCommand.Monthly command) {
+        LocalDateTime start = LocalDate.of(command.year(), command.month(), 1).atStartOfDay();
+        LocalDateTime end = start.plusMonths(1);
+
+        List<Running> histories = runningRepository.findBetweenFromAndToByRunnerId(command.runnerId(), start, end);
+
+        return histories.stream()
+                .filter(Running::isEnded)
                 .map(RunningInfo.History::from)
                 .toList();
     }

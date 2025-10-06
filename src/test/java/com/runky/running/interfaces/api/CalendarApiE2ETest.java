@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -65,15 +64,52 @@ public class CalendarApiE2ETest {
                     .addParameter("date", "2025-10-06")
                     .build()
                     .toString();
-            ParameterizedTypeReference<ApiResponse<CalendarResponse.Weekly>> type = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<CalendarResponse.Histories>> type = new ParameterizedTypeReference<>() {
             };
 
-            ResponseEntity<ApiResponse<CalendarResponse.Weekly>> response
+            ResponseEntity<ApiResponse<CalendarResponse.Histories>> response
                     = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(httpHeaders), type);
 
             assertThat(response.getBody().getResult().totalDistance()).isEqualTo(35.0);
             assertThat(response.getBody().getResult().totalDuration()).isEqualTo(60 * 30 * 7);
             assertThat(response.getBody().getResult().histories()).hasSize(7);
+        }
+    }
+
+    @Nested
+    @DisplayName("GET /api/calendar/monthly")
+    class GetMonthly {
+        private final String BASE_URL = "/api/calendar/monthly";
+
+        @Test
+        @DisplayName("월간 러닝 기록을 조회한다.")
+        void getMonthlyHistories() throws URISyntaxException {
+            LocalDateTime now = LocalDateTime.of(2025, 10, 1, 10, 0);
+            for (int i = 0; i < 4; i++) {
+                Running running = Running.start(1L, now.plusWeeks(i));
+                running.finish(5.0, 60 * 30, 6.0, running.getStartedAt().plusMinutes(30));
+                runningJpaRepository.save(running);
+            }
+            Running excluded = Running.start(1L, LocalDateTime.of(2025, 10, 31, 23, 30));
+            excluded.finish(5.0, 60 * 30, 6.0, excluded.getStartedAt().plusMinutes(30));
+            runningJpaRepository.save(excluded);
+
+
+            HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
+            String url = new URIBuilder(BASE_URL)
+                    .addParameter("year", "2025")
+                    .addParameter("month", "10")
+                    .build()
+                    .toString();
+            ParameterizedTypeReference<ApiResponse<CalendarResponse.Histories>> type = new ParameterizedTypeReference<>() {
+            };
+
+            ResponseEntity<ApiResponse<CalendarResponse.Histories>> response
+                    = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(httpHeaders), type);
+
+            assertThat(response.getBody().getResult().totalDistance()).isEqualTo(20.0);
+            assertThat(response.getBody().getResult().totalDuration()).isEqualTo(60 * 30 * 4);
+            assertThat(response.getBody().getResult().histories()).hasSize(4);
         }
     }
 }

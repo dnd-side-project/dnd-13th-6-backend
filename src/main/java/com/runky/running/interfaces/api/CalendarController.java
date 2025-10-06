@@ -23,11 +23,22 @@ public class CalendarController implements CalendarApiSpec {
 
     @Override
     @GetMapping("/weekly")
-    public ApiResponse<CalendarResponse.Weekly> getWeeklyHistories(@AuthenticationPrincipal MemberPrincipal requester,
-                                                                   @RequestParam("date") LocalDate date) {
+    public ApiResponse<CalendarResponse.Histories> getWeeklyHistories(@AuthenticationPrincipal MemberPrincipal requester,
+                                                                      @RequestParam("date") LocalDate date) {
         List<RunningResult.History> histories =
                 runningFacade.getWeeklyHistories(new RunningCriteria.Weekly(requester.memberId(), date));
 
-        return ApiResponse.success(CalendarResponse.Weekly.from(histories));
+        return ApiResponse.success(CalendarResponse.Histories.from(histories));
+    }
+
+    @Override
+    @GetMapping("/monthly")
+    public ApiResponse<CalendarResponse.Histories> getMonthlyHistories(@AuthenticationPrincipal MemberPrincipal requester,
+                                                                       @RequestParam("year") int year,
+                                                                       @RequestParam("month") int month) {
+        List<RunningResult.History> histories =
+                runningFacade.getMonthlyHistories(new RunningCriteria.Monthly(requester.memberId(), year, month));
+
+        return ApiResponse.success(CalendarResponse.Histories.from(histories));
     }
 }

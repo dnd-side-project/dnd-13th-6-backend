@@ -6,12 +6,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class CalendarResponse {
-    public record Weekly(
+    public record Histories(
             Double totalDistance,
             Long totalDuration,
             List<History> histories
     ) {
-        public static Weekly from(List<RunningResult.History> histories) {
+        public static Histories from(List<RunningResult.History> histories) {
             Double totalDistance = histories.stream()
                     .mapToDouble(RunningResult.History::distance)
                     .sum();
@@ -22,7 +22,7 @@ public class CalendarResponse {
                     .map(History::from)
                     .toList();
 
-            return new Weekly(totalDistance, totalDuration, historyResponses);
+            return new Histories(totalDistance, totalDuration, historyResponses);
         }
     }
 

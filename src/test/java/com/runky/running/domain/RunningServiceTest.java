@@ -47,7 +47,7 @@ class RunningServiceTest {
         LocalDateTime now = LocalDateTime.of(2025, 10, 6, 10, 0);
         for (int i = 0; i < 7; i++) {
             Running running = Running.start(1L, now.plusDays(i));
-            running.finish(5.0, 60 * 30, 6.0, now.plusMinutes(30));
+            running.finish(5.0, 60 * 30, 6.0, running.getStartedAt().plusMinutes(30));
             runningJpaRepository.save(running);
         }
         LocalDateTime end = now.toLocalDate().plusDays(7).atStartOfDay();
@@ -58,5 +58,22 @@ class RunningServiceTest {
         List<RunningInfo.History> histories = runningService.getWeeklyHistories(new RunningCommand.Weekly(1L, LocalDate.of(2025, 10, 6)));
 
         assertThat(histories).hasSize(7);
+    }
+
+    @DisplayName("해당 월의 러닝 기록을 조회한다.")
+    @Test
+    void getMonthlyHistories() {
+        Running start = Running.start(1L, LocalDateTime.of(2025, 9, 30, 23, 30));
+        start.finish(5.0, 60 * 30, 6.0, start.getStartedAt().plusMinutes(30));
+        Running saved = runningJpaRepository.save(start);
+
+        Running excluded = Running.start(1L, LocalDateTime.of(2025, 10, 31, 23, 30));
+        excluded.finish(5.0, 60 * 30, 6.0, excluded.getStartedAt().plusMinutes(30));
+        runningJpaRepository.save(excluded);
+
+        List<RunningInfo.History> histories = runningService.getMonthlyHistories(new RunningCommand.Monthly(1L, 2025, 10));
+
+        assertThat(histories).hasSize(1);
+        assertThat(histories.getFirst().id()).isEqualTo(saved.getId());
     }
 }

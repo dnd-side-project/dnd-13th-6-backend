@@ -47,4 +47,7 @@ public final class RunningCriteria {
 
     public record Weekly(Long runnerId, LocalDate start) {
     }
+
+    public record Monthly(Long runnerId, int year, int month) {
+    }
 }

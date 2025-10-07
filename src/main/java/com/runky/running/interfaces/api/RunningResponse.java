@@ -40,15 +40,13 @@ public final class RunningResponse {
 
 	public record MyWeeklyTotalDistance(
 		double totalDistanceKm,
-		double totalDistanceMeter,
-		LocalDate weekStart,
-		LocalDate weekEnd
+		double totalDistanceMeter
 	) {
 		public static MyWeeklyTotalDistance from(RunningResult.MyWeeklyTotalDistance r) {
 			BigDecimal km = BigDecimal.valueOf(r.totalDistanceMeter())
 				.divide(new BigDecimal("1000"));
 			double totalDistanceKm = km.setScale(2, RoundingMode.DOWN).doubleValue();
-			return new MyWeeklyTotalDistance(totalDistanceKm, r.totalDistanceMeter(), r.weekStart(), r.weekEnd());
+			return new MyWeeklyTotalDistance(totalDistanceKm, r.totalDistanceMeter());
 		}
 	}
 

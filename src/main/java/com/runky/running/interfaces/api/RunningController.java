@@ -3,6 +3,9 @@ package com.runky.running.interfaces.api;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+import com.runky.goal.application.GoalCriteria;
+import com.runky.goal.application.GoalFacade;
+import com.runky.goal.application.MemberGoalSnapshotResult;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,14 +27,15 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/runnings")
 @RequiredArgsConstructor
-public class RunningController implements com.runky.running.interfaces.api.RunningApiSpec {
+public class RunningController implements RunningApiSpec {
 	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
 	private final RunningFacade runningFacade;
+    private final GoalFacade goalFacade;
 
 	@Override
 	@PostMapping("/start")
-	public ApiResponse<com.runky.running.interfaces.api.RunningResponse.Start> start(
+	public ApiResponse<RunningResponse.Start> start(
 		@AuthenticationPrincipal MemberPrincipal requester) {
 		RunningResult.Start result = runningFacade.start(new RunningCriteria.Start(requester.memberId()));
 
@@ -48,7 +52,7 @@ public class RunningController implements com.runky.running.interfaces.api.Runni
 	public ApiResponse<RunningResponse.End> end(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable Long runningId,
-		@RequestBody com.runky.running.interfaces.api.RunningRequest.End request
+		@RequestBody RunningRequest.End request
 	) {
 		RunningCriteria.End criteria = request.toCriteria(runningId, requester.memberId());
 		RunningResult.End result = runningFacade.end(criteria);
@@ -67,17 +71,22 @@ public class RunningController implements com.runky.running.interfaces.api.Runni
 		return ApiResponse.success(RunningResponse.TodaySummary.from(result));
 	}
 
+    // TODO 추후 Goal API로 이동
 	@GetMapping("/me/weekly/total-distance")
 	public ApiResponse<RunningResponse.MyWeeklyTotalDistance> getMyWeeklyTotalDistance(
 		@AuthenticationPrincipal MemberPrincipal requester
 	) {
-		var result = runningFacade.getMyWeeklyTotalDistance(
-			new RunningCriteria.MyWeeklyTotalDistance(requester.memberId()));
-		return ApiResponse.success(RunningResponse.MyWeeklyTotalDistance.from(result));
+        MemberGoalSnapshotResult snapshot =
+                goalFacade.getMemberGoalSnapshot(new GoalCriteria.MemberGoal(requester.memberId()));
+
+        double km = snapshot.distance().doubleValue();
+        double meter = km * 1000;
+
+        return ApiResponse.success(new RunningResponse.MyWeeklyTotalDistance(km, meter));
 	}
 
 	@GetMapping("/{runningId}")
-	public ApiResponse<com.runky.running.interfaces.api.RunningResponse.RunResult> getRunResult(
+	public ApiResponse<RunningResponse.RunResult> getRunResult(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable("runningId") Long runningId
 	) {

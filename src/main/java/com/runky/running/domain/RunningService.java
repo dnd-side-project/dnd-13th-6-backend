@@ -206,37 +206,6 @@ public class RunningService {
 		return new RunningInfo.TotalDistance(command.runnerId(), totalDistance);
 	}
 
-	@Transactional(readOnly = true)
-	public RunningInfo.MyWeek getMyWeeklyTotalDistance(RunningCommand.MyWeeklyTotalDistance command) {
-		LocalDate today = LocalDate.now();
-		LocalDate weekStart = toWeekStart(today);
-		LocalDate weekEnd = toWeekEnd(weekStart);
-
-		var from = weekStart.atStartOfDay(); // inclusive
-		var toExclusive = weekEnd.plusDays(1).atStartOfDay(); // exclusive
-
-		List<Running> runnings = runningRepository.findBetweenFromAndToByRunnerId(
-			command.runnerId(), from, toExclusive
-		);
-
-		double totalMeters = runnings.stream()
-			.filter(r -> r.getStatus() == Running.Status.ENDED)
-			.map(Running::getTotalDistanceMeter)
-			.filter(Objects::nonNull)
-			.mapToDouble(Double::doubleValue)
-			.sum();
-
-		return new RunningInfo.MyWeek(command.runnerId(), totalMeters, weekStart, weekEnd);
-	}
-
-	private LocalDate toWeekStart(LocalDate date) {
-		return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-	}
-
-	private LocalDate toWeekEnd(LocalDate weekStart) {
-		return weekStart.plusDays(6);
-	}
-
 	public int removeActiveRunning(RunningCommand.RemoveActiveRunning command) {
 		return runningRepository.deleteByIdAndRunnerIdAndStatus(
 			command.runningId(),

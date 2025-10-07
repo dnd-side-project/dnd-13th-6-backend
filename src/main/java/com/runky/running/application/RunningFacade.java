@@ -62,16 +62,6 @@ public class RunningFacade {
 	}
 
 	@Transactional(readOnly = true)
-	public RunningResult.MyWeeklyTotalDistance getMyWeeklyTotalDistance(
-		RunningCriteria.MyWeeklyTotalDistance criteria
-	) {
-		RunningInfo.MyWeek info = runningService.getMyWeeklyTotalDistance(
-			new RunningCommand.MyWeeklyTotalDistance(criteria.runnerId())
-		);
-		return RunningResult.MyWeeklyTotalDistance.from(info);
-	}
-
-	@Transactional(readOnly = true)
 	public RunningResult.RunResult getRunResult(RunningCriteria.RunResult criteria) {
 		var info = runningService.getRunResult(
 			new RunningCommand.RunResult(criteria.runningId(), criteria.runningId()));

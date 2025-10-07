@@ -13,8 +13,6 @@ import com.runky.running.domain.Running;
 import com.runky.running.domain.RunningInfo;
 
 public interface RunningJpaRepository extends JpaRepository<Running, Long> {
-	boolean existsByRunnerIdAndEndedAtIsNull(Long runnerId);
-
 	Optional<Running> findByIdAndRunnerId(Long id, Long runnerId);
 
 	@Query("SELECT new com.runky.running.domain.RunningInfo$RunningResult(r.runnerId, SUM(r.totalDistanceMeter)) " +
@@ -34,15 +32,6 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 	Optional<Long> findRunnerIdById(Long id);
 
 	boolean existsByRunnerIdAndStatusAndEndedAtIsNull(Long runnerId, Running.Status status);
-
-	@Query("""
-		select distinct r.runnerId
-		  from Running r
-		 where r.status = :status
-		   and r.endedAt is null
-		   and r.runnerId in :runnerIds
-		""")
-	Set<Long> findRunnerIdsByStatusAndEndedAtIsNull(Collection<Long> runnerIds, Running.Status status);
 
 	@Query("""
 			select r

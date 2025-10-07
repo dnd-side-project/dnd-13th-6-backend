@@ -2,6 +2,7 @@ package com.runky.reward.interfaces;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.runky.reward.interfaces.api.RewardResponse;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;

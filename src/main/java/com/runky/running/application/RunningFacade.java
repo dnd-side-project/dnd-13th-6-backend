@@ -50,6 +50,8 @@ public class RunningFacade {
 	@Transactional
 	public RunningResult.End end(RunningCriteria.End criteria) {
 		RunningInfo.End info = runningService.end(criteria.toCommand());
+        eventPublisher.publishEvent(new RunningEvent.Ended(info.runningId(), info.runnerId(), info.distance(),
+                info.status(), info.startedAt(), info.endedAt()));
 		return RunningResult.End.from(info);
 	}
 
@@ -67,16 +69,6 @@ public class RunningFacade {
 	}
 
 	@Transactional(readOnly = true)
-	public RunningResult.MyWeeklyTotalDistance getMyWeeklyTotalDistance(
-		RunningCriteria.MyWeeklyTotalDistance criteria
-	) {
-		RunningInfo.MyWeek info = runningService.getMyWeeklyTotalDistance(
-			new RunningCommand.MyWeeklyTotalDistance(criteria.runnerId())
-		);
-		return RunningResult.MyWeeklyTotalDistance.from(info);
-	}
-
-	@Transactional(readOnly = true)
 	public RunningResult.RunResult getRunResult(RunningCriteria.RunResult criteria) {
 		var info = runningService.getRunResult(
 			new RunningCommand.RunResult(criteria.runningId(), criteria.runningId()));
@@ -89,4 +81,22 @@ public class RunningFacade {
 		);
 		return new RunningResult.RemovedRunning(count);
 	}
+
+    public List<RunningResult.History> getWeeklyHistories(RunningCriteria.Weekly criteria) {
+        List<RunningInfo.History> histories =
+                runningService.getWeeklyHistories(new RunningCommand.Weekly(criteria.runnerId(), criteria.start()));
+
+        return histories.stream()
+                .map(RunningResult.History::from)
+                .toList();
+    }
+
+    public List<RunningResult.History> getMonthlyHistories(RunningCriteria.Monthly criteria) {
+        List<RunningInfo.History> histories =
+                runningService.getMonthlyHistories(new RunningCommand.Monthly(criteria.runnerId(), criteria.year(), criteria.month()));
+
+        return histories.stream()
+                .map(RunningResult.History::from)
+                .toList();
+    }
 }

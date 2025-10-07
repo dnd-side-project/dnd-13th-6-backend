@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.runky.goal.application.GoalCriteria;
+import com.runky.goal.application.GoalFacade;
+import com.runky.goal.application.MemberGoalSnapshotResult;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,6 +56,11 @@ public class RunningController implements RunningApiSpec {
 	@Override
 	@PostMapping("/start")
 	public ApiResponse<Start> start(
+    private final GoalFacade goalFacade;
+
+	@Override
+	@PostMapping("/start")
+	public ApiResponse<RunningResponse.Start> start(
 		@AuthenticationPrincipal MemberPrincipal requester) {
 		RunningResult.Start result = runningFacade.start(new RunningCriteria.Start(requester.memberId()));
 
@@ -106,6 +114,7 @@ public class RunningController implements RunningApiSpec {
 		return ApiResponse.success(TodaySummary.from(result));
 	}
 
+    // TODO 추후 Goal API로 이동
 	@GetMapping("/me/weekly/total-distance")
 	public ApiResponse<MyWeeklyTotalDistance> getMyWeeklyTotalDistance(
 		@AuthenticationPrincipal MemberPrincipal requester
@@ -117,6 +126,17 @@ public class RunningController implements RunningApiSpec {
 
 	@GetMapping("/{runningId}")
 	public ApiResponse<RunResult> getRunResult(
+        MemberGoalSnapshotResult snapshot =
+                goalFacade.getMemberGoalSnapshot(new GoalCriteria.MemberGoal(requester.memberId()));
+
+        double km = snapshot.distance().doubleValue();
+        double meter = km * 1000;
+
+        return ApiResponse.success(new RunningResponse.MyWeeklyTotalDistance(km, meter));
+	}
+
+	@GetMapping("/{runningId}")
+	public ApiResponse<RunningResponse.RunResult> getRunResult(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable("runningId") Long runningId
 	) {

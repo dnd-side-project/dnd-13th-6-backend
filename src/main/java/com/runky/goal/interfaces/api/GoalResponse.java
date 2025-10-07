@@ -1,4 +1,4 @@
-package com.runky.goal.interfaces;
+package com.runky.goal.interfaces.api;
 
 import java.math.BigDecimal;
 

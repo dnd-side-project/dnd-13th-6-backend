@@ -1,6 +1,7 @@
 package com.runky.goal.application;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public final class GoalCriteria {
 	private GoalCriteria() {
@@ -17,4 +18,12 @@ public final class GoalCriteria {
 
 	public record LastWeekClover(Long memberId) {
 	}
+
+    public record UpdateDistance(Long memberId, BigDecimal distance, LocalDate date) {
+    }
+
+    public record Init(
+            Long memberId
+    ) {
+    }
 }

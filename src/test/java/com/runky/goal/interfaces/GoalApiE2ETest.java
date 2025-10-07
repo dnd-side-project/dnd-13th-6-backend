@@ -2,6 +2,8 @@ package com.runky.goal.interfaces;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.runky.goal.interfaces.api.GoalRequest;
+import com.runky.goal.interfaces.api.GoalResponse;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;

@@ -9,8 +9,6 @@ import java.util.Set;
 import com.runky.running.domain.RunningInfo.RunningResult;
 
 public interface RunningRepository {
-	boolean existsByRunnerIdAndEndedAtIsNull(Long runnerId);
-
 	boolean existsByIdAndStatus(Long id, Running.Status status);
 
 	Optional<Running> findByIdAndRunnerId(Long id, Long runnerId);
@@ -24,8 +22,6 @@ public interface RunningRepository {
 	boolean existsByRunnerIdAndStatusAndEndedAtIsNull(Long memberId, Running.Status status);
 
 	Optional<Running> findByRunnerIdAndStatusAndEndedAtIsNull(Long memberId, Running.Status status);
-
-	Set<Long> findRunnerIdsByStatusAndEndedAtIsNull(final Collection<Long> runnerIds, final Running.Status status);
 
 	List<Running> findFinishedOnDate(Long runnerId, LocalDateTime now);
 

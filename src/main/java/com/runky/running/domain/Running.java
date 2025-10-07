@@ -64,13 +64,17 @@ public class Running {
 		return this.status == Status.RUNNING && this.endedAt == null;
 	}
 
-	public void finish(double totalDistanceMinutes, long durationSeconds, Double avgSpeedMps, LocalDateTime now) {
+    public boolean isEnded() {
+        return this.status == Status.ENDED && this.endedAt != null;
+    }
+
+	public void finish(double totalDistanceMeter, long durationSeconds, Double avgSpeedMps, LocalDateTime now) {
 		if (this.status != Status.RUNNING) {
 			throw new GlobalException(RunningErrorCode.NOT_ACTIVE_RUNNING);
 		}
 		this.endedAt = now;
 		this.status = Status.ENDED;
-		this.totalDistanceMeter = totalDistanceMinutes;
+		this.totalDistanceMeter = totalDistanceMeter;
 		this.durationSeconds = durationSeconds;
 		this.avgSpeedMPS = avgSpeedMps;
 	}

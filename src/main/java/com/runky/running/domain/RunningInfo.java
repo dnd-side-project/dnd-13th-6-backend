@@ -16,7 +16,7 @@ public final class RunningInfo {
 		}
 	}
 
-	public record End(Long runningId, Long runnerId, String status, LocalDateTime startedAt, LocalDateTime endedAt) {
+	public record End(Long runningId, Long runnerId, Double distance, String status, LocalDateTime startedAt, LocalDateTime endedAt) {
 	}
 
 	public record TotalDistance(Long runnerId, Double totalDistance) {
@@ -52,4 +52,28 @@ public final class RunningInfo {
 			);
 		}
 	}
+
+    public record History(
+            Long id,
+            Long runnerId,
+            Running.Status status,
+            Double distance,
+            Long durationSeconds,
+            Double avgSpeedMPS,
+            LocalDateTime startedAt,
+            LocalDateTime endedAt
+    ) {
+        public static History from(Running running) {
+            return new History(
+                    running.getId(),
+                    running.getRunnerId(),
+                    running.getStatus(),
+                    running.getTotalDistanceMeter(),
+                    running.getDurationSeconds(),
+                    running.getAvgSpeedMPS(),
+                    running.getStartedAt(),
+                    running.getEndedAt()
+            );
+        }
+    }
 }

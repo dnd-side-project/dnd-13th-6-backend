@@ -3,6 +3,7 @@ package com.runky.running.application;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.runky.running.domain.Running;
 import com.runky.running.domain.RunningInfo;
 
 public final class RunningResult {
@@ -70,4 +71,28 @@ public final class RunningResult {
 			);
 		}
 	}
+
+    public record History(
+            Long id,
+            Long runnerId,
+            Running.Status status,
+            Double distance,
+            Long durationSeconds,
+            Double avgSpeedMPS,
+            LocalDateTime startedAt,
+            LocalDateTime endedAt
+    ) {
+        public static History from(RunningInfo.History info) {
+            return new History(
+                    info.id(),
+                    info.runnerId(),
+                    info.status(),
+                    info.distance(),
+                    info.durationSeconds(),
+                    info.avgSpeedMPS(),
+                    info.startedAt(),
+                    info.endedAt()
+            );
+        }
+    }
 }

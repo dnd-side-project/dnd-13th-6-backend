@@ -74,4 +74,22 @@ public class RunningFacade {
 		);
 		return new RunningResult.RemovedRunning(count);
 	}
+
+    public List<RunningResult.History> getWeeklyHistories(RunningCriteria.Weekly criteria) {
+        List<RunningInfo.History> histories =
+                runningService.getWeeklyHistories(new RunningCommand.Weekly(criteria.runnerId(), criteria.start()));
+
+        return histories.stream()
+                .map(RunningResult.History::from)
+                .toList();
+    }
+
+    public List<RunningResult.History> getMonthlyHistories(RunningCriteria.Monthly criteria) {
+        List<RunningInfo.History> histories =
+                runningService.getMonthlyHistories(new RunningCommand.Monthly(criteria.runnerId(), criteria.year(), criteria.month()));
+
+        return histories.stream()
+                .map(RunningResult.History::from)
+                .toList();
+    }
 }

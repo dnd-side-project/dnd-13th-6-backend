@@ -1,36 +1,33 @@
 package com.runky.goal.domain;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.runky.global.error.GlobalErrorCode;
+import com.runky.global.error.GlobalException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.runky.global.error.GlobalErrorCode;
-import com.runky.global.error.GlobalException;
-
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class GoalService {
 
-	private final GoalRepository goalRepository;
+    private final GoalRepository goalRepository;
 
-	@Transactional
-	public void saveAllMemberSnapshots(GoalCommand.Snapshot command) {
-		List<MemberGoal> memberGoals = goalRepository.findAllMemberGoals();
+    @Transactional
+    public void saveAllMemberSnapshots(GoalCommand.Snapshot command) {
+        List<MemberGoal> memberGoals = goalRepository.findAllMemberGoals();
 
-		List<MemberGoalSnapshot> snapshots = new ArrayList<>();
-		for (MemberGoal memberGoal : memberGoals) {
-			MemberGoalSnapshot snapshot = memberGoal.createSnapshot(command.date());
-			snapshots.add(snapshot);
-		}
+        List<MemberGoalSnapshot> snapshots = new ArrayList<>();
+        for (MemberGoal memberGoal : memberGoals) {
+            MemberGoalSnapshot snapshot = memberGoal.createSnapshot(command.date());
+            snapshots.add(snapshot);
+        }
 
-		goalRepository.saveAll(snapshots);
-	}
+        goalRepository.saveAll(snapshots);
+    }
 
     @Transactional
     public void updateDistances(GoalCommand.UpdateDistance cmd) {
@@ -43,43 +40,43 @@ public class GoalService {
         }
     }
 
-	@Transactional(readOnly = true)
-	public MemberGoalSnapshot getMemberGoalSnapshot(GoalCommand.GetMemberSnapshot command) {
-		return goalRepository.findMemberGoalSnapshotOfWeek(
-				command.memberId(), WeekUnit.from(command.localDate()))
-			.orElse(MemberGoalSnapshot.empty(command.memberId(), command.localDate()));
-	}
+    @Transactional(readOnly = true)
+    public MemberGoalSnapshot getMemberGoalSnapshot(GoalCommand.GetMemberSnapshot command) {
+        return goalRepository.findMemberGoalSnapshotOfWeek(
+                        command.memberId(), WeekUnit.from(command.localDate()))
+                .orElse(MemberGoalSnapshot.empty(command.memberId(), command.localDate()));
+    }
 
-	@Transactional(readOnly = true)
-	public CrewGoalSnapshot getCrewGoalSnapshot(GoalCommand.GetCrewSnapshot command) {
-		return goalRepository.findCrewGoalSnapshot(command.crewId(), WeekUnit.from(command.localDate()))
-			.orElse(CrewGoalSnapshot.empty(command.crewId(), command.localDate()));
-	}
+    @Transactional(readOnly = true)
+    public CrewGoalSnapshot getCrewGoalSnapshot(GoalCommand.GetCrewSnapshot command) {
+        return goalRepository.findCrewGoalSnapshot(command.crewId(), WeekUnit.from(command.localDate()))
+                .orElse(CrewGoalSnapshot.empty(command.crewId(), command.localDate()));
+    }
 
-	@Transactional
-	public MemberGoal updateMemberGoal(GoalCommand.Update command) {
-		MemberGoal memberGoal = goalRepository.findMemberGoalByMemberId(command.memberId())
-			.orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
+    @Transactional
+    public MemberGoal updateMemberGoal(GoalCommand.Update command) {
+        MemberGoal memberGoal = goalRepository.findMemberGoalByMemberId(command.memberId())
+                .orElseThrow(() -> new GlobalException(GlobalErrorCode.NOT_FOUND));
 
-		boolean firstSnapShot = !goalRepository.existsMemberGoalSnapShot(command.memberId());
+        boolean firstSnapShot = !goalRepository.existsMemberGoalSnapShot(command.memberId());
 
-		memberGoal.updateGoal(command.goal());
+        memberGoal.updateGoal(command.goal());
 
-		if (firstSnapShot) {
-			goalRepository.save(memberGoal.createSnapshot(LocalDate.now()));
-		}
-		return memberGoal;
-	}
+        if (firstSnapShot) {
+            goalRepository.save(memberGoal.createSnapshot(LocalDate.now()));
+        }
+        return memberGoal;
+    }
 
-	@Transactional(readOnly = true)
-	public List<CrewGoalSnapshot> getAllLastWeekCrewGoalSnapshots(GoalCommand.CrewSnapshots command) {
-		return goalRepository.findAllCrewGoalSnapshots(command.crewIds(),
-			WeekUnit.from(command.localDate().minusWeeks(1)));
-	}
+    @Transactional(readOnly = true)
+    public List<CrewGoalSnapshot> getAllLastWeekCrewGoalSnapshots(GoalCommand.CrewSnapshots command) {
+        return goalRepository.findAllCrewGoalSnapshots(command.crewIds(),
+                WeekUnit.from(command.localDate().minusWeeks(1)));
+    }
 
-	@Transactional
-	public void init(GoalCommand.Init command) {
-		MemberGoal memberGoal = MemberGoal.from(command.memberId());
-		goalRepository.save(memberGoal);
-	}
+    @Transactional
+    public void init(GoalCommand.Init command) {
+        MemberGoal memberGoal = MemberGoal.from(command.memberId());
+        goalRepository.save(memberGoal);
+    }
 }

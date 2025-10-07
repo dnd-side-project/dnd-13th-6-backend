@@ -1,15 +1,9 @@
 package com.runky.running.domain;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,47 +100,7 @@ public class RunningService {
 			.orElseGet(() -> new RunningInfo.RunnerStatusAndSub(runnerId, false, null));
 	}
 
-	@Transactional(readOnly = true)
-	public List<RunningInfo.RunnerStatusAndSub> getRunnerStatusesAndSub(final Collection<Long> runnerIds) {
-		if (runnerIds == null || runnerIds.isEmpty()) {
-			return List.of();
-		}
-
-		// 입력 순서 보존
-		final List<Long> orderedIds = runnerIds.stream()
-			.filter(Objects::nonNull)
-			.toList();
-
-		final List<Long> distinctIds = orderedIds.stream()
-			.distinct()
-			.toList();
-
-		final Set<Long> activeRunnerIds = runningRepository
-			.findRunnerIdsByStatusAndEndedAtIsNull(distinctIds, Running.Status.RUNNING);
-
-		if (activeRunnerIds.isEmpty()) {
-			return orderedIds.stream()
-				.map(id -> new RunningInfo.RunnerStatusAndSub(id, false, null))
-				.toList();
-		}
-
-		final Map<Long, Long> runningIdByRunnerId = new HashMap<>(activeRunnerIds.size());
-		for (Long runnerId : activeRunnerIds) {
-			runningRepository.findByRunnerIdAndStatusAndEndedAtIsNull(runnerId, Running.Status.RUNNING)
-				.map(Running::getId)
-				.ifPresent(runningId -> runningIdByRunnerId.put(runnerId, runningId));
-		}
-
-		return orderedIds.stream()
-			.map(runnerId -> {
-				final Long runningId = runningIdByRunnerId.get(runnerId);
-				final boolean active = (runningId != null);
-				final String sub = active ? WsDestinations.subscribe(runningId) : null;
-				return new RunningInfo.RunnerStatusAndSub(runnerId, active, sub);
-			})
-			.toList();
-	}
-
+	
 	@Transactional(readOnly = true)
 	public RunningInfo.TodaySummary getTodaySummary(final Long runnerId, final LocalDateTime now) {
 
@@ -186,29 +140,6 @@ public class RunningService {
 		return new RunningInfo.TotalDistance(command.runnerId(), totalDistance);
 	}
 
-	@Transactional(readOnly = true)
-	public RunningInfo.MyWeek getMyWeeklyTotalDistance(RunningCommand.MyWeeklyTotalDistance command) {
-		LocalDate today = LocalDate.now();
-		LocalDate weekStart = toWeekStart(today);
-		LocalDate weekEnd = toWeekEnd(weekStart);
-
-		var from = weekStart.atStartOfDay(); // inclusive
-		var toExclusive = weekEnd.plusDays(1).atStartOfDay(); // exclusive
-
-		List<Running> runnings = runningRepository.findBetweenFromAndToByRunnerId(
-			command.runnerId(), from, toExclusive
-		);
-
-		double totalMeters = runnings.stream()
-			.filter(r -> r.getStatus() == Running.Status.ENDED)
-			.map(Running::getTotalDistanceMeter)
-			.filter(Objects::nonNull)
-			.mapToDouble(Double::doubleValue)
-			.sum();
-
-		return new RunningInfo.MyWeek(command.runnerId(), totalMeters, weekStart, weekEnd);
-	}
-
     public List<RunningInfo.History> getWeeklyHistories(RunningCommand.Weekly command) {
         LocalDateTime start = command.start().atStartOfDay();
         LocalDateTime end = command.start().plusDays(7).atStartOfDay();
@@ -232,14 +163,6 @@ public class RunningService {
                 .map(RunningInfo.History::from)
                 .toList();
     }
-
-	private LocalDate toWeekStart(LocalDate date) {
-		return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-	}
-
-	private LocalDate toWeekEnd(LocalDate weekStart) {
-		return weekStart.plusDays(6);
-	}
 
 	public int removeActiveRunning(RunningCommand.RemoveActiveRunning command) {
 		return runningRepository.deleteByIdAndRunnerIdAndStatus(

@@ -5,6 +5,8 @@ import com.runky.goal.application.GoalCriteria;
 import com.runky.goal.application.GoalFacade;
 import com.runky.running.application.RunningEvent;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -25,7 +27,7 @@ public class GoalEventListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(RunningEvent.Ended event) {
-        goalFacade.updateSnapshots(new GoalCriteria.UpdateDistance(event.runnerId(),
-                BigDecimal.valueOf(event.distance()), event.endedAt().toLocalDate()));
+        BigDecimal km = BigDecimal.valueOf(event.distance()).divide(BigDecimal.valueOf(1000), 2, RoundingMode.FLOOR);
+        goalFacade.updateSnapshots(new GoalCriteria.UpdateDistance(event.runnerId(), km, event.endedAt().toLocalDate()));
     }
 }

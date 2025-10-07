@@ -6,9 +6,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import com.runky.goal.application.GoalCriteria;
-import com.runky.goal.application.GoalFacade;
-import com.runky.goal.application.MemberGoalSnapshotResult;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
+import com.runky.goal.application.GoalCriteria;
+import com.runky.goal.application.GoalFacade;
+import com.runky.goal.application.MemberGoalSnapshotResult;
 import com.runky.running.application.RunningCriteria;
 import com.runky.running.application.RunningFacade;
 import com.runky.running.application.RunningResult;
@@ -37,6 +37,7 @@ public class RunningController implements RunningApiSpec {
 	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
 	private final RunningFacade runningFacade;
+	private final GoalFacade goalFacade;
 	private final SimpMessagingTemplate messagingTemplate;
 
 	@PostMapping("/{runningId}/location/publish")
@@ -52,11 +53,6 @@ public class RunningController implements RunningApiSpec {
 
 		return ApiResponse.ok();
 	}
-
-	@Override
-	@PostMapping("/start")
-	public ApiResponse<Start> start(
-    private final GoalFacade goalFacade;
 
 	@Override
 	@PostMapping("/start")
@@ -114,36 +110,33 @@ public class RunningController implements RunningApiSpec {
 		return ApiResponse.success(TodaySummary.from(result));
 	}
 
-    // TODO 추후 Goal API로 이동
+	// TODO 추후 Goal API로 이동
 	@GetMapping("/me/weekly/total-distance")
 	public ApiResponse<MyWeeklyTotalDistance> getMyWeeklyTotalDistance(
 		@AuthenticationPrincipal MemberPrincipal requester
 	) {
-		var result = runningFacade.getMyWeeklyTotalDistance(
-			new RunningCriteria.MyWeeklyTotalDistance(requester.memberId()));
-		return ApiResponse.success(MyWeeklyTotalDistance.from(result));
+		MemberGoalSnapshotResult snapshot =
+			goalFacade.getMemberGoalSnapshot(new GoalCriteria.MemberGoal(requester.memberId()));
+
+		double km = snapshot.distance().doubleValue();
+		double meter = km * 1000;
+
+		return ApiResponse.success(new RunningResponse.MyWeeklyTotalDistance(km, meter));
 	}
 
 	@GetMapping("/{runningId}")
-	public ApiResponse<RunResult> getRunResult(
-        MemberGoalSnapshotResult snapshot =
-                goalFacade.getMemberGoalSnapshot(new GoalCriteria.MemberGoal(requester.memberId()));
-
-        double km = snapshot.distance().doubleValue();
-        double meter = km * 1000;
-
-        return ApiResponse.success(new RunningResponse.MyWeeklyTotalDistance(km, meter));
-	}
-
-	@GetMapping("/{runningId}")
-	public ApiResponse<RunningResponse.RunResult> getRunResult(
-		@AuthenticationPrincipal MemberPrincipal requester,
-		@PathVariable("runningId") Long runningId
+	public ApiResponse<MyWeeklyTotalDistance> getRunResult(
+		@AuthenticationPrincipal MemberPrincipal requester
 	) {
-		var result = runningFacade.getRunResult(new RunningCriteria.RunResult(requester.memberId(), runningId));
-		return ApiResponse.success(RunResult.from(result));
-	}
+		MemberGoalSnapshotResult snapshot =
+			goalFacade.getMemberGoalSnapshot(new GoalCriteria.MemberGoal(requester.memberId()));
 
+		double km = snapshot.distance().doubleValue();
+		double meter = km * 1000;
+
+		return ApiResponse.success(new RunningResponse.MyWeeklyTotalDistance(km, meter));
+	}
+	
 	@DeleteMapping("/{runningId}/active")
 	public ApiResponse<RemovedRunning> removeActiveRunning(
 		@AuthenticationPrincipal MemberPrincipal requester,

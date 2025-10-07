@@ -1,10 +1,12 @@
 package com.runky.goal.infrastructure;
 
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import com.runky.goal.domain.MemberGoalSnapshot;
@@ -20,4 +22,6 @@ public interface MemberGoalSnapshotJpaRepository extends JpaRepository<MemberGoa
 
 	boolean existsByMemberId(Long memberId);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<MemberGoalSnapshot> findByMemberIdAndWeekUnit(Long memberId, WeekUnit weekUnit);
 }

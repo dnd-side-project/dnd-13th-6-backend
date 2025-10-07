@@ -7,6 +7,7 @@ public record MemberGoalSnapshotResult(
         Long id,
         Long memberId,
         BigDecimal goal,
+        BigDecimal distance,
         Boolean achieved
 ) {
     public static MemberGoalSnapshotResult from(MemberGoalSnapshot snapshot) {
@@ -14,6 +15,7 @@ public record MemberGoalSnapshotResult(
                 snapshot.getId(),
                 snapshot.getMemberId(),
                 snapshot.getGoal().value(),
+                snapshot.getRunDistance(),
                 snapshot.getAchieved()
         );
     }

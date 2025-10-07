@@ -2,10 +2,8 @@ package com.runky.running.infra.jpa;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.stereotype.Repository;
 
@@ -20,11 +18,6 @@ import lombok.RequiredArgsConstructor;
 public class RunningRepositoryImpl implements RunningRepository {
 
 	private final RunningJpaRepository jpaRepository;
-
-	@Override
-	public boolean existsByRunnerIdAndEndedAtIsNull(final Long runnerId) {
-		return jpaRepository.existsByRunnerIdAndEndedAtIsNull(runnerId);
-	}
 
 	@Override
 	public Optional<Running> findByIdAndRunnerId(final Long id, final Long runnerId) {
@@ -60,12 +53,6 @@ public class RunningRepositoryImpl implements RunningRepository {
 	@Override
 	public Optional<Running> findByRunnerIdAndStatusAndEndedAtIsNull(final Long memberId, final Running.Status status) {
 		return jpaRepository.findByRunnerIdAndStatusAndEndedAtIsNull(memberId, status);
-	}
-
-	@Override
-	public Set<Long> findRunnerIdsByStatusAndEndedAtIsNull(final Collection<Long> runnerIds,
-		final Running.Status status) {
-		return jpaRepository.findRunnerIdsByStatusAndEndedAtIsNull(runnerIds, status);
 	}
 
 	@Override

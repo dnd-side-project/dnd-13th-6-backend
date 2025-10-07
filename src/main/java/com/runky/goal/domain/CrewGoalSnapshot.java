@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -15,7 +16,9 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "crew_goal_snapshot")
+@Table(name = "crew_goal_snapshot", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_crew_week", columnNames = {"crew_id", "iso_year", "iso_week"})
+})
 public class CrewGoalSnapshot extends BaseTimeEntity {
 
     @Id
@@ -27,6 +30,9 @@ public class CrewGoalSnapshot extends BaseTimeEntity {
 
     @Embedded
     private Goal goal;
+
+    @Column(name = "run_distance", nullable = false)
+    private BigDecimal runDistance;
 
     @Column(name = "achieved", nullable = false)
     private Boolean achieved;
@@ -40,6 +46,7 @@ public class CrewGoalSnapshot extends BaseTimeEntity {
     public CrewGoalSnapshot(Long crewId, Goal goal, Boolean achieved, WeekUnit weekUnit) {
         this.crewId = crewId;
         this.goal = goal;
+        this.runDistance = BigDecimal.ZERO;
         this.achieved = achieved;
         this.weekUnit = weekUnit;
     }
@@ -56,7 +63,18 @@ public class CrewGoalSnapshot extends BaseTimeEntity {
         return new CrewGoalSnapshot(crewId, new Goal(BigDecimal.ZERO), false, WeekUnit.from(date));
     }
 
+    public void addDistance(BigDecimal distance) {
+        this.runDistance = this.runDistance.add(distance);
+        if (isAchieved()) {
+            achieve();
+        }
+    }
+
     public void achieve() {
         this.achieved = true;
+    }
+
+    public boolean isAchieved() {
+        return goal.isLessThanOrEqualTo(runDistance);
     }
 }

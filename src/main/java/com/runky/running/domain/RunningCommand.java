@@ -1,5 +1,6 @@
 package com.runky.running.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public final class RunningCommand {
@@ -10,9 +11,9 @@ public final class RunningCommand {
 	}
 
 	public record End(
-		Long runningId, Long runnerId,
-		Double totalDistanceMinutes, Long durationSeconds, Double avgSpeedMPS,
-		String format, String points, int pointCount
+            Long runningId, Long runnerId,
+            Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMPS,
+            String format, String points, int pointCount
 	) {
 	}
 
@@ -27,4 +28,10 @@ public final class RunningCommand {
 
 	public record RemoveActiveRunning(Long runnerId, Long runningId) {
 	}
+
+    public record Weekly(Long runnerId, LocalDate start) {
+    }
+
+    public record Monthly(Long runnerId, int year, int month) {
+    }
 }

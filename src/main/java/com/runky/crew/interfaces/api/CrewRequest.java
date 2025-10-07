@@ -1,4 +1,4 @@
-package com.runky.crew.interfaces;
+package com.runky.crew.interfaces.api;
 
 import jakarta.validation.constraints.NotNull;
 

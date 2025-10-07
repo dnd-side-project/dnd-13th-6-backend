@@ -1,4 +1,4 @@
-package com.runky.reward.interfaces;
+package com.runky.reward.interfaces.api;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import com.runky.global.security.auth.MemberPrincipal;
 import com.runky.reward.application.RewardCriteria;
 import com.runky.reward.application.RewardFacade;
 import com.runky.reward.application.RewardResult;
-import com.runky.reward.interfaces.RewardResponse.Gotcha;
+import com.runky.reward.interfaces.api.RewardResponse.Gotcha;
 
 import lombok.RequiredArgsConstructor;
 

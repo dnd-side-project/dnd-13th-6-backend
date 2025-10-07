@@ -1,12 +1,16 @@
 package com.runky.running.interfaces.api;
 
+import static com.runky.running.interfaces.api.RunningResponse.*;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import com.runky.goal.application.GoalCriteria;
 import com.runky.goal.application.GoalFacade;
 import com.runky.goal.application.MemberGoalSnapshotResult;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +24,8 @@ import com.runky.global.security.auth.MemberPrincipal;
 import com.runky.running.application.RunningCriteria;
 import com.runky.running.application.RunningFacade;
 import com.runky.running.application.RunningResult;
+import com.runky.running.interfaces.websocket.LocationMessage;
+import com.runky.running.interfaces.websocket.RoomEvent;
 import com.runky.running.interfaces.websocket.WsDestinations;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +37,25 @@ public class RunningController implements RunningApiSpec {
 	private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
 	private final RunningFacade runningFacade;
+	private final SimpMessagingTemplate messagingTemplate;
+
+	@PostMapping("/{runningId}/location/publish")
+	public ApiResponse<Void> publish(
+		@PathVariable Long runningId,
+		@AuthenticationPrincipal MemberPrincipal requester,
+		@Validated @RequestBody LocationMessage payload
+	) {
+		Long runnerId = requester.memberId();
+		RoomEvent event = new RoomEvent("LOCATION", runningId, runnerId, payload.x(), payload.y(), payload.timestamp());
+		String dest = "/topic/runnings/" + runningId;
+		messagingTemplate.convertAndSend(dest, event);
+
+		return ApiResponse.ok();
+	}
+
+	@Override
+	@PostMapping("/start")
+	public ApiResponse<Start> start(
     private final GoalFacade goalFacade;
 
 	@Override
@@ -42,40 +67,65 @@ public class RunningController implements RunningApiSpec {
 		String publish = WsDestinations.publish(result.runningId());
 		String subscribe = WsDestinations.subscribe(result.runningId());
 
-		RunningResponse.Start response = RunningResponse.Start.from(
+		Start response = Start.from(
 			publish, subscribe, result);
 		return ApiResponse.success(response);
 	}
 
 	@Override
 	@PostMapping("/{runningId}/end")
-	public ApiResponse<RunningResponse.End> end(
+	public ApiResponse<End> end(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable Long runningId,
 		@RequestBody RunningRequest.End request
 	) {
 		RunningCriteria.End criteria = request.toCriteria(runningId, requester.memberId());
 		RunningResult.End result = runningFacade.end(criteria);
+		End response = End.from(result);
 
-		RunningResponse.End response = RunningResponse.End.from(
-			result);
+		messagingTemplate.convertAndSend("/topic/runnings/" + runningId,
+			new RoomEvent("ENDED", runningId, requester.memberId(), null, null, System.currentTimeMillis()));
+
+		return ApiResponse.success(response);
+	}
+
+	@Override
+	@PostMapping("/end")
+	public ApiResponse<End> end(
+		@AuthenticationPrincipal MemberPrincipal requester,
+		@RequestBody RunningRequest.End request
+	) {
+		RunningCriteria.EndWithNoRunningId criteria = request.toCriteria(requester.memberId());
+		RunningResult.End result = runningFacade.end(criteria);
+		Long runningId = result.runningId();
+		messagingTemplate.convertAndSend("/topic/runnings/" + runningId,
+			new RoomEvent("ENDED", runningId, requester.memberId(), null, null, System.currentTimeMillis()));
+
+		End response = End.from(result);
 		return ApiResponse.success(response);
 	}
 
 	@GetMapping("/today")
-	public ApiResponse<RunningResponse.TodaySummary> getToday(
+	public ApiResponse<TodaySummary> getToday(
 		@AuthenticationPrincipal MemberPrincipal requester
 	) {
 		var result = runningFacade.getTodaySummary(new RunningCriteria.TodaySummary(requester.memberId(),
 			LocalDateTime.now().atZone(KST).toLocalDateTime()));
-		return ApiResponse.success(RunningResponse.TodaySummary.from(result));
+		return ApiResponse.success(TodaySummary.from(result));
 	}
 
     // TODO 추후 Goal API로 이동
 	@GetMapping("/me/weekly/total-distance")
-	public ApiResponse<RunningResponse.MyWeeklyTotalDistance> getMyWeeklyTotalDistance(
+	public ApiResponse<MyWeeklyTotalDistance> getMyWeeklyTotalDistance(
 		@AuthenticationPrincipal MemberPrincipal requester
 	) {
+		var result = runningFacade.getMyWeeklyTotalDistance(
+			new RunningCriteria.MyWeeklyTotalDistance(requester.memberId()));
+		return ApiResponse.success(MyWeeklyTotalDistance.from(result));
+	}
+
+	@GetMapping("/{runningId}")
+	public ApiResponse<RunResult> getRunResult(
         MemberGoalSnapshotResult snapshot =
                 goalFacade.getMemberGoalSnapshot(new GoalCriteria.MemberGoal(requester.memberId()));
 
@@ -91,16 +141,16 @@ public class RunningController implements RunningApiSpec {
 		@PathVariable("runningId") Long runningId
 	) {
 		var result = runningFacade.getRunResult(new RunningCriteria.RunResult(requester.memberId(), runningId));
-		return ApiResponse.success(RunningResponse.RunResult.from(result));
+		return ApiResponse.success(RunResult.from(result));
 	}
 
 	@DeleteMapping("/{runningId}/active")
-	public ApiResponse<RunningResponse.RemovedRunning> removeActiveRunning(
+	public ApiResponse<RemovedRunning> removeActiveRunning(
 		@AuthenticationPrincipal MemberPrincipal requester,
 		@PathVariable Long runningId
 	) {
 		var result = runningFacade.removeActiveRunning(
 			new RunningCriteria.RemoveActiveRunning(requester.memberId(), runningId));
-		return ApiResponse.success(RunningResponse.RemovedRunning.from(result));
+		return ApiResponse.success(RemovedRunning.from(result));
 	}
 }

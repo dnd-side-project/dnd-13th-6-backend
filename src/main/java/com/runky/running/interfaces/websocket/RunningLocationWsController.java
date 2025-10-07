@@ -10,10 +10,6 @@ import org.springframework.stereotype.Controller;
 import com.runky.global.security.auth.MemberPrincipal;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,19 +32,6 @@ public class RunningLocationWsController implements RunningLocationWsApiSpec {
 		RoomEvent event = new RoomEvent("LOCATION", runningId, runnerId, payload.x(), payload.y(), payload.timestamp());
 		String dest = "/topic/runnings/" + runningId;
 		messagingTemplate.convertAndSend(dest, event);
-	}
-
-	public record LocationMessage(
-		@NotNull @DecimalMin(value = "-180", inclusive = true) @DecimalMax(value = "180", inclusive = true)
-		Double x,
-		@NotNull @DecimalMin(value = "-90", inclusive = true) @DecimalMax(value = "90", inclusive = true)
-		Double y,
-		@PositiveOrZero
-		Long timestamp
-	) {
-	}
-
-	public record RoomEvent(String type, Long runningId, Long runnerId, Double x, Double y, Long timestamp) {
 	}
 
 }

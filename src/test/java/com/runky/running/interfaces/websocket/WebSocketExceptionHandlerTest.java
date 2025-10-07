@@ -46,7 +46,7 @@ class WebSocketExceptionHandlerTest {
 			Method publishMethod = RunningLocationWsController.class.getMethod(
 				"publish",
 				Long.class,
-				RunningLocationWsController.LocationMessage.class,
+				LocationMessage.class,
 				SimpMessageHeaderAccessor.class
 			);
 			return new MethodParameter(publishMethod, 1);

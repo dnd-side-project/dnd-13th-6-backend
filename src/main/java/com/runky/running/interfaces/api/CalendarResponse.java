@@ -3,6 +3,7 @@ package com.runky.running.interfaces.api;
 import com.runky.running.application.RunningResult;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CalendarResponse {
@@ -12,17 +13,17 @@ public class CalendarResponse {
             List<History> histories
     ) {
         public static Histories from(List<RunningResult.History> histories) {
-            Double totalDistance = histories.stream()
-                    .mapToDouble(RunningResult.History::distance)
-                    .sum();
-            Long totalDuration = histories.stream()
-                    .mapToLong(RunningResult.History::durationSeconds)
-                    .sum();
-            List<History> historyResponses = histories.stream()
-                    .map(History::from)
-                    .toList();
+            Double totalDistance = 0.0;
+            Long totalDuration = 0L;
+            List<History> response = new ArrayList<>();
 
-            return new Histories(totalDistance, totalDuration, historyResponses);
+            for (RunningResult.History history : histories) {
+                totalDistance += history.distance();
+                totalDuration += history.durationSeconds();
+                response.add(History.from(history));
+            }
+
+            return new Histories(totalDistance, totalDuration, response);
         }
     }
 

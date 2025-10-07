@@ -15,7 +15,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.runky.auth.domain.port.TokenDecoder;
 import com.runky.global.security.filter.JwtAuthenticationEntryPoint;
 import com.runky.global.security.filter.JwtCookieAuthFilter;
 
@@ -31,7 +30,7 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(
 		HttpSecurity http,
 		CorsConfigurationSource corsConfigurationSource,
-		TokenDecoder tokenDecoder
+		JwtCookieAuthFilter jwtCookieAuthFilter
 	) throws Exception {
 
 		return http
@@ -57,7 +56,7 @@ public class SecurityConfig {
 				.authenticated()
 			)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.addFilterBefore(new JwtCookieAuthFilter(tokenDecoder), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(jwtCookieAuthFilter, UsernamePasswordAuthenticationFilter.class)
 			.build();
 	}
 

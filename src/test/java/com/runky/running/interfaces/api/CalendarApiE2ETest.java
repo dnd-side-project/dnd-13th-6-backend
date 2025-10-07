@@ -51,7 +51,7 @@ public class CalendarApiE2ETest {
             LocalDateTime now = LocalDateTime.of(2025, 10, 6, 10, 0);
             for (int i = 0; i < 7; i++) {
                 Running running = Running.start(1L, now.plusDays(i));
-                running.finish(5.0, 60 * 30, 6.0, now.plusMinutes(30));
+                running.finish(5.0, 60 * 30, 6.0, running.getStartedAt().plusMinutes(30));
                 runningJpaRepository.save(running);
             }
             LocalDateTime end = now.toLocalDate().plusDays(7).atStartOfDay();

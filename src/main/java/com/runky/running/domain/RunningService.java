@@ -84,11 +84,6 @@ public class RunningService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<RunningInfo.RunningResult> getTotalDistancesPeriod(LocalDateTime from, LocalDateTime to) {
-		return runningRepository.findTotalDistancesPeriod(from, to);
-	}
-
-	@Transactional(readOnly = true)
 	public boolean isActive(final Long runningId) {
 		return runningRepository.existsByIdAndStatus(runningId, Running.Status.RUNNING);
 	}
@@ -153,21 +148,6 @@ public class RunningService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<RunningInfo.RunnerStatus> getRunnerStatuses(final List<Long> runnerIds) {
-		if (runnerIds == null || runnerIds.isEmpty())
-			return List.of();
-
-		final List<Long> ordered = runnerIds.stream().filter(Objects::nonNull).toList();
-
-		final Set<Long> active = runningRepository
-			.findRunnerIdsByStatusAndEndedAtIsNull(ordered, Running.Status.RUNNING);
-
-		return ordered.stream()
-			.map(id -> new RunningInfo.RunnerStatus(id, active.contains(id)))
-			.toList();
-	}
-
-	@Transactional(readOnly = true)
 	public RunningInfo.TodaySummary getTodaySummary(final Long runnerId, final LocalDateTime now) {
 
 		List<Running> runs = runningRepository.findFinishedOnDate(runnerId, now);
@@ -228,6 +208,30 @@ public class RunningService {
 
 		return new RunningInfo.MyWeek(command.runnerId(), totalMeters, weekStart, weekEnd);
 	}
+
+    public List<RunningInfo.History> getWeeklyHistories(RunningCommand.Weekly command) {
+        LocalDateTime start = command.start().atStartOfDay();
+        LocalDateTime end = command.start().plusDays(7).atStartOfDay();
+
+        List<Running> histories = runningRepository.findBetweenFromAndToByRunnerId(command.runnerId(), start, end);
+
+        return histories.stream()
+                .filter(Running::isEnded)
+                .map(RunningInfo.History::from)
+                .toList();
+    }
+
+    public List<RunningInfo.History> getMonthlyHistories(RunningCommand.Monthly command) {
+        LocalDateTime start = LocalDate.of(command.year(), command.month(), 1).atStartOfDay();
+        LocalDateTime end = start.plusMonths(1);
+
+        List<Running> histories = runningRepository.findBetweenFromAndToByRunnerId(command.runnerId(), start, end);
+
+        return histories.stream()
+                .filter(Running::isEnded)
+                .map(RunningInfo.History::from)
+                .toList();
+    }
 
 	private LocalDate toWeekStart(LocalDate date) {
 		return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));

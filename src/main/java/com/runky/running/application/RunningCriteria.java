@@ -33,6 +33,23 @@ public final class RunningCriteria {
 		}
 	}
 
+	public record EndWithNoRunningId(
+		Long runnerId,
+		Double totalDistanceMinutes,
+		Long durationSeconds,
+		Double avgSpeedMPS,
+		String format,
+		String points,
+		int pointCount
+
+	) {
+		public RunningCommand.End toCommand(Long runningId) {
+			return new RunningCommand.End(
+				runningId, runnerId, totalDistanceMinutes, durationSeconds, avgSpeedMPS, format, points, pointCount
+			);
+		}
+	}
+
 	public record TodaySummary(Long runnerId, LocalDateTime now) {
 	}
 

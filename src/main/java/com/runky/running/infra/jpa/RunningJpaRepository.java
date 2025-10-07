@@ -56,4 +56,7 @@ public interface RunningJpaRepository extends JpaRepository<Running, Long> {
 	int deleteByIdAndRunnerIdAndStatus(Long runningId, Long runnerId, Running.Status status);
 
 	void deleteById(Long id);
+
+	@Query("select r.id from Running r where r.runnerId = :runnerId and r.status = :status")
+	Optional<Long> findIdByRunnerIdAndStatus(Long runnerId, Running.Status status);
 }

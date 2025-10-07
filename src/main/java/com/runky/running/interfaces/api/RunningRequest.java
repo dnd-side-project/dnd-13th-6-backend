@@ -15,10 +15,20 @@ public final class RunningRequest {
 			);
 		}
 
-		public record Summary(Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMPS) {
-		}
+		public RunningCriteria.EndWithNoRunningId toCriteria(Long runnerId) {
+			return new RunningCriteria.EndWithNoRunningId(
+				runnerId,
+				summary.totalDistanceMeter, summary.durationSeconds, summary.avgSpeedMPS,
+				track.format, track.points, track.pointCount
+			);
 
-		public record Track(String format, String points, int pointCount) {
 		}
 	}
+
+	public record Summary(Double totalDistanceMeter, Long durationSeconds, Double avgSpeedMPS) {
+	}
+
+	public record Track(String format, String points, int pointCount) {
+	}
+
 }

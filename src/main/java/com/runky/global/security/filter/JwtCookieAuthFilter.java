@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -20,6 +21,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -27,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
  * 폐기된다.
  */
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class JwtCookieAuthFilter extends OncePerRequestFilter {
 
 	//TODO: auth-controller의 "accessToken"와 함께 연동. 공용 상수화 필요
@@ -35,10 +39,6 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 	private static final String HDR_X_ACCESS_TOKEN = "X-Access-Token";
 	private static final String BEARER_PREFIX = "Bearer ";
 	private final TokenDecoder tokenDecoder;
-
-	public JwtCookieAuthFilter(TokenDecoder tokenDecoder) {
-		this.tokenDecoder = tokenDecoder;
-	}
 
 	// TODO: 쿠키 없을 때, 예외처리
 	@Override

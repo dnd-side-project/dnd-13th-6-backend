@@ -5,7 +5,6 @@ import com.runky.global.security.auth.MemberPrincipal;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -21,7 +20,13 @@ public interface RunningApiSpec {
 	ApiResponse<RunningResponse.End> end(
 		@Parameter(hidden = true) MemberPrincipal requester,
 		@Schema(description = "종료할 런닝 ID") Long runningId,
-		@Schema(description = "런닝 요약 및 트랙 정보") com.runky.running.interfaces.api.RunningRequest.End request
+		@Schema(description = "런닝 요약 및 트랙 정보") RunningRequest.End request
+	);
+
+	@Operation(summary = "런닝 종료", description = "런닝 id 없이, 런닝을 종료하고 전체 기록을 저장합니다.")
+	ApiResponse<RunningResponse.End> end(
+		@Parameter(hidden = true) MemberPrincipal requester,
+		@Schema(description = "런닝 요약 및 트랙 정보") RunningRequest.End request
 	);
 
 	@Operation(
@@ -44,16 +49,8 @@ public interface RunningApiSpec {
 		summary = "런닝 결과 단건 조회",
 		description = "특정 런닝 ID에 대한 최종 기록(일반적으로 종료된 세션 기준)을 조회합니다."
 	)
-	ApiResponse<RunningResponse.RunResult> getRunResult(
-		@Parameter(hidden = true) MemberPrincipal requester,
-		@Parameter(
-			name = "runningId",
-			in = ParameterIn.PATH,
-			required = true,
-			description = "조회할 런닝 ID",
-			schema = @Schema(type = "integer", format = "int64", example = "123")
-		)
-		Long runningId
+	ApiResponse<RunningResponse.MyWeeklyTotalDistance> getRunResult(
+		@Parameter(hidden = true) MemberPrincipal requester
 	);
 
 	@Operation(

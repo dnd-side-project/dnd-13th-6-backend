@@ -74,4 +74,9 @@ public class RunningRepositoryImpl implements RunningRepository {
 		return jpaRepository.deleteByIdAndRunnerIdAndStatus(runningId, runnerId, status);
 	}
 
+	@Override
+	public Optional<Long> findIdByRunnerIdAndStatus(final Long runnerId, final Running.Status status) {
+		return jpaRepository.findIdByRunnerIdAndStatus(runnerId, status);
+	}
+
 }

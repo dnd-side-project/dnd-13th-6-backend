@@ -5,7 +5,6 @@ import static com.runky.running.interfaces.api.RunningResponse.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -37,11 +36,11 @@ public class RunningController implements RunningApiSpec {
 	private final RunningFacade runningFacade;
 	private final SimpMessagingTemplate messagingTemplate;
 
-	@PostMapping("{runningId}/location/publish")
-	public ApiResponse<ApiResponse<Void>> publish(
-		@DestinationVariable Long runningId,
+	@PostMapping("/{runningId}/location/publish")
+	public ApiResponse<Void> publish(
+		@PathVariable Long runningId,
 		@AuthenticationPrincipal MemberPrincipal requester,
-		@Validated LocationMessage payload
+		@Validated @RequestBody LocationMessage payload
 	) {
 		Long runnerId = requester.memberId();
 		RoomEvent event = new RoomEvent("LOCATION", runningId, runnerId, payload.x(), payload.y(), payload.timestamp());

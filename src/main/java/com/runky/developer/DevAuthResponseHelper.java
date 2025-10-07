@@ -110,11 +110,8 @@ public class DevAuthResponseHelper {
 			.body(body);
 	}
 
-	public <T> ResponseEntity<ApiResponse<T>> redirectWithFragment(
-		ApiResponse<T> body,
-		String baseLocation,
-		Map<String, String> fragmentParams
-	) {
+	public <T> ResponseEntity<ApiResponse<T>> redirectWithFragment(ApiResponse<T> body, String baseLocation,
+		Map<String, String> fragmentParams) {
 		String frag = fragmentParams.entrySet().stream()
 			.map(e -> URLEncoder.encode(e.getKey(), StandardCharsets.UTF_8) + "="
 				+ URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))

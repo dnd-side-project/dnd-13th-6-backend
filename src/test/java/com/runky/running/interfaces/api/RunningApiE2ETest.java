@@ -47,12 +47,12 @@ class RunningApiE2ETest {
 	}
 
 	private RunningRequest.End buildEndRequest() {
-		var summary = new RunningRequest.End.Summary(
+		var summary = new RunningRequest.Summary(
 			1200.0,
 			600L,
 			2.0
 		);
-		var track = new RunningRequest.End.Track(
+		var track = new RunningRequest.Track(
 			"GEOJSON",
 			"""
 				{"type":"LineString","coordinates":[[127.0,37.0],[127.001,37.001]]}
@@ -121,12 +121,12 @@ class RunningApiE2ETest {
 			Long runningId = started.runningId();
 
 			// end 요청 payload 구성
-			var summary = new RunningRequest.End.Summary(
+			var summary = new RunningRequest.Summary(
 				1200.0,
 				600L,
 				2.0
 			);
-			var track = new RunningRequest.End.Track(
+			var track = new RunningRequest.Track(
 				"GEOJSON",
 				"""
 					{"type":"LineString","coordinates":[[127.0,37.0],[127.0005,37.0005]]}
@@ -186,8 +186,8 @@ class RunningApiE2ETest {
 
 			// end
 			var endReq = new RunningRequest.End(
-				new RunningRequest.End.Summary(1500.0, 900L, 1.6667),
-				new RunningRequest.End.Track("GEOJSON",
+				new RunningRequest.Summary(1500.0, 900L, 1.6667),
+				new RunningRequest.Track("GEOJSON",
 					"""
 						{"type":"LineString","coordinates":[[127.0,37.0],[127.001,37.001],[127.002,37.002]]}
 						""".trim(),

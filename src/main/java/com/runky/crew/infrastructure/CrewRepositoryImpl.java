@@ -20,7 +20,7 @@ public class CrewRepositoryImpl implements CrewRepository {
 
 	private final CrewJpaRepository crewJpaRepository;
 	private final CrewMemberJpaRepository crewMemberJpaRepository;
-	private final MemberCrewCountJpaRepository memberCrewCountJpaRepository;
+	private final CrewMemberCountJpaRepository crewMemberCountJpaRepository;
 
 	@Override
 	public Crew save(Crew crew) {
@@ -54,7 +54,7 @@ public class CrewRepositoryImpl implements CrewRepository {
 
 	@Override
 	public CrewMemberCount save(CrewMemberCount crewMemberCount) {
-		return memberCrewCountJpaRepository.save(crewMemberCount);
+		return crewMemberCountJpaRepository.save(crewMemberCount);
 	}
 
     @Override
@@ -64,7 +64,7 @@ public class CrewRepositoryImpl implements CrewRepository {
 
     @Override
 	public List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds) {
-		return memberCrewCountJpaRepository.findByMemberIdIn(userIds);
+		return crewMemberCountJpaRepository.findByMemberIdIn(userIds);
 	}
 
 	@Override
@@ -74,11 +74,21 @@ public class CrewRepositoryImpl implements CrewRepository {
 
 	@Override
 	public Optional<CrewMemberCount> findCountByMemberId(Long memberId) {
-		return memberCrewCountJpaRepository.findByMemberId(memberId);
+		return crewMemberCountJpaRepository.findByMemberId(memberId);
 	}
 
     @Override
     public List<CrewMember> findRelatedCrewMembers(Long userId) {
         return crewMemberJpaRepository.findRelatedCrewMembers(userId);
     }
+
+	@Override
+	public void deleteCrewMemberCountByMemberId(Long memberId) {
+		crewMemberCountJpaRepository.deleteByMemberId(memberId);
+	}
+
+	@Override
+	public void deleteCrewMembersByMemberId(Long memberId) {
+		crewMemberJpaRepository.deleteByMemberId(memberId);
+	}
 }

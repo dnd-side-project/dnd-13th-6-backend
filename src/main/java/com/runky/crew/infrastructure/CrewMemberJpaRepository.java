@@ -23,4 +23,6 @@ public interface CrewMemberJpaRepository extends JpaRepository<CrewMember, Long>
     and (m.role = com.runky.crew.domain.CrewMember.Role.LEADER or m.role = com.runky.crew.domain.CrewMember.Role.MEMBER)
 """)
     List<CrewMember> findRelatedCrewMembers(Long memberId);
+
+	void deleteByMemberId(Long memberId);
 }

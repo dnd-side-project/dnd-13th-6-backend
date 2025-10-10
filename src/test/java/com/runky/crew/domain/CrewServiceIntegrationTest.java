@@ -143,6 +143,79 @@ class CrewServiceIntegrationTest {
 	}
 
 	@Nested
+	@DisplayName("사용자 모든 크루 탈퇴 시,")
+	class CleanUp {
+		@Test
+		@DisplayName("리더로 속한 크루일 경우, 무작위로 리더를 위임하고, 탈퇴한다.")
+		void cleanUpCrewsOfUser_asLeader() {
+			CrewMemberCount crewMemberCount = CrewMemberCount.of(1L);
+			Crew crew = Crew.of(new CrewCommand.Create(1L, "Crew 1"), new Code("ABC123"));
+			crew.joinMember(2L);
+			crew.joinMember(3L);
+			crewMemberCount.increment();
+			crewRepository.save(crewMemberCount);
+			Crew saveCrew = crewRepository.save(crew);
+
+			crewService.cleanUp(new CrewCommand.Clean(1L));
+
+			Crew find = crewRepository.findById(saveCrew.getId()).orElseThrow();
+			assertThat(find.doesNotContainMember(1L)).isTrue();
+			assertThat(find.getLeaderId()).isIn(2L, 3L);
+		}
+
+		@Test
+		@DisplayName("멤버로 속한 크루일 경우, 탈퇴한다.")
+		void cleanUpCrewsOfUser_asMember() {
+			Crew crew = Crew.of(new CrewCommand.Create(10L, "Crew 1"), new Code("ABC123"));
+			crew.joinMember(1L);
+			CrewMemberCount crewMemberCount = CrewMemberCount.of(1L);
+			crewMemberCount.increment();
+			crewRepository.save(crewMemberCount);
+			Crew saveCrew = crewRepository.save(crew);
+
+			crewService.cleanUp(new CrewCommand.Clean(1L));
+
+			Crew find = crewRepository.findById(saveCrew.getId()).orElseThrow();
+			assertThat(find.doesNotContainMember(1L)).isTrue();
+		}
+
+		@Test
+		@DisplayName("크루 멤버 정보가 삭제된다.")
+		void deleteCrewMembers() {
+			CrewMemberCount crewMemberCount = CrewMemberCount.of(1L);
+			Crew crew = Crew.of(new CrewCommand.Create(10L, "Crew 1"), new Code("ABC123"));
+			crew.joinMember(1L);
+			crewMemberCount.increment();
+			Crew leaderCrew = Crew.of(new CrewCommand.Create(1L, "Crew 2"), new Code("DEF456"));
+			leaderCrew.joinMember(2L);
+			crewMemberCount.increment();
+			crewRepository.save(crew);
+			crewRepository.save(leaderCrew);
+			crewRepository.save(crewMemberCount);
+
+			crewService.cleanUp(new CrewCommand.Clean(1L));
+
+			List<CrewMember> relatedCrewMembers = crewRepository.findRelatedCrewMembers(1L);
+			assertThat(relatedCrewMembers).isEmpty();
+		}
+
+		@Test
+		@DisplayName("크루 개수 정보가 삭제된다.")
+		void deleteCrewMemberCount() {
+			CrewMemberCount crewMemberCount = CrewMemberCount.of(1L);
+			Crew crew = Crew.of(new CrewCommand.Create(10L, "Crew 1"), new Code("ABC123"));
+			crew.joinMember(1L);
+			crewMemberCount.increment();
+			crewRepository.save(crew);
+			crewRepository.save(crewMemberCount);
+
+			crewService.cleanUp(new CrewCommand.Clean(1L));
+
+			assertThat(crewRepository.findCountByMemberId(1L)).isEmpty();
+		}
+	}
+
+	@Nested
 	@DisplayName("동시성 테스트")
 	class Concurrency {
 		@Test

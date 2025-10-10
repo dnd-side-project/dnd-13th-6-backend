@@ -78,4 +78,9 @@ public final class CrewCommand {
 		Long memberId
 	) {
 	}
+
+    public record Clean(
+            Long memberId
+    ) {
+    }
 }

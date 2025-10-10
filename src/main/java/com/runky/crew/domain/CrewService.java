@@ -1,8 +1,7 @@
 package com.runky.crew.domain;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -92,24 +91,42 @@ public class CrewService {
 		return crewRepository.findAllCrewMembersOfUserWithoutUserId(userId);
 	}
 
-    @Transactional
-    public List<CrewMember> findAllRelatedCrewMembers(CrewCommand.Related command) {
-        List<CrewMember> relatedCrewMembers = crewRepository.findRelatedCrewMembers(command.userId());
-        return relatedCrewMembers.stream()
-                .filter(relatedCrewMember -> !relatedCrewMember.getMemberId().equals(command.userId()))
-                .collect(Collectors.toMap(
-                        CrewMember::getMemberId,
-                        m -> m,
-                        (m1, m2) -> m1
-                ))
-                .values()
-                .stream()
-                .toList();
-    }
+	@Transactional
+	public List<CrewMember> findAllRelatedCrewMembers(CrewCommand.Related command) {
+		List<CrewMember> relatedCrewMembers = crewRepository.findRelatedCrewMembers(command.userId());
+		return relatedCrewMembers.stream()
+			.filter(relatedCrewMember -> !relatedCrewMember.getMemberId().equals(command.userId()))
+			.collect(Collectors.toMap(
+				CrewMember::getMemberId,
+				m -> m,
+				(m1, m2) -> m1
+			))
+			.values()
+			.stream()
+			.toList();
+	}
 
-    @Transactional
-    public void init(CrewCommand.Init command) {
-        CrewMemberCount crewMemberCount = CrewMemberCount.of(command.memberId());
-        crewRepository.save(crewMemberCount);
-    }
+	@Transactional
+	public void init(CrewCommand.Init command) {
+		CrewMemberCount crewMemberCount = CrewMemberCount.of(command.memberId());
+		crewRepository.save(crewMemberCount);
+	}
+
+	@Transactional
+	public void cleanUp(CrewCommand.Clean command) {
+		List<Crew> crews = crewRepository.findCrewsByMemberId(command.memberId());
+		for (Crew crew : crews) {
+			if (crew.isLeader(command.memberId())) {
+				List<CrewMember> members = crew.getActiveMembers().stream()
+					.filter(member -> !member.isLeader())
+					.toList();
+				int leaderIndex = new Random().nextInt(members.size());
+				crew.delegateLeader(members.get(leaderIndex).getMemberId());
+			}
+			crew.leaveMember(command.memberId());
+		}
+
+		crewRepository.deleteCrewMemberCountByMemberId(command.memberId());
+		crewRepository.deleteCrewMembersByMemberId(command.memberId());
+	}
 }

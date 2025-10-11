@@ -47,11 +47,16 @@ public final class GoalCommand {
 	) {
 	}
 
-    public record UpdateDistance(
-            Long memberId,
-            Set<Long> crewIds,
-            BigDecimal distance,
-            LocalDate date
-    ) {
-    }
+	public record UpdateDistance(
+		Long memberId,
+		Set<Long> crewIds,
+		BigDecimal distance,
+		LocalDate date
+	) {
+	}
+
+	public record Clean(
+		Long memberId
+	) {
+	}
 }

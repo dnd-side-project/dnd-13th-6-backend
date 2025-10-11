@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.runky.auth.domain.AuthTokenService;
 import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewService;
+import com.runky.goal.domain.GoalCommand;
+import com.runky.goal.domain.GoalService;
 import com.runky.member.domain.Member;
 import com.runky.member.domain.MemberCommand;
 import com.runky.member.domain.MemberService;
@@ -23,6 +25,7 @@ public class MemberFacade {
 	private final MemberService memberService;
 	private final RewardService rewardService;
 	private final CrewService crewService;
+	private final GoalService goalService;
 
 	@Transactional(readOnly = true)
 	public MemberResult.WithBadge getMember(MemberCriteria.Get criteria) {
@@ -50,5 +53,6 @@ public class MemberFacade {
 		authTokenService.delete(memberId);
 		memberService.delete(new MemberCommand.DeleteMember(memberId));
 		crewService.cleanUp(new CrewCommand.Clean(memberId));
+		goalService.cleanUp(new GoalCommand.Clean(memberId));
 	}
 }

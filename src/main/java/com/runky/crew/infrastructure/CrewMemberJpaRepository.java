@@ -1,5 +1,6 @@
 package com.runky.crew.infrastructure;
 
+import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewMember;
 import java.util.List;
 import java.util.Optional;
@@ -25,4 +26,6 @@ public interface CrewMemberJpaRepository extends JpaRepository<CrewMember, Long>
     List<CrewMember> findRelatedCrewMembers(Long memberId);
 
 	void deleteByMemberId(Long memberId);
+
+	void deleteByCrew(Crew crew);
 }

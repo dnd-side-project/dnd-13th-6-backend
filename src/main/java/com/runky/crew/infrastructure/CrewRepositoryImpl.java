@@ -91,4 +91,10 @@ public class CrewRepositoryImpl implements CrewRepository {
 	public void deleteCrewMembersByMemberId(Long memberId) {
 		crewMemberJpaRepository.deleteByMemberId(memberId);
 	}
+
+	@Override
+	public void deleteCrew(Crew crew) {
+		crewJpaRepository.delete(crew);
+		crewMemberJpaRepository.deleteByCrew(crew);
+	}
 }

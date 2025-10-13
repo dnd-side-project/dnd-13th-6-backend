@@ -599,4 +599,20 @@ class CrewTest {
 				.containsExactlyInAnyOrder(1L, 2L, 3L);
 		}
 	}
+
+	@Nested
+	@DisplayName("랜덤으로 크루원을 리더로 위임 시,")
+	class DelegateRandomLeader {
+		@Test
+		@DisplayName("나를 제외한 크루원이 없을 경우, NOT_ENOUGH_CREW_MEMBER 예외를 발생시킨다.")
+		void throwNotEnoughCrewMemberException_whenAlone() {
+			Crew crew = Crew.of(new CrewCommand.Create(1L, "name"), new Code("ABC123"));
+
+			GlobalException thrown = assertThrows(GlobalException.class, crew::delegateRandomLeader);
+
+			assertThat(thrown)
+				.usingRecursiveComparison()
+				.isEqualTo(new GlobalException(CrewErrorCode.NOT_ENOUGH_CREW_MEMBER));
+		}
+	}
 }

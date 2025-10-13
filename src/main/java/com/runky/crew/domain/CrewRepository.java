@@ -33,4 +33,6 @@ public interface CrewRepository {
 	void deleteCrewMemberCountByMemberId(Long memberId);
 
 	void deleteCrewMembersByMemberId(Long memberId);
+
+	void deleteCrew(Crew crew);
 }

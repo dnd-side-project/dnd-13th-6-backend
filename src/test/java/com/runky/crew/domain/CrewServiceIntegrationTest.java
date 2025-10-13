@@ -3,6 +3,7 @@ package com.runky.crew.domain;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -212,6 +213,18 @@ class CrewServiceIntegrationTest {
 			crewService.cleanUp(new CrewCommand.Clean(1L));
 
 			assertThat(crewRepository.findCountByMemberId(1L)).isEmpty();
+		}
+
+		@Test
+		@DisplayName("본인 밖에 없는 크루라면, 크루는 삭제된다.")
+		void deleteCrew_whenAlone() {
+			Crew crew = Crew.of(new CrewCommand.Create(1L, "name"), new Code("ABC123"));
+			Crew saveCrew = crewRepository.save(crew);
+
+			crewService.cleanUp(new CrewCommand.Clean(1L));
+
+			Optional<Crew> find = crewRepository.findById(saveCrew.getId());
+			assertThat(find).isEmpty();
 		}
 	}
 

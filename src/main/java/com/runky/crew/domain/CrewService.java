@@ -116,12 +116,12 @@ public class CrewService {
 	public void cleanUp(CrewCommand.Clean command) {
 		List<Crew> crews = crewRepository.findCrewsByMemberId(command.memberId());
 		for (Crew crew : crews) {
+			if (crew.isAlone()) {
+				crewRepository.deleteCrew(crew);
+				continue;
+			}
 			if (crew.isLeader(command.memberId())) {
-				List<CrewMember> members = crew.getActiveMembers().stream()
-					.filter(member -> !member.isLeader())
-					.toList();
-				int leaderIndex = new Random().nextInt(members.size());
-				crew.delegateLeader(members.get(leaderIndex).getMemberId());
+				crew.delegateRandomLeader();
 			}
 			crew.leaveMember(command.memberId());
 		}

@@ -46,6 +46,7 @@ public class CrewLeaderService {
             throw new GlobalException(CrewErrorCode.NOT_CREW_LEADER);
         }
         List<CrewMember> leftMembers = crew.disband();
+		crewRepository.deleteCrew(crew);
 
         Set<Long> leftMemberIds = leftMembers.stream()
                 .map(CrewMember::getMemberId)

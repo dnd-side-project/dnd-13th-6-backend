@@ -1,6 +1,5 @@
 package com.runky.goal.infrastructure;
 
-import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -12,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import com.runky.goal.domain.MemberGoalSnapshot;
 import com.runky.goal.domain.WeekUnit;
 
+import jakarta.persistence.LockModeType;
+
 public interface MemberGoalSnapshotJpaRepository extends JpaRepository<MemberGoalSnapshot, Long> {
 
 	@Query("SELECT mgs FROM MemberGoalSnapshot mgs WHERE mgs.memberId IN :memberIds AND mgs.weekUnit = :weekUnit")
@@ -22,6 +23,8 @@ public interface MemberGoalSnapshotJpaRepository extends JpaRepository<MemberGoa
 
 	boolean existsByMemberId(Long memberId);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<MemberGoalSnapshot> findByMemberIdAndWeekUnit(Long memberId, WeekUnit weekUnit);
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	Optional<MemberGoalSnapshot> findByMemberIdAndWeekUnit(Long memberId, WeekUnit weekUnit);
+
+	void deleteByMemberId(Long memberId);
 }

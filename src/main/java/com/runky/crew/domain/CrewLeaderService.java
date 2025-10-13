@@ -46,15 +46,16 @@ public class CrewLeaderService {
             throw new GlobalException(CrewErrorCode.NOT_CREW_LEADER);
         }
         List<CrewMember> leftMembers = crew.disband();
-		crewRepository.deleteCrew(crew);
 
-        Set<Long> leftMemberIds = leftMembers.stream()
+		Set<Long> leftMemberIds = leftMembers.stream()
                 .map(CrewMember::getMemberId)
                 .collect(Collectors.toSet());
-        crewRepository.findCrewMemberCounts(leftMemberIds)
-                .forEach(CrewMemberCount::decrement);
 
-        return crew;
+		crewRepository.findCrewMemberCounts(leftMemberIds)
+                .forEach(CrewMemberCount::decrement);
+		crewRepository.deleteCrew(crew);
+
+		return crew;
     }
 
     @Transactional

@@ -37,7 +37,7 @@ class CrewLeaderServiceIntegrationTest {
 			Crew crew = Crew.of(new CrewCommand.Create(1L, "name"), new Code("ABC123"));
 			Crew save = crewRepository.save(crew);
 
-			crewLeaderService.disband(new CrewCommand.Disband(1L, 1L));
+			crewLeaderService.disband(new CrewCommand.Disband(save.getId(), 1L));
 
 			Optional<Crew> find = crewRepository.findById(save.getId());
 			assertThat(find).isEmpty();

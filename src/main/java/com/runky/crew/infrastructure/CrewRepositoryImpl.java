@@ -57,12 +57,12 @@ public class CrewRepositoryImpl implements CrewRepository {
 		return crewMemberCountJpaRepository.save(crewMemberCount);
 	}
 
-    @Override
-    public CrewMember save(CrewMember crewMember) {
-        return crewMemberJpaRepository.save(crewMember);
-    }
+	@Override
+	public CrewMember save(CrewMember crewMember) {
+		return crewMemberJpaRepository.save(crewMember);
+	}
 
-    @Override
+	@Override
 	public List<CrewMemberCount> findCrewMemberCounts(Set<Long> userIds) {
 		return crewMemberCountJpaRepository.findByMemberIdIn(userIds);
 	}
@@ -77,10 +77,10 @@ public class CrewRepositoryImpl implements CrewRepository {
 		return crewMemberCountJpaRepository.findByMemberId(memberId);
 	}
 
-    @Override
-    public List<CrewMember> findRelatedCrewMembers(Long userId) {
-        return crewMemberJpaRepository.findRelatedCrewMembers(userId);
-    }
+	@Override
+	public List<CrewMember> findRelatedCrewMembers(Long userId) {
+		return crewMemberJpaRepository.findRelatedCrewMembers(userId);
+	}
 
 	@Override
 	public void deleteCrewMemberCountByMemberId(Long memberId) {
@@ -95,6 +95,5 @@ public class CrewRepositoryImpl implements CrewRepository {
 	@Override
 	public void deleteCrew(Crew crew) {
 		crewJpaRepository.delete(crew);
-		crewMemberJpaRepository.deleteByCrew(crew);
 	}
 }

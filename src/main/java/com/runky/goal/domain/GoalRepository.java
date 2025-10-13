@@ -32,7 +32,11 @@ public interface GoalRepository {
 
 	boolean existsMemberGoalSnapShot(Long memberId);
 
-    Optional<MemberGoalSnapshot> findSnapshotWithLock(Long memberId, WeekUnit weekUnit);
+	Optional<MemberGoalSnapshot> findSnapshotWithLock(Long memberId, WeekUnit weekUnit);
 
-    List<CrewGoalSnapshot> findAllCrewSnapshotsWithLock(Set<Long> crewIds, WeekUnit weekUnit);
+	List<CrewGoalSnapshot> findAllCrewSnapshotsWithLock(Set<Long> crewIds, WeekUnit weekUnit);
+
+	void deleteMemberGoal(Long memberId);
+
+	void deleteAllMemberSnapshot(Long memberId);
 }

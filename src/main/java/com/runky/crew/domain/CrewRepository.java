@@ -29,4 +29,10 @@ public interface CrewRepository {
     List<Long> findAllCrewMembersOfUserWithoutUserId(Long userId);
 
     List<CrewMember> findRelatedCrewMembers(Long userId);
+
+	void deleteCrewMemberCountByMemberId(Long memberId);
+
+	void deleteCrewMembersByMemberId(Long memberId);
+
+	void deleteCrew(Crew crew);
 }

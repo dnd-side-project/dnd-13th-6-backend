@@ -23,6 +23,7 @@ public enum CrewErrorCode implements ErrorCode {
     NOT_IN_CREW(HttpStatus.BAD_REQUEST, "C112", "현재 참여중인 크루가 없습니다."),
     LAST_CREW_MEMBER(HttpStatus.BAD_REQUEST, "C113", "크루에 마지막으로 남은 사용자는 탈퇴 대신 해체해야 합니다."),
     INVALID_NOTICE(HttpStatus.BAD_REQUEST, "C114", "크루 공지사항은 1자 이상, 20자 이하여야 합니다."),
+	NOT_ENOUGH_CREW_MEMBER(HttpStatus.CONFLICT, "C115", "나를 제외한 크루원이 존재해야 리더를 위임할 수 있습니다."),
     ;
 
     private final HttpStatus status;

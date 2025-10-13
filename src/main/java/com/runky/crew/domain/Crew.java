@@ -2,7 +2,7 @@ package com.runky.crew.domain;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.runky.crew.error.CrewErrorCode;
 import com.runky.global.entity.BaseTimeEntity;
@@ -227,7 +227,7 @@ public class Crew extends BaseTimeEntity {
 			throw new GlobalException(CrewErrorCode.NOT_ENOUGH_CREW_MEMBER);
 		}
 
-		int leaderIndex = new Random().nextInt(members.size());
+		int leaderIndex = ThreadLocalRandom.current().nextInt(members.size());
 
 		delegateLeader(members.get(leaderIndex).getMemberId());
 	}

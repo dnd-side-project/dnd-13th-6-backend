@@ -69,11 +69,12 @@ public class CrewController implements CrewApiSpec {
 	@DeleteMapping("/{crewId}/members/me")
 	public ApiResponse<CrewResponse.Leave> leaveCrew(
 		@AuthenticationPrincipal MemberPrincipal requester,
-		@Valid @RequestBody CrewRequest.Leave request,
+		@RequestBody(required = false) CrewRequest.Leave request,
 		@PathVariable Long crewId
 	) {
+		Long newLeaderId = request != null ? request.newLeaderId() : null;
 		CrewResult.Leave result = crewFacade.leaveCrew(
-			new CrewCriteria.Leave(crewId, requester.memberId(), request.newLeaderId()));
+			new CrewCriteria.Leave(crewId, requester.memberId(), newLeaderId));
 		return ApiResponse.success(CrewResponse.Leave.from(result));
 	}
 

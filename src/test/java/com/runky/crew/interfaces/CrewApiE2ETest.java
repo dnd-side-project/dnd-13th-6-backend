@@ -2,8 +2,6 @@ package com.runky.crew.interfaces;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.runky.crew.interfaces.api.CrewRequest;
-import com.runky.crew.interfaces.api.CrewResponse;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +25,8 @@ import com.runky.crew.domain.Crew;
 import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewMemberCount;
 import com.runky.crew.domain.CrewRepository;
+import com.runky.crew.interfaces.api.CrewRequest;
+import com.runky.crew.interfaces.api.CrewResponse;
 import com.runky.global.response.ApiResponse;
 import com.runky.goal.domain.CrewGoalSnapshot;
 import com.runky.goal.domain.Goal;
@@ -293,6 +293,58 @@ class CrewApiE2ETest {
 
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 			assertThat(response.getBody().getResult().crewId()).isEqualTo(crew.getId());
+		}
+
+		@Test
+		@DisplayName("리더가 아닐 경우, RequestBody를 넣지 않더라도, 크루를 탈퇴할 수 있다.")
+		void leaveCrew_withoutNewLeader() {
+			long userId = 1L;
+			crewRepository.save(CrewMemberCount.of(userId));
+			Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
+			crew.joinMember(2L);
+			Crew savedCrew = crewRepository.save(crew);
+			CrewMemberCount crewMemberCount = CrewMemberCount.of(2L);
+			crewMemberCount.increment();
+			crewRepository.save(crewMemberCount);
+
+			HttpHeaders httpHeaders = tokenIssuer.issue(2L, "USER");
+
+			ParameterizedTypeReference<ApiResponse<CrewResponse.Leave>> responseType = new ParameterizedTypeReference<>() {
+			};
+
+			ResponseEntity<ApiResponse<CrewResponse.Leave>> response =
+				testRestTemplate.exchange(BASE_URL, HttpMethod.DELETE, new HttpEntity<>(httpHeaders),
+					responseType,
+					savedCrew.getId());
+
+			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+			assertThat(response.getBody().getResult().crewId()).isEqualTo(savedCrew.getId());
+		}
+
+		@Test
+		@DisplayName("리더가 크루를 탈퇴할 경우, RequestBody에 새로운 리더의 ID를 반드시 넣어야 한다.")
+		void leaveCrew_leaderMustSetNewLeader() {
+			long userId = 1L;
+			CrewMemberCount crewMemberCount = CrewMemberCount.of(userId);
+			crewMemberCount.increment();
+			crewRepository.save(crewMemberCount);
+			Crew crew = Crew.of(new CrewCommand.Create(userId, "Crew"), new Code("abc123"));
+			crew.joinMember(2L);
+			Crew savedCrew = crewRepository.save(crew);
+
+			HttpHeaders httpHeaders = tokenIssuer.issue(1L, "USER");
+
+			ParameterizedTypeReference<ApiResponse<CrewResponse.Leave>> responseType = new ParameterizedTypeReference<>() {
+			};
+
+			CrewRequest.Leave request = new CrewRequest.Leave(2L);
+			ResponseEntity<ApiResponse<CrewResponse.Leave>> response =
+				testRestTemplate.exchange(BASE_URL, HttpMethod.DELETE, new HttpEntity<>(request, httpHeaders),
+					responseType,
+					savedCrew.getId());
+
+			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+			assertThat(response.getBody().getResult().crewId()).isEqualTo(savedCrew.getId());
 		}
 	}
 

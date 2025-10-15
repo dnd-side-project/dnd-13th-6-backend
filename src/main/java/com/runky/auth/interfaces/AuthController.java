@@ -48,6 +48,16 @@ public class AuthController implements AuthApiSpec {
 		oauthResponseHandler.handle(action, response);
 	}
 
+	@GetMapping("/dev/login/oauth2/code/kakao")
+	public void devKakaoCallback(@RequestParam("code") String code, HttpServletResponse response) {
+
+		// 1. Application Layer: 비즈니스 로직
+		AuthResult.OAuthResponseAction action = authFacade.handleOAuthLogin(code);
+
+		// 2. ResponseHandler: HTTP 응답 구성 (리다이렉트)
+		oauthResponseHandler.devHandle(action, response);
+	}
+
 	/**
 	 * 회원가입 완료
 	 *

@@ -49,15 +49,6 @@ class RewardApiE2ETest {
 		databaseCleanUp.truncateAllTables();
 	}
 
-	private HttpHeaders authHeaders(long memberId, String role) {
-		var issued = provider.createTokenPair(memberId, role);
-		String accessToken = issued.accessToken();
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.COOKIE, "accessToken=" + accessToken);
-		return headers;
-	}
-
 	@Nested
 	@DisplayName("GET api/rewards/badges")
 	class GetDeviceTokenBadges {
@@ -71,7 +62,7 @@ class RewardApiE2ETest {
 			ParameterizedTypeReference<ApiResponse<RewardResponse.Images>> responseType = new ParameterizedTypeReference<>() {
 			};
 
-			HttpHeaders httpHeaders = authHeaders(1L, "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(1L, "USER");
 
 			ResponseEntity<ApiResponse<RewardResponse.Images>> response =
 				testRestTemplate.exchange(BASE_URL, HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
@@ -101,7 +92,7 @@ class RewardApiE2ETest {
 			};
 
 			testTokenIssuer.issue(1L, "USER");
-			HttpHeaders httpHeaders = authHeaders(1L, "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(1L, "USER");
 
 			ResponseEntity<ApiResponse<RewardResponse.Gotcha>> response =
 				testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(httpHeaders), responseType);
@@ -126,7 +117,7 @@ class RewardApiE2ETest {
 			clover.add(1000L);
 			cloverRepository.save(clover);
 
-			HttpHeaders httpHeaders = authHeaders(1L, "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(1L, "USER");
 
 			ResponseEntity<ApiResponse<RewardResponse.Clover>> response =
 				testRestTemplate.exchange(BASE_URL, HttpMethod.GET, new HttpEntity<>(httpHeaders),

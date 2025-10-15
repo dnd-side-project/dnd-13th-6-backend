@@ -16,10 +16,9 @@ public class TestTokenIssuer {
 
 	public HttpHeaders issue(long memberId, String role) {
 		var issued = tokenProvider.createTokenPair(memberId, role);
-		String accessToken = issued.accessToken();
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.COOKIE, "accessToken=" + accessToken);
+		headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + issued.accessToken());
 		return headers;
 	}
 }

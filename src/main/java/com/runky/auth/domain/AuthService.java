@@ -46,6 +46,17 @@ public class AuthService {
 		return userInfo;
 	}
 
+	@Transactional(readOnly = true)
+	public OAuthUserInfo devFetchOAuthUserInfo(String authorizationCode) {
+		String accessToken = oAuthClient.devFetchAccessToken(authorizationCode);
+		OAuthUserInfo userInfo = oAuthClient.fetchUserInfo(accessToken);
+
+		log.debug("OAuth user info fetched: provider={}, providerId={}",
+			userInfo.provider(), userInfo.providerId());
+
+		return userInfo;
+	}
+
 	// ========================================
 	// JWT 토큰 관리
 	// ========================================

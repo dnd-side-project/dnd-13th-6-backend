@@ -35,7 +35,7 @@ public final class RunningCriteria {
 
 	public record EndWithNoRunningId(
 		Long runnerId,
-		Double totalDistanceMinutes,
+		Double totalDistanceMeter,
 		Long durationSeconds,
 		Double avgSpeedMPS,
 		String format,
@@ -45,7 +45,7 @@ public final class RunningCriteria {
 	) {
 		public RunningCommand.End toCommand(Long runningId) {
 			return new RunningCommand.End(
-				runningId, runnerId, totalDistanceMinutes, durationSeconds, avgSpeedMPS, format, points, pointCount
+				runningId, runnerId, totalDistanceMeter, durationSeconds, avgSpeedMPS, format, points, pointCount
 			);
 		}
 	}
@@ -62,9 +62,9 @@ public final class RunningCriteria {
 	public record RemoveActiveRunning(Long runnerId, Long runningId) {
 	}
 
-    public record Weekly(Long runnerId, LocalDate start) {
-    }
+	public record Weekly(Long runnerId, LocalDate start) {
+	}
 
-    public record Monthly(Long runnerId, int year, int month) {
-    }
+	public record Monthly(Long runnerId, int year, int month) {
+	}
 }

@@ -50,8 +50,8 @@ public class RunningFacade {
 	@Transactional
 	public RunningResult.End end(RunningCriteria.End criteria) {
 		RunningInfo.End info = runningService.end(criteria.toCommand());
-        eventPublisher.publishEvent(new RunningEvent.Ended(info.runningId(), info.runnerId(), info.distance(),
-                info.status(), info.startedAt(), info.endedAt()));
+		eventPublisher.publishEvent(new RunningEvent.Ended(info.runningId(), info.runnerId(), info.distance(),
+			info.status(), info.startedAt(), info.endedAt()));
 		return RunningResult.End.from(info);
 	}
 
@@ -59,6 +59,8 @@ public class RunningFacade {
 	public RunningResult.End end(RunningCriteria.EndWithNoRunningId criteria) {
 		Long runningId = runningService.getRunningId(criteria.runnerId());
 		RunningInfo.End info = runningService.end(criteria.toCommand(runningId));
+		eventPublisher.publishEvent(new RunningEvent.Ended(info.runningId(), info.runnerId(), info.distance(),
+			info.status(), info.startedAt(), info.endedAt()));
 		return RunningResult.End.from(info);
 	}
 
@@ -82,21 +84,22 @@ public class RunningFacade {
 		return new RunningResult.RemovedRunning(count);
 	}
 
-    public List<RunningResult.History> getWeeklyHistories(RunningCriteria.Weekly criteria) {
-        List<RunningInfo.History> histories =
-                runningService.getWeeklyHistories(new RunningCommand.Weekly(criteria.runnerId(), criteria.start()));
+	public List<RunningResult.History> getWeeklyHistories(RunningCriteria.Weekly criteria) {
+		List<RunningInfo.History> histories =
+			runningService.getWeeklyHistories(new RunningCommand.Weekly(criteria.runnerId(), criteria.start()));
 
-        return histories.stream()
-                .map(RunningResult.History::from)
-                .toList();
-    }
+		return histories.stream()
+			.map(RunningResult.History::from)
+			.toList();
+	}
 
-    public List<RunningResult.History> getMonthlyHistories(RunningCriteria.Monthly criteria) {
-        List<RunningInfo.History> histories =
-                runningService.getMonthlyHistories(new RunningCommand.Monthly(criteria.runnerId(), criteria.year(), criteria.month()));
+	public List<RunningResult.History> getMonthlyHistories(RunningCriteria.Monthly criteria) {
+		List<RunningInfo.History> histories =
+			runningService.getMonthlyHistories(
+				new RunningCommand.Monthly(criteria.runnerId(), criteria.year(), criteria.month()));
 
-        return histories.stream()
-                .map(RunningResult.History::from)
-                .toList();
-    }
+		return histories.stream()
+			.map(RunningResult.History::from)
+			.toList();
+	}
 }

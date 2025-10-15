@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.runky.auth.application.port.OAuthClient;
 import com.runky.auth.config.props.KakaoProperties;
-import com.runky.auth.domain.vo.OAuthUserInfo;
+import com.runky.auth.domain.OAuthClient;
+import com.runky.auth.domain.OAuthUserInfo;
 import com.runky.auth.infrastructure.erternal.dto.KakaoTokenResponse;
 import com.runky.auth.infrastructure.erternal.dto.KakaoUserInfoResponse;
 

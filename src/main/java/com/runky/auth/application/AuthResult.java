@@ -4,24 +4,32 @@ public final class AuthResult {
 	private AuthResult() {
 	}
 
-	public enum AuthStatus {NEW_USER, EXISTING_USER}
+	public sealed interface OAuthResponseAction
+		permits OAuthResponseAction.NewUserRedirect, OAuthResponseAction.ExistingUserRedirect {
 
-	public record SigninComplete(String accessToken, String refreshToken) {
-	}
-
-	public record OAuthLogin(boolean isNewUser, String signupToken, String accessToken, String refreshToken,
-							 AuthStatus authStatus
-	) {
-		public static OAuthLogin newUser(String signupToken) {
-			return new OAuthLogin(true, signupToken, null, null, AuthStatus.NEW_USER);
+		/**
+		 * 신규 회원 - 회원가입 페이지로 리다이렉트
+		 * SignupToken을 HttpOnly Cookie로 전달
+		 */
+		record NewUserRedirect(String signupToken) implements OAuthResponseAction {
 		}
 
-		public static OAuthLogin existing(String accessToken, String refreshToken) {
-			return new OAuthLogin(false, null, accessToken, refreshToken, AuthStatus.EXISTING_USER);
+		/**
+		 * 기존 회원 - 메인 페이지로 리
+		 * 다이렉트
+		 * AuthExchangeToken을 쿼리파라미터로 전달
+		 */
+		record ExistingUserRedirect(String authExchangeToken) implements OAuthResponseAction {
 		}
 	}
 
-	public record rotatedToken(String accessToken, String refreshToken) {
+	public sealed interface SignupResponseAction permits SignupResponseAction.SignupCompleteResponse {
+
+		/**
+		 * 회원가입 완료 - AuthExchangeToken 반환
+		 */
+		record SignupCompleteResponse(String authExchangeToken) implements SignupResponseAction {
+		}
 	}
 
 }

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.runky.auth.domain.RefreshToken;
+import com.runky.auth.domain.token.refresh.RefreshToken;
 
 public interface RefreshTokenJpaRepository extends JpaRepository<RefreshToken, Long> {
 

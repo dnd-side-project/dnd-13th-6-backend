@@ -1,8 +1,5 @@
 package com.runky.member.interfaces;
 
-import java.util.List;
-
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.runky.auth.interfaces.AuthResponseHelper;
 import com.runky.auth.interfaces.TokenCookieProvider;
 import com.runky.global.response.ApiResponse;
 import com.runky.global.security.auth.MemberPrincipal;
@@ -30,7 +26,6 @@ public class MemberController implements MemberApiSpec {
 
 	private final MemberFacade memberFacade;
 	private final TokenCookieProvider cookieProvider;
-	private final AuthResponseHelper responseHelper;
 
 	@Override
 	@GetMapping("/me")
@@ -78,10 +73,6 @@ public class MemberController implements MemberApiSpec {
 	) {
 		memberFacade.deleteAccount(requester.memberId());
 
-		ResponseCookie clearAT = cookieProvider.delete("accessToken");
-		ResponseCookie clearRT = cookieProvider.delete("refreshToken");
-		ResponseCookie clearST = cookieProvider.delete("signupToken");
-
-		return responseHelper.successWithCookies(List.of(clearAT, clearRT, clearST), response);
+		return ApiResponse.ok();
 	}
 }

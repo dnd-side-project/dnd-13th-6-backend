@@ -6,4 +6,7 @@ public final class AuthRequest {
 
 	public record Signup(String nickname) {
 	}
+
+	public record ExchangeTempToken(String token) {
+	}
 }

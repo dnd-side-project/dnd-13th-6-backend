@@ -139,7 +139,7 @@ public class AuthFacade {
 	 *
 	 * Authorization Code 패턴
 	 */
-	@Transactional(readOnly = true)
+	@Transactional
 	public AuthInfo.TokenPair exchangeAuthToken(String authExchangeToken) {
 		// 1. AuthExchangeToken 소비 (일회용)
 		Long memberId = authService.consumeAuthExchangeToken(authExchangeToken);

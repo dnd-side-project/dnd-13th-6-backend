@@ -15,7 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import com.runky.auth.domain.port.TokenIssuer;
+import com.runky.auth.domain.token.jwt.JwtTokenProvider;
 import com.runky.global.response.ApiResponse;
 import com.runky.member.domain.ExternalAccount;
 import com.runky.member.domain.Member;
@@ -37,7 +37,7 @@ class MemberApiE2ETest {
 	@Autowired
 	private BadgeRepository badgeRepository;
 	@Autowired
-	private TokenIssuer tokenIssuer;
+	private JwtTokenProvider tokenProvider;
 
 	@AfterEach
 	void tearDown() {
@@ -45,8 +45,8 @@ class MemberApiE2ETest {
 	}
 
 	private HttpHeaders authHeaders(long memberId, String role) {
-		var issued = tokenIssuer.issue(memberId, role);
-		String accessToken = issued.access().token();
+		var issued = tokenProvider.createTokenPair(memberId, role);
+		String accessToken = issued.accessToken();
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.COOKIE, "accessToken=" + accessToken);

@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.runky.auth.domain.port.RefreshTokenRepository;
+import com.runky.auth.domain.token.refresh.RefreshToken;
+import com.runky.auth.domain.token.refresh.RefreshTokenRepository;
 import com.runky.utils.DatabaseCleanUp;
 
 import jakarta.persistence.EntityManager;

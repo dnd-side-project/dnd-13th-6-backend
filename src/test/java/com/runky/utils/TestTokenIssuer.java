@@ -1,24 +1,25 @@
 package com.runky.utils;
 
-import com.runky.auth.domain.port.TokenIssuer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+
+import com.runky.auth.domain.token.jwt.JwtTokenProvider;
 
 @Component
 public class TestTokenIssuer {
 
-    private final TokenIssuer tokenIssuer;
+	private final JwtTokenProvider tokenProvider;
 
-    public TestTokenIssuer(TokenIssuer tokenIssuer) {
-        this.tokenIssuer = tokenIssuer;
-    }
+	public TestTokenIssuer(final JwtTokenProvider tokenProvider) {
+		this.tokenProvider = tokenProvider;
+	}
 
-    public HttpHeaders issue(long memberId, String role) {
-        var issued = tokenIssuer.issue(memberId, role);
-        String accessToken = issued.access().token();
+	public HttpHeaders issue(long memberId, String role) {
+		var issued = tokenProvider.createTokenPair(memberId, role);
+		String accessToken = issued.accessToken();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.COOKIE, "accessToken=" + accessToken);
-        return headers;
-    }
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.COOKIE, "accessToken=" + accessToken);
+		return headers;
+	}
 }

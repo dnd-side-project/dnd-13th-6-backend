@@ -2,7 +2,6 @@ package com.runky.reward.interfaces;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.runky.reward.interfaces.api.RewardResponse;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
@@ -18,12 +17,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import com.runky.auth.domain.port.TokenIssuer;
+import com.runky.auth.domain.token.jwt.JwtTokenProvider;
 import com.runky.global.response.ApiResponse;
 import com.runky.reward.domain.Badge;
 import com.runky.reward.domain.BadgeRepository;
 import com.runky.reward.domain.Clover;
 import com.runky.reward.domain.CloverRepository;
+import com.runky.reward.interfaces.api.RewardResponse;
 import com.runky.utils.DatabaseCleanUp;
 import com.runky.utils.TestTokenIssuer;
 
@@ -42,7 +42,7 @@ class RewardApiE2ETest {
 	private CloverRepository cloverRepository;
 
 	@Autowired
-	private TokenIssuer tokenIssuer;
+	private JwtTokenProvider provider;
 
 	@AfterEach
 	void tearDown() {
@@ -50,8 +50,8 @@ class RewardApiE2ETest {
 	}
 
 	private HttpHeaders authHeaders(long memberId, String role) {
-		var issued = tokenIssuer.issue(memberId, role);
-		String accessToken = issued.access().token();
+		var issued = provider.createTokenPair(memberId, role);
+		String accessToken = issued.accessToken();
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.COOKIE, "accessToken=" + accessToken);

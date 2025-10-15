@@ -28,6 +28,16 @@ public class OAuthResponseHandler {
 		}
 	}
 
+	public void devHandle(AuthResult.OAuthResponseAction action, HttpServletResponse response) {
+
+		if (action instanceof AuthResult.OAuthResponseAction.NewUserRedirect newUser) {
+			devHandleNewUserRedirect(newUser.signupToken(), response);
+
+		} else if (action instanceof AuthResult.OAuthResponseAction.ExistingUserRedirect existing) {
+			devHandleExistingUserRedirect(existing.authExchangeToken(), response);
+		}
+	}
+
 	private void handleNewUserRedirect(String signupToken, HttpServletResponse response) {
 
 		String redirectUrl = loginRedirectProperties.newUser() + "?signupToken=" + signupToken;
@@ -41,6 +51,26 @@ public class OAuthResponseHandler {
 	private void handleExistingUserRedirect(String authExchangeToken, HttpServletResponse response) {
 
 		String redirectUrl = loginRedirectProperties.alreadyExistingUser() + "?code=" + authExchangeToken;
+		try {
+			response.sendRedirect(redirectUrl);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void devHandleNewUserRedirect(String signupToken, HttpServletResponse response) {
+
+		String redirectUrl = "https://localhost:3000/onboarding/terms" + "?signupToken=" + signupToken;
+		try {
+			response.sendRedirect(redirectUrl);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void devHandleExistingUserRedirect(String authExchangeToken, HttpServletResponse response) {
+
+		String redirectUrl = "https://localhost:3000/main" + "?code=" + authExchangeToken;
 		try {
 			response.sendRedirect(redirectUrl);
 		} catch (IOException e) {

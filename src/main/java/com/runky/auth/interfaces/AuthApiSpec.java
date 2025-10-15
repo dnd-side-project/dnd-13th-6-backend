@@ -32,6 +32,21 @@ public interface AuthApiSpec {
 	);
 
 	@Operation(
+		summary = "Localhost용 카카오 OAuth 콜백",
+		description = """
+			카카오 Authorization Code를 받아 로그인 플로우를 수행합니다.
+			- 신규 사용자: SignupToken 발급 후 리다이렉트 응답
+			- 기존 사용자: AuthExchangeToken 발급 후 리다이렉트 응답
+			컨트롤러에서 리다이렉트를 직접 수행하므로 HTTP 바디는 없습니다.
+			"""
+	)
+	void devKakaoCallback(
+		@Schema(description = "Localhost용 카카오 OAuth Authorization Code", example = "SplxlOBeZQQYbYS6WxSbIA")
+		@RequestParam("code") String code,
+		HttpServletResponse servletResponse
+	);
+
+	@Operation(
 		summary = "회원가입 완료",
 		description = """
 			SignupToken(쿼리파라미터)과 추가 정보를 받아 최종 등록을 완료합니다.

@@ -4,87 +4,139 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.runky.auth.application.port.OAuthClient;
 import com.runky.auth.domain.AuthInfo;
-import com.runky.auth.domain.AuthTokenService;
-import com.runky.auth.domain.port.TokenDecoder;
-import com.runky.auth.domain.signup.SignupTokenService;
-import com.runky.auth.domain.vo.OAuthUserInfo;
-import com.runky.auth.domain.vo.RefreshTokenClaims;
+import com.runky.auth.domain.AuthService;
+import com.runky.auth.domain.OAuthUserInfo;
+import com.runky.member.domain.Member;
 import com.runky.member.domain.MemberCommand;
+import com.runky.member.domain.MemberService;
 import com.runky.member.domain.dto.MemberInfo;
 import com.runky.member.domain.service.MemberReader;
 import com.runky.member.domain.service.MemberRegistrar;
+import com.runky.member.error.DuplicateMemberException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AuthFacade {
 
-	private final OAuthClient oAuthClient;
-	private final SignupTokenService signupTokenService;
+	private final AuthService authService;
 
 	private final MemberReader memberReader;
 	private final MemberRegistrar memberRegistrar;
-
-	private final TokenDecoder tokenDecoder;
-	private final AuthTokenService authTokenService;
+	private final MemberService memberService;
 
 	private final ApplicationEventPublisher eventPublisher;
 
 	/**
-	 * 1) code → accessToken → providerId 조회
-	 * 2) 기존 회원이면 즉시 토큰 발급
-	 * 3) 신규면 signupToken 발급
-	 * 차후 exist + get -> Optional find로 리팩토링 필요
+	 * OAuth 로그인 처리
+	 *
+	 * 흐름:
+	 * 1. OAuth 사용자 정보 조회
+	 * 2. 회원 존재 여부 확인
+	 * 3-1. 신규 → SignupToken 발급
+	 * 3-2. 기존 → JWT 발급 + AuthExchangeToken 발급
 	 */
 	@Transactional
-	public AuthResult.OAuthLogin handleOAuthLogin(String authorizationCode) {
-		String accessToken = oAuthClient.fetchAccessToken(authorizationCode);
-		OAuthUserInfo info = oAuthClient.fetchUserInfo(accessToken);
+	public AuthResult.OAuthResponseAction handleOAuthLogin(String authorizationCode) {
+		OAuthUserInfo oauthUserInfo = authService.fetchOAuthUserInfo(authorizationCode);
 
-		boolean exists = memberReader.existsByExternalAccount(info.provider(), info.providerId());
+		boolean exists = memberReader.existsByExternalAccount(
+			oauthUserInfo.provider(),
+			oauthUserInfo.providerId()
+		);
 
 		if (!exists) {
-			String signupToken = signupTokenService.issue(info);
-			return AuthResult.OAuthLogin.newUser(signupToken);
-		}
+			String signupToken = authService.issueSignupToken(oauthUserInfo);
+			log.info("New user login: provider={}, providerId={}", oauthUserInfo.provider(),
+				oauthUserInfo.providerId());
 
-		MemberInfo.Summary member = memberReader.getInfoByExternalAccount(info.provider(), info.providerId());
-		AuthInfo.TokenPair pair = authTokenService.issue(member.id(), member.role().name());
-		return AuthResult.OAuthLogin.existing(pair.accessToken(), pair.refreshToken());
+			return new AuthResult.OAuthResponseAction.NewUserRedirect(signupToken);
+		} else {
+			MemberInfo.Summary member = memberReader.getInfoByExternalAccount(
+				oauthUserInfo.provider(),
+				oauthUserInfo.providerId()
+			);
+
+			authService.issueTokens(member.id(), member.role().name());
+			String authExchangeToken = authService.issueAuthExchangeToken(member.id());
+			log.info("Existing user login: memberId={}", member.id());
+
+			return new AuthResult.OAuthResponseAction.ExistingUserRedirect(authExchangeToken);
+		}
 	}
 
 	/**
-	 * 프론트로부터 signupToken + 추가정보(닉네임)를 받아 최종 가입 후 토큰 발급
-	 * 닉네임은 반드시 클라이언트 입력을 사용한다(카카오 닉네임 사용X)
+	 * 회원가입 완료
+	 *
+	 * 흐름:
+	 * 1. SignupToken 소비
+	 * 2. 중복 가입 방지
+	 * 3. 회원 등록
+	 * 4. JWT 발급
+	 * 5. AuthExchangeToken 발급
+	 * 6. 이벤트 발행
 	 */
 	@Transactional
-	public AuthResult.SigninComplete completeSignup(String signupToken, AuthCriteria.AdditionalSignUpData command) {
-		OAuthUserInfo info = signupTokenService.get(signupToken);
+	public AuthResult.SignupResponseAction completeSignup(String signupToken,
+		AuthCriteria.AdditionalSignUpData additionalData) {
+		OAuthUserInfo oauthUserInfo = authService.consumeSignupToken(signupToken);
 
-		MemberInfo.Summary saved = memberRegistrar.registerFromExternal(
+		if (memberReader.existsByExternalAccount(oauthUserInfo.provider(), oauthUserInfo.providerId())) {
+			throw new DuplicateMemberException();
+		}
+
+		MemberInfo.Summary newMember = memberRegistrar.registerFromExternal(
 			new MemberCommand.RegisterFromExternal(
-				info.provider(), info.providerId(), command.nickname()
-			));
-		AuthInfo.TokenPair pair = authTokenService.issue(saved.id(), saved.role().name());
-		signupTokenService.delete(signupToken);
-        eventPublisher.publishEvent(new AuthEvent.SignupCompleted(saved.id()));
+				oauthUserInfo.provider(),
+				oauthUserInfo.providerId(),
+				additionalData.nickname()
+			)
+		);
 
-		return new AuthResult.SigninComplete(pair.accessToken(), pair.refreshToken());
+		String authExchangeToken = authService.issueAuthExchangeToken(newMember.id());
+
+		eventPublisher.publishEvent(new AuthEvent.SignupCompleted(newMember.id()));
+		log.info("Signup completed: memberId={}", newMember.id());
+
+		return new AuthResult.SignupResponseAction.SignupCompleteResponse(authExchangeToken);
 	}
 
-	/** RT로 AT/RT 재발급(회전) */
-	@Transactional
-	public AuthResult.rotatedToken reissueByRefresh(String refreshToken) {
-		AuthInfo.TokenPair tokenPair = authTokenService.rotateByRefreshToken(refreshToken);
-		return new AuthResult.rotatedToken(tokenPair.accessToken(), tokenPair.refreshToken());
+	/**
+	 * AuthExchangeToken → JWT 교환
+	 *
+	 * Authorization Code 패턴
+	 */
+	@Transactional(readOnly = true)
+	public AuthInfo.TokenPair exchangeAuthToken(String authExchangeToken) {
+		// 1. AuthExchangeToken 소비 (일회용)
+		Long memberId = authService.consumeAuthExchangeToken(authExchangeToken);
+		Member member = memberService.getMember(new MemberCommand.Find(memberId));
+
+		// 3. JWT 재발급 (또는 캐시된 JWT 반환)
+		AuthInfo.TokenPair tokens = authService.issueTokens(memberId, member.getRole().name());
+
+		log.info("JWT tokens exchanged: memberId={}", memberId);
+
+		return tokens;
 	}
 
+	/**
+	 * JWT 갱신 (Refresh Token Rotation)
+	 */
 	@Transactional
-	public void logoutByRefresh(String refreshToken) {
-		RefreshTokenClaims decoded = tokenDecoder.decodeRefresh(refreshToken);
-		authTokenService.delete(decoded.memberId());
+	public AuthInfo.TokenPair refreshTokens(String refreshToken) {
+		return authService.rotateTokens(refreshToken);
+	}
+
+	/**
+	 * 로그아웃
+	 */
+	@Transactional
+	public void logout(String refreshToken) {
+		authService.revokeTokens(refreshToken);
 	}
 }

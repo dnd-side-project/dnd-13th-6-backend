@@ -1,10 +1,13 @@
 package com.runky.global.security.filter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,7 +32,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 	private static final String HDR_AUTHORIZATION = "Authorization";
 	private static final String BEARER_PREFIX = "Bearer ";
+	private static final List<String> EXCLUDE_PATHS = Arrays.asList(
+		"/api/auth/**",
+		"/actuator/health",
+		"/swagger-ui/**",
+		"/v3/api-docs/**"
+	);
 	private final JwtTokenParser jwtTokenParser;
+	private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) {
+		String path = request.getRequestURI();
+		boolean shouldNotFilter = EXCLUDE_PATHS.stream()
+			.anyMatch(pattern -> pathMatcher.match(pattern, path));
+
+		if (shouldNotFilter) {
+			log.debug("Skipping JWT filter for path: {}", path);
+		}
+
+		return shouldNotFilter;
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
@@ -50,8 +73,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 			} catch (TokenRequiredException e) {
 				req.setAttribute("exception", GlobalErrorCode.INVALID_TOKEN);
 			}
-		} else {
-			req.setAttribute("exception", GlobalErrorCode.NOT_LOGIN_MEMBER);
 		}
 
 		chain.doFilter(req, res);

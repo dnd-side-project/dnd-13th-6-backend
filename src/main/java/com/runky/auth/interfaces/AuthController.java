@@ -1,7 +1,5 @@
 package com.runky.auth.interfaces;
 
-import java.io.IOException;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
-public class AuthController {
+public class AuthController implements AuthApiSpec {
 
 	private final AuthFacade authFacade;
 	private final OAuthResponseHandler oauthResponseHandler;
@@ -41,7 +39,7 @@ public class AuthController {
 	 * 3. ResponseHandler가 HTTP 응답 구성 (리다이렉트 + 쿼리파라미터)
 	 */
 	@GetMapping("/login/oauth2/code/kakao")
-	public void kakaoCallback(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
+	public void kakaoCallback(@RequestParam("code") String code, HttpServletResponse response) {
 
 		// 1. Application Layer: 비즈니스 로직
 		AuthResult.OAuthResponseAction action = authFacade.handleOAuthLogin(code);

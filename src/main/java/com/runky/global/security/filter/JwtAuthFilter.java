@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtCookieAuthFilter extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter {
 
 	private static final String HDR_AUTHORIZATION = "Authorization";
 	private static final String BEARER_PREFIX = "Bearer ";
@@ -60,7 +60,7 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 	private String resolveFromHeader(HttpServletRequest request) {
 		// Authorization: Bearer <token>
 		String auth = request.getHeader(HDR_AUTHORIZATION);
-		
+
 		if (auth == null) {
 			return null;
 		}

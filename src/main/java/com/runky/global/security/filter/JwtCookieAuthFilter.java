@@ -60,8 +60,19 @@ public class JwtCookieAuthFilter extends OncePerRequestFilter {
 	private String resolveFromHeader(HttpServletRequest request) {
 		// Authorization: Bearer <token>
 		String auth = request.getHeader(HDR_AUTHORIZATION);
-		return auth.substring(BEARER_PREFIX.length()).trim();
+		
+		if (auth == null) {
+			return null;
+		}
 
+		if (!auth.startsWith(BEARER_PREFIX)) {
+			log.debug("Authorization header does not start with Bearer: {}", auth);
+			return null;
+		}
+
+		String token = auth.substring(BEARER_PREFIX.length()).trim();
+
+		return StringUtils.hasText(token) ? token : null;
 	}
 
 }

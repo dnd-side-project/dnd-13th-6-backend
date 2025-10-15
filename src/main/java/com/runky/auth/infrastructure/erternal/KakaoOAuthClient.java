@@ -33,6 +33,19 @@ public class KakaoOAuthClient implements OAuthClient {
 	}
 
 	@Override
+	public String devFetchAccessToken(String authorizationCode) {
+		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+		body.add("grant_type", "authorization_code");
+		body.add("client_id", props.clientId());
+		body.add("redirect_uri", "https://api.runky.store/api/auth/dev/login/oauth2/code/kakao");
+		body.add("code", authorizationCode);
+
+		KakaoTokenResponse tokenResponse = kakaoApiHttpClient.getAccessToken(body);
+
+		return tokenResponse.accessToken();
+	}
+
+	@Override
 	public OAuthUserInfo fetchUserInfo(String accessToken) {
 		String authorizationHeader = "Bearer " + accessToken;
 

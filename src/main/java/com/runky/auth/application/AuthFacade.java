@@ -69,6 +69,35 @@ public class AuthFacade {
 		}
 	}
 
+	@Transactional
+	public AuthResult.OAuthResponseAction devHandleOAuthLogin(String authorizationCode) {
+		OAuthUserInfo oauthUserInfo = authService.devFetchOAuthUserInfo(authorizationCode);
+
+		boolean exists = memberReader.existsByExternalAccount(
+			oauthUserInfo.provider(),
+			oauthUserInfo.providerId()
+		);
+
+		if (!exists) {
+			String signupToken = authService.issueSignupToken(oauthUserInfo);
+			log.info("New user login: provider={}, providerId={}", oauthUserInfo.provider(),
+				oauthUserInfo.providerId());
+
+			return new AuthResult.OAuthResponseAction.NewUserRedirect(signupToken);
+		} else {
+			MemberInfo.Summary member = memberReader.getInfoByExternalAccount(
+				oauthUserInfo.provider(),
+				oauthUserInfo.providerId()
+			);
+
+			authService.issueTokens(member.id(), member.role().name());
+			String authExchangeToken = authService.issueAuthExchangeToken(member.id());
+			log.info("Existing user login: memberId={}", member.id());
+
+			return new AuthResult.OAuthResponseAction.ExistingUserRedirect(authExchangeToken);
+		}
+	}
+
 	/**
 	 * 회원가입 완료
 	 *

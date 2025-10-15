@@ -1,13 +1,12 @@
 package com.runky.auth.interfaces;
 
-import java.util.List;
+import java.io.IOException;
 
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,131 +14,107 @@ import org.springframework.web.bind.annotation.RestController;
 import com.runky.auth.application.AuthCriteria;
 import com.runky.auth.application.AuthFacade;
 import com.runky.auth.application.AuthResult;
-import com.runky.auth.config.props.LoginRedirectProperties;
+import com.runky.auth.domain.AuthInfo;
 import com.runky.global.response.ApiResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController implements AuthApiSpec {
-	private final LoginRedirectProperties loginRedirectProperties;
+@RequestMapping("/api/auth")
+public class AuthController {
+
 	private final AuthFacade authFacade;
-	private final TokenCookieProvider cookieProvider;
-	private final AuthResponseHelper responseHelper;
+	private final OAuthResponseHandler oauthResponseHandler;
+	private final SignupResponseHandler signupResponseHandler;
+	private final HeaderUtil headerUtil;
 
 	/**
-	 * 카카오 콜백: code 교환 후 분기
-	 * - NEW_USER: signupToken 쿠키 + AuthResponse.NewUser
-	 * - EXISTING_USER: AT/RT 쿠키 + AuthResponse.ExistingUser
+	 * 카카오 OAuth 콜백
+	 *
+	 * 플로우:
+	 * 1. Application Layer에서 비즈니스 로직 처리
+	 * 2. ResponseAction 반환
+	 * 3. ResponseHandler가 HTTP 응답 구성 (리다이렉트 + 쿼리파라미터)
 	 */
-	//	@GetMapping("/login/oauth2/code/kakao")
-	//	public ApiResponse<AuthResponse> kakaoCallback(
-	//		@RequestParam("code") String code,
-	//		HttpServletResponse servletResponse
-	//	) {
-	//		AuthResult.OAuthLogin result = authFacade.handleOAuthLogin(code);
-	//
-	//		return switch (result.authStatus()) {
-	//			case NEW_USER -> {
-	//				ResponseCookie st = cookieProvider.signupToken(result.signupToken());
-	//				yield responseHelper.successWithCookiesAndRedirect(
-	//					ApiResponse.success(new AuthResponse.NewUser()),
-	//					List.of(st),
-	//					NEW_USER_REDIRECT,
-	//					servletResponse
-	//				);
-	//			}
-	//			case EXISTING_USER -> {
-	//				ResponseCookie at = cookieProvider.accessToken(result.accessToken());
-	//				ResponseCookie rt = cookieProvider.refreshToken(result.refreshToken());
-	//				yield responseHelper.successWithCookies(
-	//					ApiResponse.success(new AuthResponse.ExistingUser()),
-	//					List.of(at, rt),
-	//					servletResponse
-	//				);
-	//			}
-	//		};
-	//	}
 	@GetMapping("/login/oauth2/code/kakao")
-	public ResponseEntity<ApiResponse<?>> kakaoCallback(
-		@RequestParam("code") String code
-	) {
-		AuthResult.OAuthLogin result = authFacade.handleOAuthLogin(code);
+	public void kakaoCallback(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
 
-		return switch (result.authStatus()) {
-			case NEW_USER -> {
-				ResponseCookie st = cookieProvider.signupToken(result.signupToken());
-				yield responseHelper.successWithCookiesAndRedirect(
-					ApiResponse.success(new AuthResponse.NewUser()),
-					List.of(st),
-					loginRedirectProperties.newUser()
-				);
-			}
-			case EXISTING_USER -> {
-				ResponseCookie at = cookieProvider.accessToken(result.accessToken());
-				ResponseCookie rt = cookieProvider.refreshToken(result.refreshToken());
-				yield responseHelper.successWithCookiesAndRedirect(
-					ApiResponse.success(new AuthResponse.ExistingUser()),
-					List.of(at, rt),
-					loginRedirectProperties.alreadyExistingUser()
-				);
-			}
-		};
+		// 1. Application Layer: 비즈니스 로직
+		AuthResult.OAuthResponseAction action = authFacade.handleOAuthLogin(code);
+
+		// 2. ResponseHandler: HTTP 응답 구성 (리다이렉트)
+		oauthResponseHandler.handle(action, response);
 	}
 
 	/**
-	 * 회원가입 완료: signupToken(쿠키)로 최종 등록 → AT/RT 발급
+	 * 회원가입 완료
+	 *
+	 * SignupToken (쿼리파라미터) + 추가정보(닉네임)
 	 */
 	@PostMapping("/signup/complete")
-	public ApiResponse<Void> completeSignup(
-		@CookieValue("signupToken") String signupToken,
-		@RequestBody AuthRequest.Signup request,
-		HttpServletResponse servletResponse
-	) {
-		AuthResult.SigninComplete result = authFacade.completeSignup(signupToken,
-			new AuthCriteria.AdditionalSignUpData(request.nickname()));
+	public ResponseEntity<ApiResponse<SignupResponseHandler.SignupCompleteResponse>> completeSignup(
+		@RequestParam("signupToken") String signupToken,
+		@Valid @RequestBody AuthCriteria.AdditionalSignUpData request) {
 
-		ResponseCookie st = cookieProvider.delete("signupToken");
+		AuthResult.SignupResponseAction action = authFacade.completeSignup(signupToken, request);
 
-		ResponseCookie at = cookieProvider.accessToken(result.accessToken());
-		ResponseCookie rt = cookieProvider.refreshToken(result.refreshToken());
-
-		return responseHelper.successWithCookies(List.of(st, at, rt), servletResponse);
+		return signupResponseHandler.handle(action);
 	}
 
 	/**
-	 * 토큰 재발급: RT로 AT/RT 재발급
+	 * JWT 교환 API
+	 *
+	 * AuthExchangeToken → JWT 교환
+	 * 응답: Authorization Header (Access Token), X-Refresh-Token Header (Refresh Token)
+	 */
+	@PostMapping("/token/exchange")
+	public ApiResponse<Void> exchangeAuthToken(@Valid @RequestBody TokenExchangeRequest request,
+		HttpServletResponse response) {
+
+		AuthInfo.TokenPair tokens = authFacade.exchangeAuthToken(request.authCode());
+
+		headerUtil.addJwtHeaders(response, tokens);
+
+		return ApiResponse.ok();
+
+	}
+
+	/**
+	 * JWT 갱신 (Refresh Token Rotation)
+	 *
+	 * 요청: X-Refresh-Token 헤더
+	 * 응답: Authorization Header (새 Access Token), X-Refresh-Token Header (새 Refresh Token)
 	 */
 	@PostMapping("/token/refresh")
-	public ApiResponse<Void> refresh(
-		@CookieValue("refreshToken") String refreshToken,
-		HttpServletResponse servletResponse
-	) {
-		AuthResult.rotatedToken rotated = authFacade.reissueByRefresh(refreshToken);
+	public ApiResponse<Void> refreshToken(
+		@RequestHeader("X-Refresh-Token") String refreshToken,
+		HttpServletResponse response) {
 
-		ResponseCookie at = cookieProvider.accessToken(rotated.accessToken());
-		ResponseCookie rt = cookieProvider.refreshToken(rotated.refreshToken());
+		AuthInfo.TokenPair newTokens = authFacade.refreshTokens(refreshToken);
 
-		return responseHelper.successWithCookies(List.of(at, rt), servletResponse);
+		headerUtil.addJwtHeaders(response, newTokens);
+
+		return ApiResponse.ok();
 	}
 
 	/**
-	 * 로그아웃: RT 로그아웃 처리 후 AT/RT/ST 쿠키 제거
+	 * 로그아웃
+	 *
+	 * 요청: X-Refresh-Token 헤더
 	 */
 	@PostMapping("/logout")
-	public ApiResponse<Void> logout(
-		@CookieValue("refreshToken") String refreshToken,
-		HttpServletResponse servletResponse
+	public ApiResponse<Void> logout(@RequestHeader("X-Refresh-Token") String refreshToken) {
+		authFacade.logout(refreshToken);
+		return ApiResponse.ok();
+	}
+
+	// ===== Request DTOs =====
+	public record TokenExchangeRequest(
+		@NotBlank String authCode
 	) {
-		authFacade.logoutByRefresh(refreshToken);
-
-		ResponseCookie clearAT = cookieProvider.delete("accessToken");
-		ResponseCookie clearRT = cookieProvider.delete("refreshToken");
-		ResponseCookie clearST = cookieProvider.delete("signupToken");
-
-		return responseHelper.successWithCookies(List.of(clearAT, clearRT, clearST), servletResponse);
 	}
 }

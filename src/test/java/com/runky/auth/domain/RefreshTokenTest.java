@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.runky.auth.domain.token.refresh.RefreshToken;
 import com.runky.auth.exception.domain.ExpiredTokenException;
 import com.runky.auth.exception.domain.InvalidTokenException;
 import com.runky.auth.exception.domain.TokenRequiredException;
@@ -107,6 +108,6 @@ class RefreshTokenTest {
 			assertThat(rt.getCreatedAt()).isEqualTo(newCreatedAt);
 			assertThat(rt.getExpiresAt()).isEqualTo(newExpiresAt);
 		}
-		
+
 	}
 }

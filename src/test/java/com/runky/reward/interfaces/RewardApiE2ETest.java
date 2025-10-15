@@ -2,7 +2,6 @@ package com.runky.reward.interfaces;
 
 import static org.assertj.core.api.Assertions.*;
 
-import com.runky.reward.interfaces.api.RewardResponse;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
@@ -18,12 +17,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import com.runky.auth.domain.port.TokenIssuer;
+import com.runky.auth.domain.token.jwt.JwtTokenProvider;
 import com.runky.global.response.ApiResponse;
 import com.runky.reward.domain.Badge;
 import com.runky.reward.domain.BadgeRepository;
 import com.runky.reward.domain.Clover;
 import com.runky.reward.domain.CloverRepository;
+import com.runky.reward.interfaces.api.RewardResponse;
 import com.runky.utils.DatabaseCleanUp;
 import com.runky.utils.TestTokenIssuer;
 
@@ -42,20 +42,11 @@ class RewardApiE2ETest {
 	private CloverRepository cloverRepository;
 
 	@Autowired
-	private TokenIssuer tokenIssuer;
+	private JwtTokenProvider provider;
 
 	@AfterEach
 	void tearDown() {
 		databaseCleanUp.truncateAllTables();
-	}
-
-	private HttpHeaders authHeaders(long memberId, String role) {
-		var issued = tokenIssuer.issue(memberId, role);
-		String accessToken = issued.access().token();
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.COOKIE, "accessToken=" + accessToken);
-		return headers;
 	}
 
 	@Nested
@@ -71,7 +62,7 @@ class RewardApiE2ETest {
 			ParameterizedTypeReference<ApiResponse<RewardResponse.Images>> responseType = new ParameterizedTypeReference<>() {
 			};
 
-			HttpHeaders httpHeaders = authHeaders(1L, "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(1L, "USER");
 
 			ResponseEntity<ApiResponse<RewardResponse.Images>> response =
 				testRestTemplate.exchange(BASE_URL, HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
@@ -101,7 +92,7 @@ class RewardApiE2ETest {
 			};
 
 			testTokenIssuer.issue(1L, "USER");
-			HttpHeaders httpHeaders = authHeaders(1L, "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(1L, "USER");
 
 			ResponseEntity<ApiResponse<RewardResponse.Gotcha>> response =
 				testRestTemplate.exchange(BASE_URL, HttpMethod.PATCH, new HttpEntity<>(httpHeaders), responseType);
@@ -126,7 +117,7 @@ class RewardApiE2ETest {
 			clover.add(1000L);
 			cloverRepository.save(clover);
 
-			HttpHeaders httpHeaders = authHeaders(1L, "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(1L, "USER");
 
 			ResponseEntity<ApiResponse<RewardResponse.Clover>> response =
 				testRestTemplate.exchange(BASE_URL, HttpMethod.GET, new HttpEntity<>(httpHeaders),

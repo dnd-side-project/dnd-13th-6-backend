@@ -15,7 +15,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import com.runky.auth.domain.port.TokenIssuer;
 import com.runky.global.response.ApiResponse;
 import com.runky.member.domain.ExternalAccount;
 import com.runky.member.domain.Member;
@@ -24,6 +23,7 @@ import com.runky.reward.domain.Badge;
 import com.runky.reward.domain.BadgeRepository;
 import com.runky.reward.domain.MemberBadge;
 import com.runky.utils.DatabaseCleanUp;
+import com.runky.utils.TestTokenIssuer;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MemberApiE2ETest {
@@ -37,20 +37,11 @@ class MemberApiE2ETest {
 	@Autowired
 	private BadgeRepository badgeRepository;
 	@Autowired
-	private TokenIssuer tokenIssuer;
+	private TestTokenIssuer testTokenIssuer;
 
 	@AfterEach
 	void tearDown() {
 		databaseCleanUp.truncateAllTables();
-	}
-
-	private HttpHeaders authHeaders(long memberId, String role) {
-		var issued = tokenIssuer.issue(memberId, role);
-		String accessToken = issued.access().token();
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.COOKIE, "accessToken=" + accessToken);
-		return headers;
 	}
 
 	@Nested
@@ -69,7 +60,7 @@ class MemberApiE2ETest {
 
 			ParameterizedTypeReference<ApiResponse<MemberResponse.Detail>> responseType = new ParameterizedTypeReference<>() {
 			};
-			HttpHeaders httpHeaders = authHeaders(savedMember.getId(), "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(savedMember.getId(), "USER");
 
 			ResponseEntity<ApiResponse<MemberResponse.Detail>> response = testRestTemplate.exchange(BASE_URL,
 				HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
@@ -91,7 +82,7 @@ class MemberApiE2ETest {
 
 			ParameterizedTypeReference<ApiResponse<MemberResponse.Nickname>> responseType = new ParameterizedTypeReference<>() {
 			};
-			HttpHeaders httpHeaders = authHeaders(savedMember.getId(), "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(savedMember.getId(), "USER");
 
 			MemberRequest.Nickname request = new MemberRequest.Nickname("newNick");
 
@@ -122,7 +113,7 @@ class MemberApiE2ETest {
 
 			ParameterizedTypeReference<ApiResponse<MemberResponse.Badge>> responseType = new ParameterizedTypeReference<>() {
 			};
-			HttpHeaders httpHeaders = authHeaders(member.getId(), "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(member.getId(), "USER");
 
 			MemberRequest.Badge request = new MemberRequest.Badge(badge2.getId());
 
@@ -151,7 +142,7 @@ class MemberApiE2ETest {
 
 			ParameterizedTypeReference<ApiResponse<MemberResponse.Badge>> responseType = new ParameterizedTypeReference<>() {
 			};
-			HttpHeaders httpHeaders = authHeaders(member2.getId(), "USER");
+			HttpHeaders httpHeaders = testTokenIssuer.issue(member2.getId(), "USER");
 
 			ResponseEntity<ApiResponse<MemberResponse.Badge>> response = testRestTemplate.exchange(
 				"/api/members/" + member1.getId() + "/badge",

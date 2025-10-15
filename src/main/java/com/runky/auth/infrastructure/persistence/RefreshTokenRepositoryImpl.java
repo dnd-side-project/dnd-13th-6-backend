@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.runky.auth.domain.RefreshToken;
-import com.runky.auth.domain.port.RefreshTokenRepository;
+import com.runky.auth.domain.token.refresh.RefreshToken;
+import com.runky.auth.domain.token.refresh.RefreshTokenRepository;
 
 import lombok.RequiredArgsConstructor;
 

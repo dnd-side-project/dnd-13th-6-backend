@@ -1,4 +1,4 @@
-package com.runky.auth.infrastructure.token;
+package com.runky.auth.domain.token.refresh;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HexFormat;
@@ -9,7 +9,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.stereotype.Component;
 
 import com.runky.auth.config.props.RefreshTokenHashProperties;
-import com.runky.auth.domain.port.TokenHasher;
 import com.runky.auth.exception.infra.TokenBlankException;
 import com.runky.auth.exception.infra.TokenHashAlgorithmUnsupportedException;
 import com.runky.auth.exception.infra.TokenHashFailureException;
@@ -22,7 +21,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Component
 @RequiredArgsConstructor
-public class RefreshTokenHasher implements TokenHasher {
+public class RefreshTokenHasher {
 
 	private static final String ALGORITHM = "HmacSHA256";
 

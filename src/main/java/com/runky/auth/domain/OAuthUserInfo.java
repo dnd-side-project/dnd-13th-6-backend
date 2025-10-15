@@ -1,4 +1,4 @@
-package com.runky.auth.domain.vo;
+package com.runky.auth.domain;
 
 public record OAuthUserInfo(
 	String provider,

@@ -3,7 +3,7 @@ package com.runky.member.application;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.runky.auth.domain.AuthTokenService;
+import com.runky.auth.domain.AuthService;
 import com.runky.crew.domain.CrewCommand;
 import com.runky.crew.domain.CrewService;
 import com.runky.goal.domain.GoalCommand;
@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberFacade {
 
-	private final AuthTokenService authTokenService;
+	private final AuthService authService;
 	private final MemberService memberService;
 	private final RewardService rewardService;
 	private final CrewService crewService;
@@ -50,7 +50,7 @@ public class MemberFacade {
 
 	@Transactional
 	public void deleteAccount(Long memberId) {
-		authTokenService.delete(memberId);
+		authService.deleteRefreshToken(memberId);
 		memberService.delete(new MemberCommand.DeleteMember(memberId));
 		crewService.cleanUp(new CrewCommand.Clean(memberId));
 		goalService.cleanUp(new GoalCommand.Clean(memberId));

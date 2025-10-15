@@ -1,4 +1,4 @@
-package com.runky.auth.domain;
+package com.runky.auth.domain.token.refresh;
 
 import java.time.Instant;
 

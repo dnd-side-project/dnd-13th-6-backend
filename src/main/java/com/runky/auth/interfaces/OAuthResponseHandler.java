@@ -18,7 +18,7 @@ public class OAuthResponseHandler {
 	/**
 	 * OAuthResponseAction에 따라 적절한 응답 처리
 	 */
-	public void handle(AuthResult.OAuthResponseAction action, HttpServletResponse response) throws IOException {
+	public void handle(AuthResult.OAuthResponseAction action, HttpServletResponse response) {
 
 		if (action instanceof AuthResult.OAuthResponseAction.NewUserRedirect newUser) {
 			handleNewUserRedirect(newUser.signupToken(), response);
@@ -28,15 +28,23 @@ public class OAuthResponseHandler {
 		}
 	}
 
-	private void handleNewUserRedirect(String signupToken, HttpServletResponse response) throws IOException {
+	private void handleNewUserRedirect(String signupToken, HttpServletResponse response) {
 
 		String redirectUrl = loginRedirectProperties.newUser() + "?signupToken=" + signupToken;
-		response.sendRedirect(redirectUrl);
+		try {
+			response.sendRedirect(redirectUrl);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	private void handleExistingUserRedirect(String authExchangeToken, HttpServletResponse response) throws IOException {
+	private void handleExistingUserRedirect(String authExchangeToken, HttpServletResponse response) {
 
 		String redirectUrl = loginRedirectProperties.alreadyExistingUser() + "?code=" + authExchangeToken;
-		response.sendRedirect(redirectUrl);
+		try {
+			response.sendRedirect(redirectUrl);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

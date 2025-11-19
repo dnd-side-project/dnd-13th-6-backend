@@ -58,7 +58,7 @@ class AuthFacadeSignupToExchangeFlowTest {
 		when(authService.issueAuthExchangeToken(100L)).thenReturn(exchangeToken);
 
 		// ----- 실행: 회원가입 완료 -----
-		AuthCriteria.AdditionalSignUpData data = new AuthCriteria.AdditionalSignUpData("one-dish");
+		AuthCriteria.AdditionalSignUpData data = new AuthCriteria.AdditionalSignUpData("onedish");
 		AuthResult.SignupResponseAction signupRes = facade.completeSignup(signupToken, data);
 
 		assertThat(signupRes).isInstanceOf(AuthResult.SignupResponseAction.SignupCompleteResponse.class);

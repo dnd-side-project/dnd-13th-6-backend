@@ -47,6 +47,36 @@ public interface AuthApiSpec {
 	);
 
 	@Operation(
+		summary = "Apple OAuth 콜백",
+		description = """
+			Apple Authorization Code를 받아 로그인 플로우를 수행합니다.
+			- 신규 사용자: SignupToken 발급 후 리다이렉트 응답
+			- 기존 사용자: AuthExchangeToken 발급 후 리다이렉트 응답
+			컨트롤러에서 리다이렉트를 직접 수행하므로 HTTP 바디는 없습니다.
+			"""
+	)
+	void appleCallback(
+		@Schema(description = "Apple OAuth Authorization Code", example = "c1234567890abcdef")
+		@RequestParam("code") String code,
+		HttpServletResponse servletResponse
+	);
+
+	@Operation(
+		summary = "Localhost용 Apple OAuth 콜백",
+		description = """
+			Apple Authorization Code를 받아 로그인 플로우를 수행합니다.
+			- 신규 사용자: SignupToken 발급 후 리다이렉트 응답
+			- 기존 사용자: AuthExchangeToken 발급 후 리다이렉트 응답
+			컨트롤러에서 리다이렉트를 직접 수행하므로 HTTP 바디는 없습니다.
+			"""
+	)
+	void devAppleCallback(
+		@Schema(description = "Localhost용 Apple OAuth Authorization Code", example = "c1234567890abcdef")
+		@RequestParam("code") String code,
+		HttpServletResponse servletResponse
+	);
+
+	@Operation(
 		summary = "회원가입 완료",
 		description = """
 			SignupToken(쿼리파라미터)과 추가 정보를 받아 최종 등록을 완료합니다.

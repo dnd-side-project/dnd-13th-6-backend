@@ -41,8 +41,8 @@ public class AuthFacade {
 	 * 3-2. 기존 → JWT 발급 + AuthExchangeToken 발급
 	 */
 	@Transactional
-	public AuthResult.OAuthResponseAction handleOAuthLogin(String authorizationCode) {
-		OAuthUserInfo oauthUserInfo = authService.fetchOAuthUserInfo(authorizationCode);
+	public AuthResult.OAuthResponseAction handleOAuthLogin(String provider, String authorizationCode) {
+		OAuthUserInfo oauthUserInfo = authService.fetchOAuthUserInfo(provider, authorizationCode);
 
 		boolean exists = memberReader.existsByExternalAccount(
 			oauthUserInfo.provider(),
@@ -70,8 +70,8 @@ public class AuthFacade {
 	}
 
 	@Transactional
-	public AuthResult.OAuthResponseAction devHandleOAuthLogin(String authorizationCode) {
-		OAuthUserInfo oauthUserInfo = authService.devFetchOAuthUserInfo(authorizationCode);
+	public AuthResult.OAuthResponseAction devHandleOAuthLogin(String provider, String authorizationCode) {
+		OAuthUserInfo oauthUserInfo = authService.devFetchOAuthUserInfo(provider, authorizationCode);
 
 		boolean exists = memberReader.existsByExternalAccount(
 			oauthUserInfo.provider(),

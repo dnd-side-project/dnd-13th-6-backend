@@ -33,6 +33,13 @@ kakao:
   client-id: ${KAKAO_CLIENT_ID}
   redirect-url: ${KAKAO_REDIRECT_URL}
 
+apple:
+  service-id: ${APPLE_SERVICE_ID}
+  team-id: ${APPLE_TEAM_ID}
+  key-id: ${APPLE_KEY_ID}
+  private-key: ${APPLE_PRIVATE_KEY}
+  redirect-url: ${APPLE_REDIRECT_URL}
+
 ---
 spring:
   config:
@@ -42,6 +49,18 @@ kakao:
   client-id: 10591b4c28e1de84d6fd5da8ec5c3467
   redirect-url: http://localhost:8080/api/auth/login/oauth2/code/kakao
 
+apple:
+  service-id: api.runky.store
+  team-id: UZ3ZMHV48B
+  key-id: PD5963AF
+  private-key: |
+    -----BEGIN PRIVATE KEY-----
+    MIGTAgEyqGwIBAQQgNet0Zu0MGrkqRFN0
+    gEo9c2RccecsC1Td0O/lfgYIKoZIzj0DAQehRANCAAQIm6TB5DJxbe9d
+    UEE55wgpQIDHqCfV6r5Itu3Mx2JmbW7zfw7PvFXDH2VmkG4/G4dMRKRb
+    CdyMwkpn
+    -----END PRIVATE KEY-----
+  redirect-url: https://api.runky.store/api/auth/login/oauth2/code/apple
 
 runky:
   login:

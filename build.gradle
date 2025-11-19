@@ -43,9 +43,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     // JWT
-    implementation 'io.jsonwebtoken:jjwt:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    // Apple JWT verification
+    implementation 'org.bouncycastle:bcpkix-jdk18on:1.78.1'
+
+    // Cache for Apple public keys
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
 
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'

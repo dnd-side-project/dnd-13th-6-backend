@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 	SignupTokenProperties.class,
 	RefreshTokenHashProperties.class,
 	KakaoProperties.class,
+	AppleProperties.class,
 	LoginRedirectProperties.class
 })
 public class AuthPropsConfig {

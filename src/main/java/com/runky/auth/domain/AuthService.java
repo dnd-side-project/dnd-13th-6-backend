@@ -1,5 +1,7 @@
 package com.runky.auth.domain;
 
+import java.util.Map;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuthService {
 
-	private final OAuthClient oAuthClient;
+	private final Map<String, OAuthClient> oAuthClients;
 	private final SignupTokenProvider signupTokenProvider;
 	private final AuthExchangeTokenProvider authExchangeTokenProvider;
 	private final JwtTokenParser parser;
@@ -35,8 +37,20 @@ public class AuthService {
 	// OAuth 처리
 	// ========================================
 
+	/**
+	 * provider에 해당하는 OAuthClient를 반환합니다.
+	 */
+	private OAuthClient getOAuthClient(String provider) {
+		OAuthClient client = oAuthClients.get(provider + "OAuthClient");
+		if (client == null) {
+			throw new GlobalException(AuthErrorCode.UN_SUPPORT_AUTHENTICATION);
+		}
+		return client;
+	}
+
 	@Transactional(readOnly = true)
-	public OAuthUserInfo fetchOAuthUserInfo(String authorizationCode) {
+	public OAuthUserInfo fetchOAuthUserInfo(String provider, String authorizationCode) {
+		OAuthClient oAuthClient = getOAuthClient(provider);
 		String accessToken = oAuthClient.fetchAccessToken(authorizationCode);
 		OAuthUserInfo userInfo = oAuthClient.fetchUserInfo(accessToken);
 
@@ -47,7 +61,8 @@ public class AuthService {
 	}
 
 	@Transactional(readOnly = true)
-	public OAuthUserInfo devFetchOAuthUserInfo(String authorizationCode) {
+	public OAuthUserInfo devFetchOAuthUserInfo(String provider, String authorizationCode) {
+		OAuthClient oAuthClient = getOAuthClient(provider);
 		String accessToken = oAuthClient.devFetchAccessToken(authorizationCode);
 		OAuthUserInfo userInfo = oAuthClient.fetchUserInfo(accessToken);
 

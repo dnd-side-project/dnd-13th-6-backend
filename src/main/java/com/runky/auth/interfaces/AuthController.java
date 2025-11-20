@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,14 +48,14 @@ public class AuthController implements AuthApiSpec {
         oauthResponseHandler.devHandle(action, response);
     }
 
-    @GetMapping("/login/oauth2/code/apple")
+    @RequestMapping(value = "/login/oauth2/code/apple", method = {RequestMethod.GET, RequestMethod.POST})
     public void appleCallback(@RequestParam("code") String code, HttpServletResponse response) {
 
         AuthResult.OAuthResponseAction action = authFacade.handleOAuthLogin("apple", code);
         oauthResponseHandler.handle(action, response);
     }
 
-    @GetMapping("/dev/login/oauth2/code/apple")
+    @RequestMapping(value = "/dev/login/oauth2/code/apple", method = {RequestMethod.GET, RequestMethod.POST})
     public void devAppleCallback(@RequestParam("code") String code, HttpServletResponse response) {
 
         AuthResult.OAuthResponseAction action = authFacade.devHandleOAuthLogin("apple", code);

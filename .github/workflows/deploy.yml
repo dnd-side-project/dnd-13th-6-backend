@@ -49,7 +49,7 @@ jobs:
           echo "APPLE_SERVICE_ID=${{ secrets.APPLE_SERVICE_ID }}" >> ./docker/.env
           echo "APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}" >> ./docker/.env
           echo "APPLE_KEY_ID=${{ secrets.APPLE_KEY_ID }}" >> ./docker/.env
-          echo "APPLE_PRIVATE_KEY=${{ secrets.APPLE_PRIVATE_KEY }}" >> ./docker/.env
+          echo "APPLE_PRIVATE_KEY=\"${{ secrets.APPLE_PRIVATE_KEY }}\"" >> ./docker/.env
           echo "APPLE_REDIRECT_URL=${{ secrets.APPLE_REDIRECT_URL }}" >> ./docker/.env
           echo "JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}" >> ./docker/.env
           echo "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" >> ./docker/.env

@@ -63,7 +63,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "https://*.runky.store", "http://*.runky.store",
-                "https://localhost:3000", "http://localhost:3000"
+                "https://localhost:3000", "http://localhost:3000",
+                "https://appleid.apple.com"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Collections.singletonList("*")); // 모든 헤더 허용

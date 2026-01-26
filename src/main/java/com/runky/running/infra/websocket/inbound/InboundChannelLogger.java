@@ -5,6 +5,7 @@ import static java.lang.String.*;
 
 import java.util.Optional;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.messaging.Message;
@@ -15,6 +16,7 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 
 import com.runky.global.security.auth.MemberPrincipal;
+import com.runky.running.infra.websocket.heartbeat.HeartbeatMonitor;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class InboundChannelLogger implements ChannelInterceptor {
+
+	private final HeartbeatMonitor heartbeatMonitor;
+
+	public InboundChannelLogger(@Lazy HeartbeatMonitor heartbeatMonitor) {
+		this.heartbeatMonitor = heartbeatMonitor;
+	}
 
 	private static final String LOG_FORMAT_HEARTBEAT = "[IN][HEARTBEAT] sessionId=%s";
 	private static final String LOG_FORMAT_CONNECT = "[IN] [CONNECT] sessionId=%s memberId=%s";
@@ -44,11 +52,15 @@ public class InboundChannelLogger implements ChannelInterceptor {
 
 		if (stomp.isHeartbeat()) {
 			log.debug(format(LOG_FORMAT_HEARTBEAT, sessionId));
+			heartbeatMonitor.recordHeartbeat(sessionId);
 			return message;
 		}
 
 		switch (command) {
-			case CONNECT -> log.info(format(LOG_FORMAT_CONNECT, sessionId, memberId));
+			case CONNECT -> {
+				log.info(format(LOG_FORMAT_CONNECT, sessionId, memberId));
+				heartbeatMonitor.recordHeartbeat(sessionId);
+			}
 
 			case SUBSCRIBE -> log.info(format(LOG_FORMAT_SUBSCRIBE, sessionId, destination, subscriptionId, memberId));
 
@@ -56,7 +68,10 @@ public class InboundChannelLogger implements ChannelInterceptor {
 
 			case UNSUBSCRIBE -> log.info(format(LOG_FORMAT_UNSUBSCRIBE, sessionId, subscriptionId, memberId));
 
-			case DISCONNECT -> log.info(format(LOG_FORMAT_DISCONNECT, sessionId, memberId));
+			case DISCONNECT -> {
+				log.info(format(LOG_FORMAT_DISCONNECT, sessionId, memberId));
+				heartbeatMonitor.removeSession(sessionId);
+			}
 
 			//	default -> log.debug(format(LOG_FORMAT_DEFAULT, command, sessionId, memberId));
 		}

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.runky.auth.domain.AuthService;
 import com.runky.global.security.auth.MemberPrincipal;
 import com.runky.running.infra.websocket.auth.StompAuthorizationHeaderTokenResolver;
+import com.runky.running.infra.websocket.session.WebSocketSessionManager;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,24 +31,43 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
 	private final AuthService authService;
 	private final StompAuthorizationHeaderTokenResolver tokenResolver;
+	private final WebSocketSessionManager sessionManager;
 
 	@Override
 	public Message<?> preSend(@NonNull Message<?> message, MessageChannel channel) {
 		StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+		StompCommand command = accessor.getCommand();
 
-		if (!StompCommand.CONNECT.equals(accessor.getCommand())) {
-			return message;
+		if (StompCommand.CONNECT.equals(command)) {
+			handleConnect(accessor);
+		} else if (StompCommand.DISCONNECT.equals(command)) {
+			handleDisconnect(accessor);
 		}
 
+		return message;
+	}
+
+	private void handleConnect(StompHeaderAccessor accessor) {
 		Authentication authentication = resolveAuthentication(accessor);
 
 		if (authentication != null) {
 			accessor.setUser(authentication);
-			storePrincipal(accessor, authentication);
+			MemberPrincipal principal = storePrincipal(accessor, authentication);
+
+			// 세션 등록 (재연결 시 이전 세션 자동 만료)
+			if (principal != null && accessor.getSessionId() != null) {
+				sessionManager.registerSession(principal.memberId(), accessor.getSessionId());
+			}
 		}
 
 		removeAuthorizationHeader(accessor);
-		return message;
+	}
+
+	private void handleDisconnect(StompHeaderAccessor accessor) {
+		String sessionId = accessor.getSessionId();
+		if (sessionId != null) {
+			sessionManager.unregisterSession(sessionId);
+		}
 	}
 
 	private Authentication resolveAuthentication(StompHeaderAccessor accessor) {
@@ -64,11 +84,12 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 		return attrs != null && attrs.get(AUTHENTICATION) instanceof Authentication;
 	}
 
-	private void storePrincipal(StompHeaderAccessor accessor, Authentication auth) {
+	private MemberPrincipal storePrincipal(StompHeaderAccessor accessor, Authentication auth) {
 		MemberPrincipal principal = authService.principalOf(auth);
 		if (accessor.getSessionAttributes() != null) {
 			accessor.getSessionAttributes().put(MEMBER_PRINCIPAL, principal);
 		}
+		return principal;
 	}
 
 	private void removeAuthorizationHeader(StompHeaderAccessor accessor) {
